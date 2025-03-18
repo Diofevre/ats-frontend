@@ -7,7 +7,7 @@ interface Props {
 
 const Layout = ({ children } : Props) => {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#2C9CC6] to-[#231818]'>
+    <div className='min-h-screen bg-gradient-to-br from-[#4BB3DA] to-[#548293]'>
       <Navbar />
       {children}
     </div>

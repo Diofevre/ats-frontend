@@ -37,7 +37,7 @@ const ApplicationForm = () => {
           Retour aux offres
         </button>
 
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8 px-1">
           {/* Job Header */}
           <div className="bg-white rounded-xl p-8 shadow-sm">
             <div className="flex items-center space-x-2 text-blue-600 text-sm font-medium mb-4">
@@ -188,12 +188,12 @@ const ApplicationForm = () => {
                   <div className="flex justify-end space-x-4">
                     <Button 
                       variant="outline" 
-                      className="px-6 rounded-[12px]"
+                      className="px-6 rounded-[12px] h-10"
                       onClick={() => router.back()}
                     >
                       Annuler
                     </Button>
-                    <Button className="px-6 bg-blue-600 hover:bg-blue-700 rounded-[12px]">
+                    <Button className="px-6 bg-blue-600 hover:bg-blue-700 rounded-[12px] h-10">
                       Soumettre ma candidature
                     </Button>
                   </div>
