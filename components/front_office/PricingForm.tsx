@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import { section } from "framer-motion/client";
 
 const formSchema = z.object({
   nom: z.string().min(2, { message: "Le nom est requis" }),
