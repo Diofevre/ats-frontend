@@ -2,7 +2,7 @@ export const navLinks = [
   { href: '#', label: 'Fonctionnalités' },
   { href: '#', label: 'Témoignages' },
   { href: '#', label: 'Tarifs' },
-  { href: '#', label: 'Offres d\'emploi' },
+  { href: '/offres-lists', label: 'Offres d\'emploi' },
 ];
 
 export const mockJobs = [
