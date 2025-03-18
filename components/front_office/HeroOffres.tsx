@@ -74,8 +74,8 @@ const Hero = () => {
             variants={fadeInUp}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/offres')}
-            className="bg-[#D24848] text-white px-8 py-2.5 rounded-[12px] text-sm hover:bg-[#D24848] transition-colors"
+            onClick={() => router.push('/offres-lists')}
+            className="rounded-[24px] px-8 h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
           >
             Voir nos offres d&apos;emploi
           </motion.button>
@@ -149,7 +149,9 @@ const Hero = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button className="bg-blue-600 text-white px-6 rounded-lg hover:bg-blue-700 transition-colors h-12 w-full">
+            <Button 
+              className="rounded-[12px] px-6 h-12 w-full bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-100 hover:shadow-2xl hover:shadow-cyan-500/30"
+            >
               Valider
             </Button>
           </motion.div>

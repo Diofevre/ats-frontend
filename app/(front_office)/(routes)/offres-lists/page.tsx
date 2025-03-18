@@ -134,7 +134,7 @@ const OffresLists = () => {
                           whileTap={{ scale: 0.95 }}
                         >
                           <Button 
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 rounded-[12px] w-full h-10"
+                            className="flex-1 bg-blue-600/90 hover:bg-blue-700 rounded-[12px] w-full h-10"
                             onClick={() => router.push(`/offres-lists/${job.id}/postuler`)}
                           >
                             Postuler
@@ -204,7 +204,7 @@ const OffresLists = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 rounded-[12px] h-12">
+                    <Button className="w-full bg-blue-600/90 hover:bg-blue-700 rounded-[12px] h-12">
                       Rechercher
                     </Button>
                   </motion.div>

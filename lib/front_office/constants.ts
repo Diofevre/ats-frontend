@@ -2,7 +2,7 @@ export const navLinks = [
   { href: '#', label: 'Fonctionnalités' },
   { href: '#', label: 'Témoignages' },
   { href: '#', label: 'Tarifs' },
-  { href: '/offres-lists', label: 'Offres d\'emploi' },
+  { href: '/offres', label: 'Offres d\'emploi' },
 ];
 
 export const mockJobs = [
@@ -40,3 +40,41 @@ export const mockJobs = [
     startDate: '15 mai 2025',
   },
 ]
+
+export const testimonials = [
+  {
+    quote:
+      "ATS a révolutionné notre processus de recrutement. Nous avons réduit notre temps d'embauche de 45% et amélioré considérablement la qualité de nos recrutements.",
+    name: "ANDRIABILALA Herizo Niaina",
+    position: "DRH, Techno Québec",
+    avatar: "/assets/images/profile.png",
+  },
+  {
+    quote:
+      "Une plateforme intuitive qui a simplifié la gestion de nos candidatures et boosté notre collaboration interne.",
+    name: "Sophie Martin",
+    position: "Responsable RH, Innovatech",
+    avatar: "/assets/images/profile.png",
+  },
+  {
+    quote:
+      "Grâce à ATS, nous attirons des talents exceptionnels et prenons des décisions plus éclairées.",
+    name: "Lucas Dupont",
+    position: "Directeur des talents, FutureCorp",
+    avatar: "/assets/images/profile.png",
+  },
+  {
+    quote:
+      "Une plateforme intuitive qui a simplifié la gestion de nos candidatures et boosté notre collaboration interne.",
+    name: "Sophie Martin",
+    position: "Responsable RH, Innovatech",
+    avatar: "/assets/images/profile.png",
+  },
+  {
+    quote:
+      "Grâce à ATS, nous attirons des talents exceptionnels et prenons des décisions plus éclairées.",
+    name: "Lucas Dupont",
+    position: "Directeur des talents, FutureCorp",
+    avatar: "/assets/images/profile.png",
+  },
+];

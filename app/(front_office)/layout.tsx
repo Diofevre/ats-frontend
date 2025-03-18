@@ -1,3 +1,4 @@
+import Footer from '@/components/front_office/Footer'
 import Navbar from '@/components/front_office/Navbar'
 import React from 'react'
 
@@ -10,6 +11,7 @@ const Layout = ({ children } : Props) => {
     <div className='min-h-screen bg-gradient-to-br from-[#4BB3DA] to-[#548293]'>
       <Navbar />
       {children}
+      <Footer />
     </div>
   )
 }

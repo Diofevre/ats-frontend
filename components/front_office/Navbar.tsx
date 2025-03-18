@@ -5,18 +5,22 @@ import { Menu, X } from 'lucide-react';
 import { navLinks } from '@/lib/front_office/constants';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '../ui/button';
 
 const demoButton = (
-  <button className="bg-blue-600 text-white px-4 py-2.5 rounded-[12px] hover:bg-blue-700">
-    Demande une démo
-  </button>
+  <Button
+    size="lg"
+    className="rounded-[24px] h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+  >
+    Demander une démo
+  </Button>
 );
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+    <nav className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
       <div className="flex justify-between h-16">
         <div className="flex items-center">
           <Link href='/' className="relative">
