@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
 import { navLinks } from '@/lib/front_office/constants';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const demoButton = (
   <button className="bg-blue-600 text-white px-4 py-2.5 rounded-[12px] hover:bg-blue-700">
@@ -15,18 +16,23 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav>
+    <nav className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
       <div className="flex justify-between h-16">
         <div className="flex items-center">
-          <div className="relative">
-            <Link href="/" className="text-4xl font-bold text-blue-600">ATS</Link>
-          </div>
+          <Link href='/' className="relative">
+            <Image 
+              src='/ats.png'
+              alt='ats'
+              height='50'
+              width='50'
+            />
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6 text-sm">
           {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="text-gray-600 hover:text-blue-600">
+            <a key={link.label} href={link.href} className="text-white">
               {link.label}
             </a>
           ))}
@@ -37,7 +43,7 @@ const Navbar = () => {
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-600 hover:text-blue-600"
+            className="text-white"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -49,7 +55,7 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className="block px-3 py-2 text-gray-600 hover:text-blue-600">
+              <a key={link.label} href={link.href} className="block px-3 py-2 text-white">
                 {link.label}
               </a>
             ))}

@@ -21,14 +21,14 @@ const Offres = () => {
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
               Offres d&apos;emploi en vedette
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg">
               Trouvez l&apos;opportunité de carrière idéale parmi 10 000 offres d&apos;emploi.
             </p>
           </div>
 
           <div className="space-y-6">
             {mockJobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-600">
+              <Card key={job.id} className="hover:shadow-xl transition-all duration-300 rounded-[12px]">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div className="space-y-4">
@@ -87,7 +87,7 @@ const Offres = () => {
         {/* Search Sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-4">
-            <Card className="shadow-md">
+            <Card className="shadow-md rounded-[12px]">
               <CardContent className="p-6 space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">

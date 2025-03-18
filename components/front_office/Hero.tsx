@@ -18,10 +18,10 @@ const Hero = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
             Rejoignez notre équipe et <span className='text-[#4AC9B5]'>développez</span> votre potentiel
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-white">
             Trouvez l&apos;opportunité qui vous correspond et construisez votre avenir professionnel avec nous.
           </p>
-          <button onClick={() => router.push('/offres')} className="bg-blue-600 text-white px-8 py-2.5 rounded-[12px] text-lg hover:bg-blue-700 transition-colors">
+          <button onClick={() => router.push('/offres')} className="bg-[#D24848] text-white px-8 py-2.5 rounded-[12px] text-sm hover:bg-[#D24848] transition-colors">
             Voir nos offres d&apos;emploi
           </button>
         </div>
@@ -35,21 +35,21 @@ const Hero = () => {
       </div>
       
       {/* Filtres */}
-      <div className="mt-12 bg-white p-6 rounded-lg border">
+      <div className="mt-24 bg-white p-8 rounded-[12px] border">
         <div className="grid md:grid-cols-4 gap-4">
           <div className="relative flex items-center">
             <Search className="absolute inset-y-0 left-3 my-auto text-gray-400" size={20} />
             <Input
               type="text"
               placeholder="Titre du poste"
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 h-12 pr-4 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div className="relative flex items-center">
             <MapPin className="absolute inset-y-0 left-3 my-auto text-gray-400" size={20} />
             <Select>
-              <SelectTrigger className="w-full pl-10 pr-4 border rounded-lg">
+              <SelectTrigger className="w-full pl-10 pr-4 border rounded-lg h-12">
                 <SelectValue placeholder="Toutes les emplacements" />
               </SelectTrigger>
               <SelectContent>
@@ -63,7 +63,7 @@ const Hero = () => {
           <div className="relative">
             <Briefcase className="absolute inset-y-0 left-3 my-auto text-gray-400" size={20} />
             <Select>
-              <SelectTrigger className="w-full pl-10 pr-4 border rounded-lg">
+              <SelectTrigger className="w-full pl-10 pr-4 border rounded-lg h-12">
                 <SelectValue placeholder="Type d'emplois" />
               </SelectTrigger>
               <SelectContent>
@@ -74,7 +74,7 @@ const Hero = () => {
             </Select>
           </div>
 
-          <Button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <Button className="bg-blue-600 text-white px-6 rounded-lg hover:bg-blue-700 transition-colors h-12">
             Valider
           </Button>
         </div>

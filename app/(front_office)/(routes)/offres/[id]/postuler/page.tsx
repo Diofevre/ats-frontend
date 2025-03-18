@@ -27,11 +27,11 @@ const ApplicationForm = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 rounded-[12px]">
-      <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen rounded-[12px] mt-6">
+      <div className="max-w-4xl mx-auto py-8">
         <button 
           onClick={() => router.back()} 
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+          className="flex items-center mb-8 transition-colors"
         >
           <ArrowLeft className="h-5 w-5 mr-2" />
           Retour aux offres
