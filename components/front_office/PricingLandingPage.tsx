@@ -9,8 +9,8 @@ const PricingLandingPage = () => {
 
   return (
     <section
-      id="pricing"
-      className="py-24 relative text-white overflow-hidden"
+      id="tarif"
+      className="py-16 relative text-white overflow-hidden"
       ref={ref}
     >
       <div 

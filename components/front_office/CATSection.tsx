@@ -9,7 +9,7 @@ const CTASection = () => {
   const { ref, isInView } = useSectionInView({ threshold: 0.1 });
 
   return (
-    <section id="cta" ref={ref} className="relative">
+    <section ref={ref} className="relative">
       <div className="absolute inset-0">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-200 rounded-full opacity-30 blur-3xl" />
         <div className="absolute top-1/3 left-10 w-48 h-48 bg-cyan-100 rounded-full opacity-20 blur-2xl" />

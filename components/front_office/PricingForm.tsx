@@ -56,7 +56,7 @@ export function PricingForm() {
   }
 
   return (
-    <section id="tarif">
+    <section>
       {" "}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
