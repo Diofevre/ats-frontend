@@ -10,6 +10,7 @@ import {
   ForgotPasswordPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
+  OtpResendConfirmationPayload,
 } from '@/lib/types/authentications/user.types';
 import axios from 'axios';
 
@@ -43,16 +44,24 @@ export const register = async (payload: RegisterPayload): Promise<{ email: strin
   return handleRequest(api.post('/api/users/register', formData));
 };
 
+// Confirm Registration OTP
 export const confirmRegistration = async (payload: OtpConfirmPayload): Promise<OtpConfirmResponse> => {
   return handleRequest(api.post('/api/users/confirm', payload));
 };
 
+// Confirm Resend OTP
+export const otpResendOtp = async (payload: OtpResendConfirmationPayload): Promise<{ email: string; message: string }> => {
+  return handleRequest(api.post('/api/users/resend-otp', payload));
+};
+
+// Login
 export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
   const response = await handleRequest<LoginResponse>(api.post('/api/users/login', payload));
   localStorage.setItem('token', response.token);
   return response;
 };
 
+// Logout
 export const logout = async (): Promise<{ message: string }> => {
   const response: { message: string } = await handleRequest(api.post('/api/users/logout'));
   localStorage.removeItem('token');
@@ -64,6 +73,7 @@ export const forgotPassword = async (payload: ForgotPasswordPayload): Promise<{ 
   return handleRequest(api.post('/api/users/forgot-password', payload));
 };
 
+// Reset Password
 export const resetPassword = async (payload: ResetPasswordPayload): Promise<{ message: string }> => {
   return handleRequest(api.post('/api/users/reset-password', payload));
 };
@@ -73,6 +83,7 @@ export const getCurrentUser = async (): Promise<User> => {
   return handleRequest(api.get('/api/users/me'));
 };
 
+// Update Profile
 export const updateProfile = async (payload: UpdateProfilePayload): Promise<User> => {
   const formData = createFormData(payload);
   return handleRequest(api.put('/api/users/me', formData));
@@ -88,6 +99,7 @@ export const isAuthenticated = (): boolean => {
   return !!localStorage.getItem('token');
 };
 
+// Get Token
 export const getToken = (): string | null => {
   return localStorage.getItem('token');
 };

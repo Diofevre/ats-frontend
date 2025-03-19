@@ -30,7 +30,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4">
       <div className="w-full">
         <FormRegister
           onSubmit={handleSubmit}

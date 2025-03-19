@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { toast } from 'sonner';
-import { confirmRegistration } from '@/lib/services/authentications/user';
+import { confirmRegistration, otpResendOtp } from '@/lib/services/authentications/user';
 
 const formSchema = z.object({
   otp: z.string().min(6, "OTP must be at least 6 characters"),
@@ -27,6 +27,7 @@ const FormVerifyPage = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,6 +51,23 @@ const FormVerifyPage = () => {
       toast.error(error instanceof Error ? error.message : 'Failed to verify OTP');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!email) {
+      toast.error('Email is required for resending OTP');
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await otpResendOtp({ email });
+      toast.success('New verification code sent successfully!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to resend verification code');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -113,13 +131,17 @@ const FormVerifyPage = () => {
               Didn&apos;t receive the code?{' '}
               <button
                 type="button"
-                className="text-emerald-600 hover:text-emerald-700 font-medium"
-                onClick={() => {
-                  // Handle resend logic here
-                  toast.info('Resend functionality not implemented yet');
-                }}
+                className="text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleResendOtp}
+                disabled={isResending}
               >
-                Resend
+                {isResending ? (
+                  <>
+                    Resending...
+                  </>
+                ) : (
+                  'Resend'
+                )}
               </button>
             </p>
           </div>

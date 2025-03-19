@@ -34,6 +34,10 @@ export interface OtpConfirmPayload {
   otp: string;
 }
 
+export interface OtpResendConfirmationPayload {
+  email: string;
+}
+
 export interface OtpConfirmResponse {
   email: string;
   token: string;
@@ -44,8 +48,7 @@ export interface ForgotPasswordPayload {
 }
 
 export interface ResetPasswordPayload {
-  email: string;
-  otp: string;
+  encryptedToken: string;
   newPassword: string;
 }
 
