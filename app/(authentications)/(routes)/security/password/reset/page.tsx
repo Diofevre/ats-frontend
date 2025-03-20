@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -27,6 +27,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function ResetPassword() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -43,15 +44,14 @@ export default function ResetPassword() {
 
   useEffect(() => {
     try {
-      // Get encrypted token from URL (contains encrypted email and OTP)
-      const pathSegments = window.location.pathname.split('/');
-      const tokenFromUrl = pathSegments[pathSegments.length - 1];
+      // Get verification token from query parameters
+      const verificationToken = searchParams.get('verification');
       
-      if (!tokenFromUrl || tokenFromUrl.length === 0) {
+      if (!verificationToken) {
         throw new Error('Token de réinitialisation manquant');
       }
       
-      setEncryptedToken(tokenFromUrl);
+      setEncryptedToken(verificationToken);
     } catch (error) {
       console.error('Error getting reset token:', error);
       form.setError('root', {
@@ -59,7 +59,7 @@ export default function ResetPassword() {
         message: 'Token de réinitialisation invalide ou manquant',
       });
     }
-  }, [form]);
+  }, [searchParams, form]);
 
   const onSubmit = async (data: FormData) => {
     if (!encryptedToken) {
@@ -73,7 +73,6 @@ export default function ResetPassword() {
     try {
       setIsLoading(true);
       
-      // Send encrypted token (containing email and OTP) along with new password
       await resetPassword({
         encryptedToken,
         newPassword: data.newPassword,
