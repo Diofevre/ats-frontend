@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { mockJobs } from '@/lib/front_office/constants'
+import { mockJobs } from '@/lib/constants/front_office/constants'
 
 const ApplicationForm = () => {
   const params = useParams()

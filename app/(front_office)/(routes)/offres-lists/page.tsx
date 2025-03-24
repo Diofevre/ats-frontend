@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from 'next/navigation'
-import { mockJobs } from '@/lib/front_office/constants'
+import { mockJobs } from '@/lib/constants/front_office/constants'
 
 const OffresLists = () => {
   const router = useRouter()
