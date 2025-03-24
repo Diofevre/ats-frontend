@@ -8,7 +8,7 @@ import { Button } from '../ui/button';
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden text-white mt-20">
+    <section className="relative overflow-hidden text-white mt-16">
       <div className="container relative z-10 py-16 md:py-28 h-full mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
           <motion.div
