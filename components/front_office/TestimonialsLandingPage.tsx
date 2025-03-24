@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useSectionInView } from "@/lib/use-section-in-view";
-import { testimonials } from "@/lib/front_office/constants";
+import { testimonials } from "@/lib/constants/front_office/constants";
 import TestimonialCard from "./TestimonialsCard";
 
 const TestimonialsSection = () => {
