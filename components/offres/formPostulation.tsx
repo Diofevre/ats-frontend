@@ -170,7 +170,7 @@ const ApplicationFormulaire: React.FC<ApplicationFormulaireProps> = ({
               <SelectContent>
                 <SelectItem value="linkedin">LinkedIn</SelectItem>
                 <SelectItem value="website">
-                  Site web de l'entreprise
+                  Site web de l&apos;entreprise
                 </SelectItem>
                 <SelectItem value="referral">Recommandation</SelectItem>
                 <SelectItem value="other">Autre</SelectItem>
@@ -363,7 +363,7 @@ const ApplicationFormulaire: React.FC<ApplicationFormulaireProps> = ({
               {hasReferent === "yes" && (
                 <div>
                   <Label htmlFor="referents" className="text-gray-700">
-                    Référents (format JSON, ex: ["Nom1", "Nom2"])
+                    Référents (format JSON, ex: [&quot;Nom1&quot;, &quot;Nom2&quot;])
                   </Label>
                   <Textarea
                     id="referents"
@@ -391,7 +391,7 @@ const ApplicationFormulaire: React.FC<ApplicationFormulaireProps> = ({
                 }
               />
               <Label htmlFor="privacy" className="text-sm text-gray-500">
-                En soumettant ce formulaire, j'accepte que mes informations
+                En soumettant ce formulaire, j&apos;accepte que mes informations
                 soient traitées conformément à la politique de confidentialité.
               </Label>
             </div>

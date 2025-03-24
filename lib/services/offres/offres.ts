@@ -2,7 +2,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { OffreType } from "@/lib/types/offres/offres.type";
 
-const API_URL = process.env.NEXT_PUBLIC_BACK_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 

@@ -67,11 +67,11 @@ const OffresLists = () => {
         <div className="lg:col-span-2 space-y-8">
           <motion.div variants={itemVariants}>
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              Offres d'emploi en vedette
+              Offres d&apos;emploi en vedette
             </h1>
             <p className="text-lg">
-              Trouvez l'opportunité de carrière idéale parmi 10 000 offres
-              d'emploi.
+              Trouvez l&apos;opportunité de carrière idéale parmi 10 000 offres
+              d&apos;emploi.
             </p>
           </motion.div>
 

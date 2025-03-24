@@ -20,7 +20,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job, isLoading }) =>
     <div className="bg-white rounded-xl p-8 shadow-sm">
       <div className="flex items-center space-x-2 text-blue-600 text-sm font-medium mb-4">
         <Briefcase className="h-4 w-4" />
-        <span>Offre d'emploi</span>
+        <span>Offre d&apos;emploi</span>
       </div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{job?.titre}</h1>
       <div className="grid md:grid-cols-3 gap-6">
