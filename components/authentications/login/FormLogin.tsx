@@ -59,10 +59,6 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onSocialLogin, onForgot
       </div>
 
       <div className="p-8">
-        <h2 className="text-2xl font-light text-center text-blue-900 mb-8">
-          Welcome back
-        </h2>
-
         <div className="space-y-3 mb-8">
           <button
             onClick={() => onSocialLogin('google')}

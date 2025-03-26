@@ -77,8 +77,11 @@ const FormVerifyPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen w-full bg-gradient-to-br from-white to-cyan-50 relative flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e533_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e533_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_-20%,#000_70%,transparent_110%)]" />
+      
+      <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-light text-blue-900">Verify your email</h2>
           <p className="text-gray-600 mt-2">
@@ -87,7 +90,7 @@ const FormVerifyPage = () => {
           </p>
         </div>
 
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
+        <div className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               <FormField
