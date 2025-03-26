@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Search,
   MapPin,
@@ -8,19 +8,54 @@ import {
   Calendar,
   Clock,
   Users,
+  Frown,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAllOffres } from "@/lib/services/offres/offres";
+import { OffreFilters, useAllOffres } from "@/lib/services/offres/offres";
 import { OffreType } from "@/lib/types/offres/offres.type";
 import JobListSkeleton from "@/components/offres/jobCardSkeleton";
 import Link from "next/link";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const searchSchema = z.object({
+  titre: z.string().nullable().default(null),
+  lieu: z.string().nullable().default(null),
+});
+
+type SearchFormData = z.infer<typeof searchSchema>;
+
+const NoJobsFound: React.FC = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.5 }}
+    className="text-center py-12">
+    <Frown className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      Aucune offre trouvée
+    </h3>
+    <p className="text-gray-600">
+      Essayez d&apos;ajuster vos critères de recherche pour trouver des
+      opportunités.
+    </p>
+  </motion.div>
+);
 
 const OffresLists = () => {
-  const { mockJobs, isLoading } = useAllOffres();
+  const [filters, setFilters] = useState<OffreFilters>({
+    titre: undefined,
+    lieu: undefined,
+  });
+
+  const { mockJobs, isLoading } = useAllOffres(filters);
+
+  console.log("mockJobs:", mockJobs);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -56,6 +91,24 @@ const OffresLists = () => {
     },
   };
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SearchFormData>({
+    resolver: zodResolver(searchSchema),
+    defaultValues: {
+      titre: null,
+      lieu: null,
+    },
+  });
+
+  const onSubmit = (data: SearchFormData) => {
+    const titre: string | undefined = data.titre ?? undefined;
+    const lieu: string | undefined = data.lieu ?? undefined;
+    setFilters({ titre, lieu });
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -63,7 +116,6 @@ const OffresLists = () => {
       variants={containerVariants}
       className="py-12">
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           <motion.div variants={itemVariants}>
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -75,9 +127,10 @@ const OffresLists = () => {
             </p>
           </motion.div>
 
-          {/* Gestion du chargement avec isLoading */}
           {isLoading ? (
             <JobListSkeleton />
+          ) : Array.isArray(mockJobs) && mockJobs.length === 0 ? (
+            <NoJobsFound />
           ) : (
             <motion.div variants={containerVariants} className="space-y-6">
               {mockJobs?.map((job: OffreType) => (
@@ -147,7 +200,7 @@ const OffresLists = () => {
                           <motion.div
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}>
-                            <Link href={"/offres-lists/1/postuler"}>
+                            <Link href={`/offres-lists/${job.id}/postuler`}>
                               <Button className="flex-1 bg-blue-600/90 hover:bg-blue-700 rounded-[12px] w-full h-10">
                                 Postuler
                               </Button>
@@ -191,37 +244,69 @@ const OffresLists = () => {
                     Affinez votre recherche pour trouver le poste idéal
                   </p>
                 </div>
-                <div className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <motion.div whileHover={{ scale: 1.02 }} className="relative">
                     <Search
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                       size={20}
                     />
-                    <Input
-                      type="text"
-                      placeholder="Titre du poste, entreprise..."
-                      className="pl-10 h-12"
+                    <Controller
+                      name="titre"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type="text"
+                          placeholder="Titre du poste, entreprise..."
+                          className="pl-10 h-12"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value || null)
+                          }
+                        />
+                      )}
                     />
+                    {errors.titre && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.titre.message}
+                      </p>
+                    )}
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.02 }} className="relative">
                     <MapPin
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                       size={20}
                     />
-                    <Input
-                      type="text"
-                      placeholder="Ville ou région"
-                      className="pl-10 h-12"
+                    <Controller
+                      name="lieu"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type="text"
+                          placeholder="Ville ou région"
+                          className="pl-10 h-12"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value || null)
+                          }
+                        />
+                      )}
                     />
+                    {errors.lieu && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.lieu.message}
+                      </p>
+                    )}
                   </motion.div>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}>
-                    <Button className="w-full bg-blue-600/90 hover:bg-blue-700 rounded-[12px] h-12">
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600/90 hover:bg-blue-700 rounded-[12px] h-12">
                       Rechercher
                     </Button>
                   </motion.div>
-                </div>
+                </form>
               </CardContent>
             </Card>
           </div>
