@@ -1,142 +1,153 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
+import { ADMIN_ROUTES, ADMIN_SERVERS } from '@/lib/constants/back_office/constants';
 import { cn } from '@/lib/utils';
-import { ADMIN_ROUTES } from '@/lib/constants/back_office/constants';
+import { useRouter } from 'next/navigation';
+import UserInfo from './UserInfo';
 
 interface AdminSidebarProps {
   isOpen: boolean;
 }
 
 export default function AdminSidebar({ isOpen }: AdminSidebarProps) {
-  const pathname = usePathname();
-  const [showDashboardSubmenu, setShowDashboardSubmenu] = useState(true);
+  const router = useRouter();
+  const [activeServer, setActiveServer] = useState('ats');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['dashboard']);
 
-  const isActive = (path: string) => pathname === path;
-
-  const NavLink = ({ path, label, icon: Icon }: { path: string; label: string; icon: React.ElementType }) => (
-    <Link
-      href={path}
-      className={cn(
-        "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group relative overflow-hidden",
-        isActive(path) 
-          ? "bg-white text-[#2C9CC6] shadow-lg" 
-          : "text-white hover:bg-white/20"
-      )}
-    >
-      <Icon className={cn(
-        "w-5 h-5 mr-3 transition-transform duration-300 group-hover:scale-110",
-        isActive(path) ? "text-[#2C9CC6]" : "text-white"
-      )} />
-      <span className="relative z-10">{label}</span>
-      {!isActive(path) && (
-        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-      )}
-    </Link>
-  );
-
-  const SubNavLink = ({ path, label, icon: Icon }: { path: string; label: string; icon: React.ElementType }) => (
-    <Link
-      href={path}
-      className={cn(
-        "flex items-center px-4 py-2.5 text-sm rounded-xl transition-all duration-300 group relative overflow-hidden",
-        isActive(path) 
-          ? "bg-white text-[#2C9CC6] shadow-lg" 
-          : "text-white/90 hover:bg-white/20"
-      )}
-    >
-      <Icon className={cn(
-        "w-4 h-4 mr-3 transition-transform duration-300 group-hover:scale-110",
-        isActive(path) ? "text-[#2C9CC6]" : "text-white/90"
-      )} />
-      <span className="relative z-10">{label}</span>
-      {!isActive(path) && (
-        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-      )}
-    </Link>
-  );
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-16 h-[calc(100vh-4rem)] w-[280px] bg-[#2C9CC6] transition-all duration-300 ease-in-out transform z-20 shadow-xl",
-        isOpen ? "translate-x-0" : "-translate-x-full",
-        "md:translate-x-0"
-      )}
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex-1 py-6 px-4 space-y-2">
-          {/* Logo */}
-          <div className="px-3 py-4 mb-8">
-            <Link href="/admin" className="block transition-transform duration-300 hover:scale-105">
-              <Image
-                src="/ats.png"
-                alt="Logo"
-                width={140}
-                height={40}
-                className="object-contain"
-                priority
-              />
-            </Link>
-          </div>
-
-          {/* Dashboard Section with Submenu */}
-          <div className="mb-4">
-            <button
-              onClick={() => setShowDashboardSubmenu(!showDashboardSubmenu)}
-              className={cn(
-                "flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group relative overflow-hidden",
-                isActive(ADMIN_ROUTES.dashboard.path) 
-                  ? "bg-white text-[#2C9CC6] shadow-lg" 
-                  : "text-white hover:bg-white/20"
+    <div className="flex min-h-screen">
+      {/* Servers sidebar */}
+      <div className="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-2">
+        {/* Servers */}
+        <div className="mb-2">
+          {ADMIN_SERVERS.map((server, index) => (
+            <React.Fragment key={server.id}>
+              <button
+                onClick={() => setActiveServer(server.id)}
+                className={cn(
+                  "w-12 h-12 rounded-[24px] flex items-center justify-center transition-all duration-200 group relative mb-2",
+                  activeServer === server.id 
+                    ? "bg-[#5865F2] rounded-[16px]" 
+                    : "bg-[#313338] hover:bg-[#5865F2] hover:rounded-[16px]"
+                )}
+              >
+                <span className="text-white font-semibold text-sm">
+                  {server.initial}
+                </span>
+                
+                {/* Server Indicator */}
+                <div className={cn(
+                  "absolute left-0 w-1 bg-white rounded-r-full transition-all duration-200",
+                  activeServer === server.id ? "h-8" : "h-2 group-hover:h-8",
+                  activeServer === server.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                )} style={{ transform: 'translateX(-50%)' }} />
+              </button>
+              
+              {index === 0 && (
+                <>
+                  <button title='Ajout' className="w-12 h-12 rounded-[24px] bg-[#313338] flex items-center justify-center hover:bg-[#3BA55C] hover:rounded-[16px] transition-all duration-200 group mb-2">
+                    <Plus className="w-6 h-6 text-[#3BA55C] group-hover:text-white transition-colors" />
+                  </button>
+                </>
               )}
-            >
-              <ADMIN_ROUTES.dashboard.icon className={cn(
-                "w-5 h-5 mr-3 transition-transform duration-300 group-hover:scale-110",
-                isActive(ADMIN_ROUTES.dashboard.path) ? "text-[#2C9CC6]" : "text-white"
-              )} />
-              <span className="relative z-10">{ADMIN_ROUTES.dashboard.label}</span>
-              <ChevronDown className={cn(
-                "w-4 h-4 ml-auto transition-transform duration-300",
-                showDashboardSubmenu && "transform rotate-180",
-                isActive(ADMIN_ROUTES.dashboard.path) ? "text-[#2C9CC6]" : "text-white"
-              )} />
-              {!isActive(ADMIN_ROUTES.dashboard.path) && (
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              )}
-            </button>
-
-            <div className={cn(
-              "overflow-hidden transition-all duration-300 ease-in-out",
-              showDashboardSubmenu ? "max-h-48 mt-2" : "max-h-0"
-            )}>
-              <div className="ml-4 space-y-1">
-                {ADMIN_ROUTES.dashboard.subMenu.map((item) => (
-                  <SubNavLink key={item.path} {...item} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Main Navigation Items */}
-          <div className="space-y-1.5">
-            {Object.entries(ADMIN_ROUTES)
-              .filter(([key]) => key !== 'dashboard' && key !== 'settings')
-              .map(([, route]) => (
-                <NavLink key={route.path} {...route} />
-              ))}
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div className="p-4 bg-[#2C9CC6]/80 backdrop-blur-sm">
-          <NavLink {...ADMIN_ROUTES.settings} />
+            </React.Fragment>
+          ))}
         </div>
       </div>
-    </aside>
+
+      {/* Channels sidebar */}
+      <div className={cn(
+        "w-60 bg-[#2B2D31] transform transition-transform duration-300",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Server name header */}
+        <div className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22] shadow-sm">
+          <h2 className="font-semibold text-white uppercase">ATS System</h2>
+        </div>
+
+        {/* Navigation Categories */}
+        <div className="p-2 text-[#949BA4]">
+          {/* Dashboard with submenu */}
+          <div className="mb-4">
+            <button
+              onClick={() => toggleCategory('dashboard')}
+              className="flex items-center px-1 mb-1 w-full hover:text-white group"
+            >
+              <ChevronDown className={cn(
+                "w-3 h-3 mr-1 transition-transform",
+                expandedCategories.includes('dashboard') ? "transform rotate-0" : "transform -rotate-90"
+              )} />
+              <span className="text-xs font-semibold tracking-wide">
+                TABLEAU DE BORD
+              </span>
+            </button>
+
+            {expandedCategories.includes('dashboard') && (
+              <div className="space-y-0.5">
+                <button className="flex items-center w-full px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35363C] hover:text-white group">
+                  <ADMIN_ROUTES.dashboard.icon className="w-5 h-5 mr-1.5 text-[#949BA4] group-hover:text-white" />
+                  <span className="text-sm">{ADMIN_ROUTES.dashboard.label}</span>
+                </button>
+                {ADMIN_ROUTES.dashboard.subMenu.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => router.push(item.path)}
+                    className="flex items-center w-full px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35363C] hover:text-white group"
+                  >
+                    <item.icon className="w-5 h-5 mr-1.5 text-[#949BA4] group-hover:text-white" />
+                    <span className="text-sm">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Other Categories */}
+          <div className="mb-4">
+            <button
+              onClick={() => toggleCategory('main')}
+              className="flex items-center px-1 mb-1 w-full hover:text-white group"
+            >
+              <ChevronDown className={cn(
+                "w-3 h-3 mr-1 transition-transform",
+                expandedCategories.includes('main') ? "transform rotate-0" : "transform -rotate-90"
+              )} />
+              <span className="text-xs font-semibold tracking-wide">
+                GESTION
+              </span>
+            </button>
+
+            {expandedCategories.includes('main') && (
+              <div className="space-y-0.5">
+                {Object.entries(ADMIN_ROUTES)
+                  .filter(([key]) => key !== 'dashboard' && key !== 'settings')
+                  .map(([, route]) => (
+                    <button
+                      key={route.path}
+                      onClick={() => router.push(route.path)}
+                      className="flex items-center w-full px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35363C] hover:text-white group"
+                    >
+                      <route.icon className="w-5 h-5 mr-1.5 text-[#949BA4] group-hover:text-white" />
+                      <span className="text-sm">{route.label}</span>
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <UserInfo />
+      </div>
+    </div>
   );
 }
