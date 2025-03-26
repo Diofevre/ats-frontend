@@ -94,11 +94,14 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-white to-cyan-50 relative flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e533_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e533_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_-20%,#000_70%,transparent_110%)]" />
+      
+      <div className="relative z-10 w-full max-w-md">
         <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mb-6">
-            <KeyRound className="h-8 w-8 text-indigo-600" />
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-cyan-100 mb-6">
+            <KeyRound className="h-8 w-8 text-cyan-600" />
           </div>
           <h2 className="text-3xl font-extrabold text-gray-900">
             Réinitialisation du mot de passe
@@ -136,7 +139,7 @@ export default function ResetPassword() {
                     {...form.register('newPassword')}
                     type={showPassword ? 'text' : 'password'}
                     id="newPassword"
-                    className={`appearance-none rounded-lg relative block w-full px-3 py-2 border ${
+                    className={`appearance-none rounded-lg relative block w-full px-3 py-3 border ${
                       form.formState.errors.newPassword
                         ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                         : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
@@ -172,7 +175,7 @@ export default function ResetPassword() {
                     {...form.register('confirmPassword')}
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="confirmPassword"
-                    className={`appearance-none rounded-lg relative block w-full px-3 py-2 border ${
+                    className={`appearance-none rounded-lg relative block w-full px-3 py-3 border ${
                       form.formState.errors.confirmPassword
                         ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                         : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
@@ -210,7 +213,7 @@ export default function ResetPassword() {
             <div className="flex items-center justify-between">
               <Link
                 href="/login"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                className="text-sm font-medium text-green-600 hover:text-green-500"
               >
                 Retour à la connexion
               </Link>
@@ -220,7 +223,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-[12px] uppercase text-sm w-full h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

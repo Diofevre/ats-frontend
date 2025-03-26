@@ -30,8 +30,11 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center p-4">
-      <div className="w-full">
+    <div className="min-h-screen w-full bg-gradient-to-br from-white to-cyan-50 relative flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e533_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e533_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_-20%,#000_70%,transparent_110%)]" />
+      
+      <div className="relative z-10 w-full max-w-md">
         <FormRegister
           onSubmit={handleSubmit}
           onSocialLogin={handleSocialLogin}
