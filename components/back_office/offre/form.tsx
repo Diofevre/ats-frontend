@@ -3,7 +3,8 @@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { CreateOffreDto, Devise, Offre, Status } from '@/lib/types/offres/offres.type';
-import React from 'react';
+import { Edit, ImageIcon, Plus, Upload } from 'lucide-react';
+import React, { useRef } from 'react';
 
 interface OffreFormProps {
   initialData?: Offre;
@@ -12,11 +13,14 @@ interface OffreFormProps {
 }
 
 export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [imageError, setImageError] = React.useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = React.useState<CreateOffreDto>({
     titre: initialData?.titre || '',
     description: initialData?.description || '',
     date_limite: initialData?.date_limite?.split('T')[0] || '',
-    status: initialData?.status || 'OUVERT',
+    status: initialData?.status || 'CREE',
     nombre_requis: initialData?.nombre_requis || 1,
     lieu: initialData?.lieu || '',
     pays: initialData?.pays || '',
@@ -25,20 +29,50 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
     devise: initialData?.devise || 'EURO',
     horaire_ouverture: initialData?.horaire_ouverture || '09:00:00',
     horaire_fermeture: initialData?.horaire_fermeture || '17:00:00',
+    image_url: initialData?.image_url || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    setIsLoading(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'image_url') {
+      setImageError(false);
+    }
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setFormData(prev => ({ ...prev, image_url: result }));
+        setImageError(false);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const devises: Devise[] = ['EURO', 'DOLLAR', 'DOLLAR_CANADIEN', 'LIVRE', 'YEN', 'ROUPIE', 'ARIARY'];
-  const statuses: Status[] = ['OUVERT', 'FERME'];
+  const statuses: Status[] = ['OUVERT', 'FERME', 'CREE'];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-4">
@@ -53,6 +87,66 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
             required
             className="mt-1 h-12 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Image URL</label>
+          <Input
+            type="url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+            className="mt-1 h-12 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+          <input
+            placeholder='file'
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+          <div 
+            className="mt-2 cursor-pointer"
+            onClick={handleImageClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleImageClick()}
+          >
+            {formData.image_url ? (
+              imageError ? (
+                <div className="flex items-center justify-center h-48 bg-gray-100 rounded-lg border border-dashed border-gray-300 hover:bg-gray-50 transition-colors">
+                  <div className="text-center">
+                    <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="mt-2 text-sm text-gray-500">Image non valide</p>
+                    <p className="mt-1 text-xs text-gray-400">Cliquez pour télécharger une image</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden group">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={formData.image_url}
+                    alt="Aperçu de l'image"
+                    onError={handleImageError}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Upload className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+              )
+            ) : (
+              <div className="flex items-center justify-center h-48 bg-gray-100 rounded-lg border border-dashed border-gray-300 hover:bg-gray-50 transition-colors">
+                <div className="text-center">
+                  <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-2 text-sm text-gray-500">Aucune image sélectionnée</p>
+                  <p className="mt-1 text-xs text-gray-400">Cliquez pour télécharger une image</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
@@ -88,7 +182,8 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
               value={formData.status}
               onChange={handleChange}
               required
-              className="mt-1 h-12 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              disabled={!isLoading || isLoading}
+              className="mt-1 h-12 p-2 block w-full rounded-md border border-gray-300/20 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               {statuses.map(status => (
                 <option key={status} value={status}>{status}</option>
@@ -208,9 +303,20 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
         </button>
         <button
           type="submit"
-          className="px-5 py-2.5 text-sm font-medium text-white bg-[#2C9CC6] border border-transparent rounded-[12px] hover:bg-[#2C9CC6]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="flex px-5 py-2.5 text-sm font-medium text-white bg-[#1E1F22] border border-transparent rounded-[12px] hover:bg-[#313338] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          disabled={isLoading}
         >
-          {initialData ? 'Modifier' : 'Créer'}
+          {isLoading ? (
+            <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          ) : initialData ? (
+            <Edit className="w-5 h-5 mr-2" />
+          ) : (
+            <Plus className="w-5 h-5 mr-2" />
+          )}
+          {isLoading ? 'Chargement...' : initialData ? 'Modifier' : 'Créer'}
         </button>
       </div>
     </form>

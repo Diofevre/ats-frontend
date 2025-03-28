@@ -1,4 +1,3 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from '@/lib/utils';
 import { Candidate } from "@/lib/types/candidats/candidate.types";
@@ -18,42 +17,62 @@ export function CandidatesList({ candidates, isLoading, onDelete, onView }: Cand
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Candidat</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Téléphone</TableHead>
-            <TableHead>Date d&apos;inscription</TableHead>
-            <TableHead>Référents</TableHead>
-            <TableHead className="w-[80px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+    <div className="rounded-lg border border-gray-200 overflow-hidden">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Candidat
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Email
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Téléphone
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date d&apos;inscription
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Référents
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
           {candidates?.map((candidate) => (
-            <TableRow key={candidate.id}>
-              <TableCell>
+            <tr key={candidate.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-3">
                   <CandidateAvatar candidate={candidate} />
                   <span className="font-medium">{candidate.nom}</span>
                 </div>
-              </TableCell>
-              <TableCell>{candidate.email}</TableCell>
-              <TableCell>{candidate.telephone}</TableCell>
-              <TableCell>{formatDate(candidate.created_at)}</TableCell>
-              <TableCell>{candidate.referents?.length || 0} référents</TableCell>
-              <TableCell>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {candidate.email}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {candidate.telephone}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {formatDate(candidate.created_at)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {candidate.referents?.length || 0} référents
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <CandidateActions
                   candidate={candidate}
                   onDelete={onDelete}
                   onView={onView}
                 />
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           ))}
-        </TableBody>
-      </Table>
+        </tbody>
+      </table>
     </div>
   );
 }

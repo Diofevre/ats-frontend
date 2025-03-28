@@ -1,3 +1,5 @@
+'use client'
+
 import useSWR from 'swr';
 import { toast } from 'sonner';
 import { candidatesService } from '@/lib/services/candidats/candidats';
