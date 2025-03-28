@@ -2,7 +2,7 @@
 
 import { CandidateDetails } from '@/components/back_office/candidats/details';
 import { CandidatesList } from '@/components/back_office/candidats/list';
-import { WelcomeHeader } from '@/components/back_office/candidats/welcome';
+import { WelcomeHeader } from '@/components/back_office/WelcomeUser';
 import { useCandidates } from '@/hooks/use-candidats';
 import { useState } from 'react';
 
@@ -11,12 +11,12 @@ export default function CandidatesPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   return (
-    <div className="container mx-auto py-10 space-y-8">
+    <div className="container mx-auto space-y-8">
       <WelcomeHeader />
       
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Gestion des Candidats</h1>
+          <h1 className="text-2xl font-bold uppercase">Gestion des Candidats</h1>
         </div>
         
         <CandidatesList

@@ -1,3 +1,5 @@
+'use client'
+
 import { offreService } from '@/lib/services/offres/offres';
 import { Offre } from '@/lib/types/offres/offres.type';
 import useSWR from 'swr';

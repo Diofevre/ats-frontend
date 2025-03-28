@@ -1,3 +1,5 @@
+'use client'
+
 import { ProcessusService } from '@/lib/services/processus/processus';
 import { Processus } from '@/lib/types/processus/processus';
 import useSWR from 'swr';

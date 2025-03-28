@@ -6,6 +6,8 @@ import {
   FileText,
   BarChart3,
   Settings,
+  AlignEndHorizontal,
+  BookCopy,
 } from 'lucide-react';
 
 export const ADMIN_SERVERS = [
@@ -38,7 +40,12 @@ export const ADMIN_ROUTES = {
   postulations: {
     path: '/admin/postulations',
     label: 'Gestion des postulations',
-    icon: Briefcase,
+    icon: BookCopy,
+  },
+  processus: {
+    path: '/admin/processus',
+    label: 'Gestion des processus',
+    icon: AlignEndHorizontal,
   },
   applications: {
     path: '/admin/candidatures',

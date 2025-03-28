@@ -7,45 +7,16 @@ import { Briefcase, MapPin, Clock, Plus, Pencil, Trash2, Search, Filter, Chevron
 import { CreateOffreDto, Offre, UpdateOffreDto } from '@/lib/types/offres/offres.type';
 import { OffreForm } from '@/components/back_office/offre/form';
 import { offreService } from '@/lib/services/offres/offres';
+import OffreSkeleton from './_components/skeleton';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
-const OffreSkeleton = () => (
-  <tr className="animate-pulse">
-    <td className="px-6 py-4">
-      <div className="flex items-center">
-        <div className="h-12 w-12 bg-gray-200 rounded-lg"></div>
-        <div className="ml-4">
-          <div className="h-4 w-48 bg-gray-200 rounded"></div>
-          <div className="h-3 w-32 bg-gray-200 rounded mt-2"></div>
-        </div>
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-32 bg-gray-200 rounded"></div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-40 bg-gray-200 rounded"></div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-24 bg-gray-200 rounded"></div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-20 bg-gray-200 rounded"></div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-24 bg-gray-200 rounded"></div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="flex justify-end space-x-2">
-        <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-        <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-      </div>
-    </td>
-  </tr>
-);
-
 const Offres = () => {
+  const { token, loading: authLoading } = useAuth();
+  const router = useRouter();
   const { offres, isLoading, isError, mutate } = useOffres();
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingOffre, setEditingOffre] = React.useState<Offre | null>(null);
@@ -53,8 +24,11 @@ const Offres = () => {
   const [filterStatus, setFilterStatus] = React.useState<'TOUS' | 'OUVERT' | 'FERME'>('TOUS');
   const [currentPage, setCurrentPage] = React.useState(1);
 
+  // All hooks are now called unconditionally at the top level
   const filteredOffres = React.useMemo(() => {
-    return offres?.filter(offre => {
+    if (!offres) return [];
+    
+    return offres.filter(offre => {
       const matchesSearch = 
         offre.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         offre.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,19 +42,30 @@ const Offres = () => {
     });
   }, [offres, searchTerm, filterStatus]);
 
-  const totalPages = Math.ceil((filteredOffres?.length || 0) / ITEMS_PER_PAGE);
+  const totalPages = React.useMemo(() => 
+    Math.ceil(filteredOffres.length / ITEMS_PER_PAGE)
+  , [filteredOffres]);
+
   const paginatedOffres = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredOffres?.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    return filteredOffres.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredOffres, currentPage]);
 
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterStatus]);
 
+  React.useEffect(() => {
+    if (!authLoading && !token) {
+      console.error("No token available. User is not authenticated.");
+      router.push('/login');
+      toast.error('Veuillez vous connecter pour accéder à cette page.');
+    }
+  }, [authLoading, token, router]);
+
   const handleCreate = async (data: CreateOffreDto) => {
     try {
-      await offreService.create(data);
+      await offreService.create(data, token);
       await mutate();
       setIsFormOpen(false);
     } catch (error) {
@@ -92,7 +77,7 @@ const Offres = () => {
   const handleUpdate = async (data: UpdateOffreDto) => {
     if (!editingOffre) return;
     try {
-      await offreService.update(editingOffre.id, data);
+      await offreService.update(editingOffre.id, data, token);
       await mutate();
       setEditingOffre(null);
     } catch (error) {
@@ -104,7 +89,7 @@ const Offres = () => {
   const handleDelete = async (id: number) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) return;
     try {
-      await offreService.delete(id);
+      await offreService.delete(id, token);
       await mutate();
     } catch (error) {
       console.error('Error deleting offer:', error);
@@ -114,11 +99,7 @@ const Offres = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Une erreur est survenue lors du chargement des offres.
-        </div>
-      </div>
+      <OffreSkeleton />
     );
   }
 
@@ -126,10 +107,10 @@ const Offres = () => {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Offres d&apos;emploi</h1>
+          <h1 className="text-2xl font-bold text-gray-900 uppercase">Offres d&apos;emploi</h1>
           <button
             onClick={() => setIsFormOpen(true)}
-            className="flex items-center px-4 py-2.5 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors"
+            className="flex items-center px-4 py-2.5 bg-[#1E1F22] text-white rounded-[12px] hover:bg-[#313338] transition-colors"
           >
             <Plus className="w-5 h-5 mr-2" />
             Nouvelle offre
@@ -271,7 +252,7 @@ const Offres = () => {
                     {!isLoading && filteredOffres?.length === 0 && (
                       <tr>
                         <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                          Aucune offre ne correspond à votre recherche
+                          Aucune offre disponible
                         </td>
                       </tr>
                     )}
@@ -329,7 +310,7 @@ const Offres = () => {
                         onClick={() => setCurrentPage(index + 1)}
                         className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                           currentPage === index + 1
-                            ? 'z-10 bg-[#2C9CC6] border-[#2C9CC6] text-white'
+                            ? 'z-10 bg-[#1E1F22] border-[#1E1F22] text-white'
                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                         }`}
                       >

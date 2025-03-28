@@ -11,6 +11,15 @@ const api = axios.create({
   },
 });
 
+// Function to set the authorization header
+const setAuthHeader = (token: string | null) => {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+  }
+};
+
 export interface OffreFilters {
   titre?: string;
   status?: string;
@@ -87,17 +96,32 @@ export const offreService = {
     return response.data;
   },
 
-  create: async (offre: CreateOffreDto): Promise<Offre> => {
-    const response = await api.post<Offre>('/api/offres', offre);
-    return response.data;
+  create: async (offre: CreateOffreDto, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.post<Offre>('/api/offres', offre);
+      return response.data;
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
   },
 
-  update: async (id: number, offre: UpdateOffreDto): Promise<Offre> => {
-    const response = await api.put<Offre>(`/api/offres/${id}`, offre);
-    return response.data;
+  update: async (id: number, offre: UpdateOffreDto, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.put<Offre>(`/api/offres/${id}`, offre);
+      return response.data;
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
   },
 
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/offres/${id}`);
+  delete: async (id: number, token: string | null): Promise<void> => {
+    setAuthHeader(token);
+    try {
+      await api.delete(`/api/offres/${id}`);
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
   },
 };

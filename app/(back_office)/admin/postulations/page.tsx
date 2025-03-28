@@ -11,8 +11,8 @@ const Postulations: React.FC = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen p-6">
+        <div className="max-w-7xl mx-auto">
           <div className="bg-red-50 p-4 rounded-lg flex items-center text-red-800">
             <AlertCircle className="w-5 h-5 mr-2" />
             Une erreur est survenue lors du chargement des processus.
@@ -23,11 +23,11 @@ const Postulations: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mes Postulations</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-2xl font-bold text-gray-900 uppercase">Mes Postulations</h1>
+          <p className="text-sm text-gray-500">
             Suivez l&apos;évolution de vos processus de recrutement
           </p>
         </div>

@@ -1,5 +1,5 @@
 export type Devise = 'EURO' | 'DOLLAR' | 'DOLLAR_CANADIEN' | 'LIVRE' | 'YEN' | 'ROUPIE' | 'ARIARY';
-export type Status = 'OUVERT' | 'FERME';
+export type Status = 'OUVERT' | 'FERME' | 'CREE';
 
 export type OffreType = {
   created_at: string;
