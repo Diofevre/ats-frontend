@@ -25,7 +25,7 @@ import * as z from "zod";
 
 const searchSchema = z.object({
   titre: z.string().nullable().default(null),
-  lieu: z.string().nullable().default(null),
+  pays: z.string().nullable().default(null),
 });
 
 type SearchFormData = z.infer<typeof searchSchema>;
@@ -49,13 +49,11 @@ const NoJobsFound: React.FC = () => (
 
 const OffresLists = () => {
   const [filters, setFilters] = useState<OffreFilters>({
-    titre: undefined,
-    lieu: undefined,
+    text: undefined,
+    pays: undefined,
   });
 
   const { mockJobs, isLoading } = useAllOffres(filters);
-
-  console.log("mockJobs:", mockJobs);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -99,14 +97,14 @@ const OffresLists = () => {
     resolver: zodResolver(searchSchema),
     defaultValues: {
       titre: null,
-      lieu: null,
+      pays: null,
     },
   });
 
   const onSubmit = (data: SearchFormData) => {
-    const titre: string | undefined = data.titre ?? undefined;
-    const lieu: string | undefined = data.lieu ?? undefined;
-    setFilters({ titre, lieu });
+    const text: string | undefined = data.titre ?? undefined;
+    const pays: string | undefined = data.pays ?? undefined;
+    setFilters({ text, pays });
   };
 
   return (
@@ -277,7 +275,7 @@ const OffresLists = () => {
                       size={20}
                     />
                     <Controller
-                      name="lieu"
+                      name="pays"
                       control={control}
                       render={({ field }) => (
                         <Input
@@ -291,9 +289,9 @@ const OffresLists = () => {
                         />
                       )}
                     />
-                    {errors.lieu && (
+                    {errors.pays && (
                       <p className="text-red-500 text-sm mt-1">
-                        {errors.lieu.message}
+                        {errors.pays.message}
                       </p>
                     )}
                   </motion.div>
