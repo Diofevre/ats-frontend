@@ -80,7 +80,7 @@ export function WelcomeHeader() {
   return (
     <div className="space-y-4">
       <div className="grid md:grid-cols-[1.5fr,1fr] gap-6">
-        <Card className="overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="overflow-hidden border transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="shrink-0 bg-gray-50 rounded-xl p-1 shadow-sm">
@@ -144,7 +144,7 @@ export function WelcomeHeader() {
           </div>
         </Card>
 
-        <Card className="p-6 bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="p-6 border transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Calendrier</h3>
             <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1">
@@ -166,9 +166,9 @@ export function WelcomeHeader() {
             </div>
           </div>
           
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7">
             {daysInWeek.map(day => (
-              <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+              <div key={day} className="text-center text-sm font-medium text-gray-500 py-1.5">
                 {day}
               </div>
             ))}
@@ -177,7 +177,7 @@ export function WelcomeHeader() {
                 <div
                   key={`${weekIndex}-${dayIndex}`}
                   className={`
-                    text-center py-2 text-sm rounded-lg transition-all duration-200
+                    text-center py-1.5 text-sm rounded-lg transition-all duration-200
                     ${day === null ? 'text-gray-300' : 'text-gray-700'}
                     ${day === currentDate.getDate() 
                       ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' 

@@ -2,9 +2,10 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { Bell, Settings, UserCircle, LogOut, Loader2 } from 'lucide-react';
+import { Settings, UserCircle, LogOut, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import NotificationBell from './Notifications';
 
 const UserInfo = () => {
   const router = useRouter();
@@ -15,10 +16,8 @@ const UserInfo = () => {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.push('/'); 
     } catch (error) {
       console.error("Logout error:", error);
-    } finally {
       setIsLoggingOut(false);
     }
   };
@@ -69,12 +68,7 @@ const UserInfo = () => {
         </div>
       </div>
       <div className="flex flex-shrink-0">
-        <button
-          title="Notifications"
-          className="p-2 hover:bg-[#35363C] rounded-md group"
-        >
-          <Bell className="w-4 h-4 text-[#949BA4] group-hover:text-white" />
-        </button>
+        <NotificationBell />
         <button
           title="Settings"
           className="p-2 hover:bg-[#35363C] rounded-md group"

@@ -37,7 +37,7 @@ export const ProcessusForm: React.FC<ProcessusFormProps> = ({ onSubmit, onCancel
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-[20px] shadow-xl w-full max-w-xl relative">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-[#1E1F22]">Nouveau Processus</h2>
           <button

@@ -63,7 +63,7 @@ const ForgotPassword = () => {
           </div>
 
           {success ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center mt-4">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                 <Mail className="h-6 w-6 text-green-600" />
               </div>
@@ -123,7 +123,7 @@ const ForgotPassword = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="rounded-[12px] uppercase text-sm w-full h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+                  className="flex items-center justify-center rounded-[12px] uppercase text-sm w-full h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
                 >
                   {isLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />

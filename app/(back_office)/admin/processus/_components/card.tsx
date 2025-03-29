@@ -31,7 +31,7 @@ export const ProcessusCard: React.FC<ProcessusCardProps> = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-white rounded-lg border transition-shadow duration-300">
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">

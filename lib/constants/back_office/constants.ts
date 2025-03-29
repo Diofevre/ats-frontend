@@ -3,8 +3,6 @@ import {
   Calendar,
   Users,
   Briefcase,
-  FileText,
-  BarChart3,
   Settings,
   AlignEndHorizontal,
   BookCopy,
@@ -46,16 +44,6 @@ export const ADMIN_ROUTES = {
     path: '/admin/processus',
     label: 'Gestion des processus',
     icon: AlignEndHorizontal,
-  },
-  applications: {
-    path: '/admin/candidatures',
-    label: 'Candidatures',
-    icon: FileText,
-  },
-  reports: {
-    path: '/admin/reports',
-    label: 'Rapports',
-    icon: BarChart3,
   },
   settings: {
     path: '/admin/settings',
