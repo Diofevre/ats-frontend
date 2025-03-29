@@ -71,7 +71,7 @@ export default function AdminSidebar({ isOpen }: AdminSidebarProps) {
                       : "bg-[#313338] hover:bg-[#2C9CC6] hover:rounded-[16px]"
                   )}
                 >
-                  <span className="text-white font-semibold text-sm">
+                  <span className="text-black font-semibold text-sm">
                     {server.initial}
                   </span>
                   

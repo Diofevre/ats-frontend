@@ -44,7 +44,7 @@ export const JsonQuizForm = ({ processusId, onSubmit, onCancel }: JsonQuizFormPr
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
         <h2 className="text-2xl font-bold text-[#1E1F22] mb-4">Ajouter un Quiz (JSON)</h2>
         

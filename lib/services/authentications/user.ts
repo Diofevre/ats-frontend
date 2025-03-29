@@ -64,8 +64,9 @@ export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
 // Logout
 export const logout = async (): Promise<{ message: string }> => {
   const response = await handleRequest<{ message: string }>(
-    api.post('/api/users/logout')
+    api.put('/api/users/logout')
   );
+  
   localStorage.removeItem('token');
   return response;
 };

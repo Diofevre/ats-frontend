@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminSidebar from '@/components/back_office/AdminSidebar';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import SkeletonAdmin from '@/components/SkeletonAdmin';
 
 export default function RootLayout({
   children,
@@ -10,21 +13,44 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen] = useState(true);
+  const { user, loading, error } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && (!user || error)) {
+      router.push('/login');
+    }
+  }, [user, loading, error, router]);
+
+  if (loading) {
+    return <SkeletonAdmin />;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
-    <div className="flex">
-      {/* Sidebar fixe */}
-      <div className="fixed left-0 top-0 min-h-screen overflow-y-auto">
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar container - fixed on desktop, sliding on mobile */}
+      <div className="fixed left-0 top-0 h-screen z-40">
         <AdminSidebar isOpen={sidebarOpen} />
       </div>
 
-      {/* Contenu principal */}
+      {/* Main content area - responsive padding based on sidebar state */}
       <main
         className={cn(
-          "flex-grow min-h-screen transition-all duration-300 ml-64",
+          "flex-1 transition-all duration-300",
+          "min-h-screen w-full",
+          // Responsive margin for sidebar
+          "lg:ml-[332px]", // 72px (server bar) + 260px (channel bar)
+          // Padding for content
+          "p-4 sm:p-6 lg:p-8",
+          // Ensure content starts below mobile header on small screens
+          "pt-16 lg:pt-8"
         )}
       >
-        <div className="max-w-7xl mx-auto p-4 sm:p-4 lg:p-4">
+        <div className="max-w-7xl mx-auto">
           {children}
         </div>
       </main>

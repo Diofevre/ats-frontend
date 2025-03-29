@@ -106,18 +106,32 @@ const Offres = () => {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 uppercase">Offres d&apos;emploi</h1>
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="flex items-center px-4 py-2.5 bg-[#1E1F22] text-white rounded-[12px] hover:bg-[#313338] transition-colors"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Nouvelle offre
-          </button>
+        {/* Enhanced Sticky Header */}
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent uppercase">
+                  Offres d&apos;emploi
+                </h1>
+                <div className="hidden sm:block h-8 w-[1px] bg-gray-200"></div>
+                <span className="hidden sm:block text-sm text-gray-500">
+                  Gestion des offres
+                </span>
+              </div>
+              <button
+                onClick={() => setIsFormOpen(true)}
+                className="group relative inline-flex items-center px-6 py-2.5 bg-[#1E1F22] text-white rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-gray-900/20 active:scale-95"
+              >
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#1E1F22] via-[#313338] to-[#1E1F22] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Plus className="w-4 h-4 mr-2 relative z-10 transition-transform group-hover:rotate-90 duration-300" />
+                <span className="relative z-10 font-medium">Ajouter</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8 mt-8">
           <div className="p-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
@@ -334,7 +348,7 @@ const Offres = () => {
       </div>
 
       {(isFormOpen || editingOffre) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h2 className="text-2xl font-bold p-4">
