@@ -21,7 +21,7 @@ const setAuthHeader = (token: string | null) => {
 };
 
 export interface OffreFilters {
-  titre?: string;
+  text?: string;
   status?: string;
   minNombreRequis?: number;
   lieu?: string;
@@ -39,19 +39,18 @@ const buildUrl = (baseUrl: string, filters: OffreFilters): string => {
   if (filters.status) params.append("status", filters.status);
   if (filters.minNombreRequis)
     params.append("minNombreRequis", filters.minNombreRequis.toString());
-  if (filters.lieu) params.append("lieu", filters.lieu);
   if (filters.pays) params.append("pays", filters.pays);
   if (filters.type_emploi) params.append("type_emploi", filters.type_emploi);
   if (filters.salaire) params.append("salaire", filters.salaire.toString());
   if (filters.devise) params.append("devise", filters.devise);
   if (filters.date_publication)
     params.append("date_publication", filters.date_publication);
-
-  url.search = params.toString();
+  if (filters.text) params.append("text", filters.text);
+  if (filters) url.search = params.toString();
   return url.toString();
 };
 
-export const useAllOffres = (filters: OffreFilters = {}) => {
+export const useAllOffres = (filters: OffreFilters) => {
   const baseUrl = `${API_URL}/api/offres`;
   const urlWithFilters = buildUrl(baseUrl, filters);
 

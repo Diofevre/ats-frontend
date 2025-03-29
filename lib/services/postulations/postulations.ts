@@ -6,7 +6,7 @@ export const Postulation = async (formData: FormData) => {
   try {
     const res = await axios.post(`${API_URL}/api/postulations`, formData, {
       headers: {
-        "Content-Type": "mutipart/form-data",
+        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;

@@ -80,7 +80,9 @@ export default function OffreDetails() {
                 <div className="lg:col-span-1">
                   <div className="relative w-full h-64 rounded-lg overflow-hidden">
                     <Image
-                      src={mockJob?.image_url}
+                      src={
+                        mockJob?.image_url ?? "/assets/images/default-offre.png"
+                      }
                       alt={mockJob?.titre}
                       width={400}
                       height={256}

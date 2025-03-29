@@ -28,10 +28,9 @@ import { OffreFilters, useAllOffres } from "@/lib/services/offres/offres";
 import { OffreType } from "@/lib/types/offres/offres.type";
 import Link from "next/link";
 
-// Schéma Zod pour le formulaire de recherche
 const searchSchema = z.object({
-  titre: z.string().nullable().default(null),
-  lieu: z.string().nullable().default(null),
+  text: z.string().nullable().default(null),
+  pays: z.string().nullable().default(null),
   type_emploi: z.string().nullable().default(null),
 });
 
@@ -39,8 +38,8 @@ type SearchFormData = z.infer<typeof searchSchema>;
 
 const Hero = () => {
   const [filters, setFilters] = useState<OffreFilters>({
-    titre: undefined,
-    lieu: undefined,
+    text: undefined,
+    pays: undefined,
     type_emploi: undefined,
   });
 
@@ -55,19 +54,19 @@ const Hero = () => {
   } = useForm<SearchFormData>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      titre: null,
-      lieu: null,
+      text: null,
+      pays: null,
       type_emploi: null,
     },
   });
 
   const onSubmit = (data: SearchFormData) => {
-    const titre: string | undefined = data.titre ?? undefined;
-    const lieu: string | undefined = data.lieu ?? undefined;
+    const text: string | undefined = data.text ?? undefined;
+    const pays: string | undefined = data.pays ?? undefined;
     const type_emploi: string | undefined = data.type_emploi ?? undefined;
     setFilters({
-      titre,
-      lieu,
+      text,
+      pays,
       type_emploi,
     });
     setHasSearched(true);
@@ -166,22 +165,20 @@ const Hero = () => {
               size={20}
             />
             <Controller
-              name="titre"
+              name="text"
               control={control}
               render={({ field }) => (
                 <Input
                   type="text"
                   placeholder="Titre du poste"
-                  className="w-full pl-10 pr-4 h-12 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 h-9 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500"
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(e.target.value || null)}
                 />
               )}
             />
-            {errors.titre && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.titre.message}
-              </p>
+            {errors.text && (
+              <p className="text-red-500 text-sm mt-1">{errors.text.message}</p>
             )}
           </motion.div>
 
@@ -189,11 +186,11 @@ const Hero = () => {
             whileHover={{ scale: 1.02 }}
             className="relative flex items-center">
             <MapPin
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" // Centrage précis
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
               size={20}
             />
             <Controller
-              name="lieu"
+              name="pays"
               control={control}
               render={({ field }) => (
                 <Select
@@ -203,15 +200,15 @@ const Hero = () => {
                     <SelectValue placeholder="Toutes les emplacements" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Paris">Paris</SelectItem>
-                    <SelectItem value="Lyon">Lyon</SelectItem>
-                    <SelectItem value="Marseille">Marseille</SelectItem>
+                    <SelectItem value="All">Tout</SelectItem>
+                    <SelectItem value="France">France</SelectItem>
+                    <SelectItem value="Madagascar">Madagascar</SelectItem>
                   </SelectContent>
                 </Select>
               )}
             />
-            {errors.lieu && (
-              <p className="text-red-500 text-sm mt-1">{errors.lieu.message}</p>
+            {errors.pays && (
+              <p className="text-red-500 text-sm mt-1">{errors.pays.message}</p>
             )}
           </motion.div>
 
@@ -219,7 +216,7 @@ const Hero = () => {
             whileHover={{ scale: 1.02 }}
             className="relative flex items-center">
             <Briefcase
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" // Centrage précis
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
               size={20}
             />
             <Controller
@@ -233,9 +230,10 @@ const Hero = () => {
                     <SelectValue placeholder="Type d'emplois" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cdi">CDI</SelectItem>
-                    <SelectItem value="cdd">CDD</SelectItem>
-                    <SelectItem value="stage">Stage</SelectItem>
+                    <SelectItem value="All">Tout</SelectItem>
+                    <SelectItem value="CDI">CDI</SelectItem>
+                    <SelectItem value="CDD">CDD</SelectItem>
+                    <SelectItem value="STAGE">Stage</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -250,11 +248,10 @@ const Hero = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center" // Ajout pour aligner le bouton
-          >
+            className="flex items-center">
             <Button
               type="submit"
-              className="w-full h-12 rounded-[12px] px-6 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transition-all">
+              className="w-full h-9 rounded-[12px] px-6 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transition-all">
               Valider
             </Button>
           </motion.div>
@@ -277,8 +274,8 @@ const Hero = () => {
                 transition={{ duration: 0.2 }}>
                 <Card className="hover:shadow-xl transition-all duration-300 rounded-[12px]">
                   <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                      <div className="space-y-4">
+                    <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
+                      <div className="flex-1 space-y-4">
                         <div>
                           <motion.div
                             whileHover={{ scale: 1.05 }}
@@ -299,39 +296,41 @@ const Hero = () => {
                             {job.description}
                           </p>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                           <motion.div
                             whileHover={{ x: 5 }}
                             className="flex items-center text-gray-600">
-                            <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                            <MapPin className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
                             {`${job.lieu}, ${job.pays}`}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
                             className="flex items-center text-gray-600">
-                            <Briefcase className="h-4 w-4 mr-2 text-gray-400" />
+                            <Briefcase className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
                             {job.type_emploi}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
                             className="flex items-center text-gray-600">
-                            <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                            <Calendar className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
                             {new Date(job.created_at).toLocaleDateString()}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
                             className="flex items-center text-gray-600">
-                            <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                            <Clock className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
                             {`${job.horaire_ouverture} - ${job.horaire_fermeture}`}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600">
-                            <Users className="h-4 w-4 mr-2 text-gray-400" />
+                            className="flex items-center text-gray-600 col-span-2">
+                            <Users className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
                             {`${job.nombre_requis} poste(s)`}
                           </motion.div>
                         </div>
                       </div>
+
                       <div className="flex md:flex-col gap-3 md:min-w-[140px]">
                         <motion.div
                           whileHover={{ scale: 1.05 }}
