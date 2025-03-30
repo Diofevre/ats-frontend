@@ -31,7 +31,7 @@ export default function RootLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background bg-gray-50">
       {/* Sidebar container - fixed on desktop, sliding on mobile */}
       <div className="fixed left-0 top-0 h-screen z-40">
         <AdminSidebar isOpen={sidebarOpen} />
@@ -40,7 +40,7 @@ export default function RootLayout({
       {/* Main content area - responsive padding based on sidebar state */}
       <main
         className={cn(
-          "flex-1 transition-all duration-300",
+          "flex-1 transition-all duration-300 ",
           "min-h-screen w-full",
           // Responsive margin for sidebar
           "lg:ml-[332px]", // 72px (server bar) + 260px (channel bar)
