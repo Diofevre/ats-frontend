@@ -58,22 +58,3 @@ export const USER_STATUS = {
   dnd: "bg-[#F23F43]",
   offline: "bg-[#80848E]",
 } as const;
-
-export const NavClient = [
-  {
-    href: "/client/candidature",
-    label: "Mes candidatures",
-  },
-  {
-    href: "/client/profile",
-    label: "Mon profil",
-  },
-  {
-    href: "/client/quiz",
-    label: "Quiz",
-  },
-  {
-    href: "/client/progress",
-    label: "Ma progression",
-  },
-];
