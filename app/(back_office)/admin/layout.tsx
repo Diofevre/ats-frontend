@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import AdminSidebar from '@/components/back_office/AdminSidebar';
-import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import SkeletonAdmin from '@/components/SkeletonAdmin';
+import { useEffect, useState } from "react";
+import AdminSidebar from "@/components/back_office/AdminSidebar";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import SkeletonAdmin from "@/components/SkeletonAdmin";
 
 export default function RootLayout({
   children,
@@ -18,7 +18,7 @@ export default function RootLayout({
 
   useEffect(() => {
     if (!loading && (!user || error)) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, loading, error, router]);
 
@@ -48,11 +48,8 @@ export default function RootLayout({
           "p-4 sm:p-6 lg:p-8",
           // Ensure content starts below mobile header on small screens
           "pt-16 lg:pt-8"
-        )}
-      >
-        <div className="max-w-7xl mx-auto">
-          {children}
-        </div>
+        )}>
+        <div className="max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );
