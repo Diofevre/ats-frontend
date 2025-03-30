@@ -4,7 +4,8 @@ export interface User {
   email: string;
   phone: string;
   profile?: string;
-  role: 'ADMIN' | 'MODERATEUR';
+  role: 'ADMINISTRATEUR' | 'MODERATEUR';
+  organisation_id?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;

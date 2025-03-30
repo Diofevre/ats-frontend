@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import axios from "axios";
 import { OffreType, CreateOffreDto, Offre, UpdateOffreDto } from "@/lib/types/offres/offres.type";
+import { Offres } from "@/lib/types/offre-details";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
@@ -122,5 +123,14 @@ export const offreService = {
     } finally {
       setAuthHeader(null); // Clear token after request
     }
+  },
+
+  getDetailsById: async (id: number): Promise<Offres> => {
+    const response = await api.get<Offres>(`/api/offres/${id}/details`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    return response.data;
   },
 };
