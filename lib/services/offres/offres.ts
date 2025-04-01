@@ -1,11 +1,7 @@
 import useSWR from "swr";
 import axios from "axios";
-import {
-  OffreType,
-  CreateOffreDto,
-  Offre,
-  UpdateOffreDto,
-} from "@/lib/types/offres/offres.type";
+import { OffreType, CreateOffreDto, Offre, UpdateOffreDto } from "@/lib/types/offres/offres.type";
+import { Offres } from "@/lib/types/offre-details";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
@@ -130,6 +126,35 @@ export const offreService = {
     setAuthHeader(token);
     try {
       await api.delete(`/api/offres/${id}`);
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
+  },
+
+  getDetailsById: async (id: number): Promise<Offres> => {
+    const response = await api.get<Offres>(`/api/offres/${id}/details`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    return response.data;
+  },
+
+  publish: async (id: number, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.put<Offre>(`/api/offres/${id}/publish`);
+      return response.data;
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
+  },
+
+  fermer: async (id: number, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.post<Offre>(`/api/offres/${id}/fermer`);
+      return response.data;
     } finally {
       setAuthHeader(null); // Clear token after request
     }

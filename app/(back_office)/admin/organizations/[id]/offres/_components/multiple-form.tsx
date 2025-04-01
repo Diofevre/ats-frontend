@@ -1,0 +1,75 @@
+'use client'
+
+import React, { useState } from 'react';
+import { CreateOffreDto, Offre } from '@/lib/types/offres/offres.type';
+import { StepIndicator } from './step-indicator';
+import CreateForm from './form-annonce';
+import { Preview } from './preview';
+import { useOffres } from '@/hooks/use-offre';
+import { toast } from 'sonner';
+
+const STEPS = ['Offre d\'emploi', 'Aperçu'];
+
+export function MultiStepForm() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [offreData, setOffreData] = useState<CreateOffreDto | null>(null);
+  const { createOffre, isLoadings } = useOffres();
+
+  const handleOffreSubmit = async (data: CreateOffreDto | Offre) => {
+    try {
+      setOffreData(data as CreateOffreDto);
+      setCurrentStep(1);
+    } catch (error) {
+      console.error('Erreur lors de la validation de l\'offre:', error);
+      toast.error('Une erreur est survenue lors de la validation de l\'offre');
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleFinish = async () => {
+    try {
+      if (!offreData) {
+        throw new Error('Données manquantes');
+      }
+
+      await createOffre(offreData);
+
+      setOffreData(null);
+      setCurrentStep(0);
+      
+      toast.success('Offre créée avec succès !');
+    } catch (error) {
+      console.error('Erreur lors de la création:', error);
+      toast.error('Une erreur est survenue lors de la création de l\'offre');
+    }
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <StepIndicator currentStep={currentStep} steps={STEPS} />
+      
+      <div className="mt-8">
+        {currentStep === 0 && (
+          <CreateForm
+            onSubmit={handleOffreSubmit}
+            onCancel={() => setCurrentStep(0)}
+          />
+        )}
+        
+        {currentStep === 1 && offreData && (
+          <Preview
+            offreData={offreData}
+            onBack={handleBack}
+            onFinish={handleFinish}
+            isLoading={isLoadings}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
