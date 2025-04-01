@@ -12,7 +12,7 @@ export default function ApplicationList({
 }: ApplicationListProps) {
   return (
     <div className="space-y-4">
-      {applications.map((application) => (
+      {applications?.map((application) => (
         <CandidatureCard
           key={application.id}
           application={application}

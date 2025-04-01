@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 
@@ -15,7 +16,9 @@ const LoginClient: React.FC<FormLoginProps> = ({
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
       <div className="mb-8 text-center pt-8">
-        <img
+        <Image
+          width={500}
+          height={500}
           src="/ats.png"
           alt="Luxury Hotel"
           className="w-20 h-20 mx-auto object-cover"

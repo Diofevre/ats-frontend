@@ -45,7 +45,7 @@ export const useMyPostulation = (token: string | undefined) => {
 };
 
 export const useMyStats = (token: string | undefined) => {
-  const url = `${API_URL}/api/candidats/stats`;
+  const url = `${API_URL}/api/candidats/dashboard/stats`;
   const { data, error, mutate } = useSWR(
     token ? [url, token] : null,
     fetcherProtected

@@ -26,7 +26,7 @@ export default function Candidature() {
   );
 
   return (
-    <div className="space-y-4 mt-4">
+    <div className="space-y-4 px-6 py-8 bg-gray-50 rounded-xl mt-4">
       <div className="flex justify-between items-center bg-white p-6 rounded-xl border border-gray-200 transition-all duration-200 hover:border-blue-300">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold text-gray-900">

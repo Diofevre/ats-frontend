@@ -69,6 +69,10 @@ export const NavClient = [
     label: "Mon profil",
   },
   {
+    href: "/client/quiz",
+    label: "Evaluation",
+  },
+  {
     href: "/client/progress",
     label: "Ma progression",
   },

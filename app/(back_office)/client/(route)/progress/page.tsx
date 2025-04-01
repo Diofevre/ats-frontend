@@ -74,7 +74,7 @@ export default function ProgressSection() {
   // const { myStats, isLoading } = useMyStats(client?.token_candidat);
 
   return (
-    <div className="container mx-auto space-y-8">
+    <div className="container mx-auto px-6 py-8 bg-gray-50 rounded-xl space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Ma progression</h2>
       </div>

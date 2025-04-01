@@ -39,7 +39,7 @@ export default function ApplicationDetailPage() {
 
   if (!application) {
     return (
-      <div className="container mx-auto text-center">
+      <div className="container mx-auto px-6 py-8 bg-gray-50 rounded-xl text-center">
         <h1 className="text-2xl font-bold mb-4">Candidature non trouvée</h1>
         <Button
           onClick={() => router.push("/client/candidature")}

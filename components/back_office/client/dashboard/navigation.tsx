@@ -24,7 +24,7 @@ const Navigation = () => {
   };
 
   return (
-    <div className="h-16 my-5 bg-[#1e1f22] flex items-center px-4">
+    <div className="h-16 my-5 rounded-xl bg-[#1e1f22] flex items-center px-4">
       <nav className="flex items-center gap-2">
         {NavClient.map((link, index) => (
           <Link

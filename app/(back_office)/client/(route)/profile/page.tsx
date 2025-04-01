@@ -62,7 +62,7 @@ export default function ProfileSection() {
   }
 
   return (
-    <div className="container mx-auto   min-h-screen">
+    <div className="container mx-auto px-6 py-8 bg-gray-50 rounded-xl min-h-screen">
       {/* En-tête */}
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Mon profil</h2>
