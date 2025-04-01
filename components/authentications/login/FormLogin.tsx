@@ -48,34 +48,7 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onForgotPassword }) => 
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-8 text-center">
-        <img 
-          src="/ats.png"
-          alt="Luxury Hotel"
-          className="w-20 h-20 mx-auto object-cover"
-        />
-      </div>
-
       <div className="p-8">
-        {/* <div className="space-y-3 mb-8">
-          <button
-            onClick={() => onSocialLogin('google')}
-            className="w-full flex items-center justify-center space-x-3 py-3 rounded-xl text-gray-700 bg-white border transition-colors hover:bg-gray-50"
-          >
-            <FcGoogle className="w-5 h-5" />
-            <span className="font-medium">Continue with Google</span>
-          </button>
-        </div> */}
-
-        {/* <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 text-gray-500 bg-white">Or continue with</span>
-          </div>
-        </div> */}
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
@@ -130,7 +103,7 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onForgotPassword }) => 
               <button 
                 type="button"
                 onClick={onForgotPassword}
-                className="text-sm text-emerald-600 hover:text-emerald-700"
+                className="text-sm text-cyan-600 hover:text-cyan-600/80"
               >
                 Forgot password?
               </button>
@@ -139,7 +112,7 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onForgotPassword }) => 
             <Button
               type="submit"
               size="lg"
-              className="rounded-[12px] uppercase w-full h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+              className="rounded-[12px] uppercase w-full h-12 bg-[#2C9CC6] text-black hover:bg-[#2C9CC6]/80 font-semibold transform transition-all"
               disabled={isLoading}
             >
               {isLoading ? (

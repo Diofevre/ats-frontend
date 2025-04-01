@@ -8,7 +8,7 @@ import { Button } from '../ui/button';
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden text-white mt-16">
+    <section className="relative overflow-hidden text-white mt-12">
       <div className="container relative z-10 py-16 md:py-28 h-full mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
           <motion.div
@@ -52,7 +52,7 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 size="lg"
-                className="rounded-[24px] h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+                className="rounded-[12px] h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
               >
                 Commencer gratuitement
               </Button>
@@ -60,7 +60,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-[24px] h-12 bg-transparent backdrop-blur-sm border-2 border-white text-white hover:bg-white/10 font-semibold transition-all hover:scale-105 hover:border-white/40"
+                className="rounded-[12px] h-12 bg-transparent backdrop-blur-sm border border-white text-white hover:bg-white/10 font-semibold transition-all hover:scale-105 hover:border-white/40"
               >
                 Voir la démo
               </Button>

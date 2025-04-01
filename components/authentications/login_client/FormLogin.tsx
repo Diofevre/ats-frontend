@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Image from "next/image";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 
@@ -15,17 +14,13 @@ const LoginClient: React.FC<FormLoginProps> = ({
   isLoading,
 }) => {
   return (
-    <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="w-full max-w-md overflow-hidden">
       <div className="mb-8 text-center pt-8">
-        <Image
-          width={500}
-          height={500}
-          src="/ats.png"
-          alt="Luxury Hotel"
-          className="w-20 h-20 mx-auto object-cover"
-        />
-        <h2 className="mt-4 text-2xl font-bold text-gray-800">Bienvenue</h2>
-        <p className="mt-2 text-gray-600">Connectez-vous pour continuer</p>
+        {/* ATS Logo */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">ATS Portal</h1>
+          <p className="text-sm text-gray-500 mt-2">Applicant Tracking System</p>
+        </div>
       </div>
 
       <div className="p-8 pt-0">

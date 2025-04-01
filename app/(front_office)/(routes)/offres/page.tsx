@@ -1,12 +1,9 @@
 import Hero from "@/components/front_office/HeroOffres";
-import React from "react";
 
-const Offres = () => {
+export default function Home() {
   return (
-    <div className="space-y-6 min-h-screen">
+    <div className="min-h-screen">
       <Hero />
     </div>
   );
-};
-
-export default Offres;
+}

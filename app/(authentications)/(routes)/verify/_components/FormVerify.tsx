@@ -83,7 +83,7 @@ const FormVerifyPage = () => {
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-light text-blue-900">Verify your email</h2>
+          <h2 className="text-2xl font-light text-cyan-600">Verify your email</h2>
           <p className="text-gray-600 mt-2">
             We&apos;ve sent a verification code to<br />
             <span className="font-medium text-gray-900">{email}</span>
@@ -114,7 +114,7 @@ const FormVerifyPage = () => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full rounded-xl bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+                className="w-full rounded-[12px] bg-[#2C9CC6] hover:bg-[#2C9CC6]/80 uppercase h-12 text-slate-900 font-semibold transform transition-all"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -134,7 +134,7 @@ const FormVerifyPage = () => {
               Didn&apos;t receive the code?{' '}
               <button
                 type="button"
-                className="text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-cyan-600 hover:text-cyan-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleResendOtp}
                 disabled={isResending}
               >
