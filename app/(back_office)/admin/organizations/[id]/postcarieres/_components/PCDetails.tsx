@@ -55,7 +55,7 @@ const PostCariereDetails = ({ id }: PostCariereDetailsProps) => {
 
         <div className="flex space-x-2">
           <Link
-            href={`/postcarrieres/${id}/edit`}
+            href={`/postcarieres/${id}/edit`}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Edit

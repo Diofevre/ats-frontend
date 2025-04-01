@@ -71,9 +71,6 @@ export default function ServerList({
           </div>
         ) : !organizations || organizations.length === 0 ? (
           <div className="flex flex-col items-center py-4 px-2 text-center">
-            <span className="text-sm text-gray-400">
-              Ajoutez votre première organisation
-            </span>
             <span className="text-xs text-gray-500 mt-1">
               Cliquez sur le + ci-dessus
             </span>

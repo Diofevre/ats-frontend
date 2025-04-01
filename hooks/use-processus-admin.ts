@@ -1,10 +1,24 @@
 'use client'
 
 import { ProcessusService } from '@/lib/services/processus-admin/processus-service';
-import { AddQuizzDto, CreateProcessusDto, Processus } from '@/lib/types/processus-admin/processus-admin';
+import { AddQuizzDto, CreateProcessusDto, Processus, ProcessusDetail } from '@/lib/types/processus-admin/processus-admin';
 import useSWR from 'swr';
 
 const PROCESSUS_KEY = 'processus';
+const PROCESSUS_DETAIL_KEY = 'processus-detail';
+
+export function useProcessusById(id: string) {
+  const { data, error } = useSWR<ProcessusDetail>(
+    id ? `${PROCESSUS_DETAIL_KEY}-${id}` : null,
+    () => ProcessusService.getById(id)
+  );
+
+  return {
+    processusDetail: data,
+    isLoading: !error && !data,
+    isError: error
+  };
+}
 
 export function useProcessus() {
   const { data: processus, error, mutate } = useSWR<Processus[]>(
@@ -33,7 +47,36 @@ export function useProcessus() {
 
   const addQuizz = async (id: string, quizz: AddQuizzDto) => {
     await ProcessusService.addQuizz(id, quizz);
-    // Optionally refetch the processus data after adding quiz
+    mutate();
+  };
+
+  const startProcessus = async (id: string) => {
+    await ProcessusService.start(id);
+    mutate();
+  };
+
+  const startInacheve = async (id: string) => {
+    await ProcessusService.startInacheve(id);
+    mutate();
+  };
+
+  const startForCandidat = async (id: string) => {
+    await ProcessusService.startForCandidat(id);
+    mutate();
+  };
+
+  const makeTop = async (id: string) => {
+    await ProcessusService.makeTop(id);
+    mutate();
+  };
+
+  const makeBottom = async (id: string) => {
+    await ProcessusService.makeBottom(id);
+    mutate();
+  };
+
+  const reverseOrder = async (id1: string, id2: string) => {
+    await ProcessusService.reverseOrder(id1, id2);
     mutate();
   };
 
@@ -45,5 +88,11 @@ export function useProcessus() {
     updateProcessus,
     deleteProcessus,
     addQuizz,
+    startProcessus,
+    startInacheve,
+    startForCandidat,
+    makeTop,
+    makeBottom,
+    reverseOrder,
   };
 }

@@ -20,10 +20,6 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = () => {
-    toast.error('Social login is not implemented yet');
-  };
-
   const handleForgotPassword = () => {
     router.push('/forgot-password');
   };
@@ -37,19 +33,17 @@ const Login = () => {
         {/* Login Form */}
           <FormLogin
             onSubmit={handleSubmit}
-            onSocialLogin={handleSocialLogin}
             onForgotPassword={handleForgotPassword}
           />
 
-        {/* Sign Up Link */}
-        <div className="text-center mb-6">
+        {/* <div className="text-center mb-6">
           <button
             onClick={() => router.push('/register')}
             className="text-sm text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Don&apos;t have an account? <span className="underline">Sign up</span>
           </button>
-        </div>
+        </div> */}
 
         {/* Terms and Privacy */}
         <p className="text-center text-sm text-gray-500">

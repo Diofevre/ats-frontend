@@ -4,7 +4,7 @@ import { offreService } from '@/lib/services/offres/offres';
 import { Offres } from '@/lib/types/offre-details';
 import useSWR from 'swr';
 
-export function useOffres(id: number) {
+export function useOffresDetails(id: number) {
   const { data, error, isLoading, mutate } = useSWR<Offres>(
     id ? `offres/${id}/details` : null,
     () => offreService.getDetailsById(id)

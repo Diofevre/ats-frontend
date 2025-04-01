@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Loader2, Plus, Search, X } from 'lucide-react';
-import { CreateProcessusDto } from '@/lib/types/processus-admin/processus-admin';
+import { CreateProcessusDto, ProcessusType } from '@/lib/types/processus-admin/processus-admin';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,7 @@ export const ProcessusForm: React.FC<ProcessusFormProps> = ({ onSubmit, onCancel
             <select
               id="type"
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as ProcessusType })}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#1E1F22] focus:border-transparent transition-shadow"
               disabled={loading}
             >
