@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   CandidatsType,
   PostulationType,
+  StatClientType,
 } from "@/lib/types/client/client.types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -52,7 +53,7 @@ export const useMyStats = (token: string | undefined) => {
   );
 
   return {
-    myStats: data,
+    myStats: data as StatClientType,
     isLoading: !error && !data,
     isError: error,
     mutate,

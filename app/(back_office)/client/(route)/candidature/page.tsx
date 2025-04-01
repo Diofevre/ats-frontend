@@ -51,7 +51,7 @@ export default function Candidature() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl  shadow-sm space-y-4">
+      <div className=" rounded-xl  shadow-sm space-y-4">
         {isLoading ? (
           <div className="space-y-4">
             {Array(3)

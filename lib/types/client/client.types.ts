@@ -37,3 +37,25 @@ export type OffreType = {
   titre: string;
   type_emploi: string;
 };
+
+type EtapesActuelleType = {
+  accepte: number;
+  en_revision: number;
+  entretien: number;
+  rejete: number;
+  soumis: number;
+};
+
+type PostulationsScoreType = {
+  nombre_processus: number;
+  offre_titre: string;
+  postulation_id: number;
+  score_total: number;
+};
+
+export type StatClientType = {
+  etapes_actuelles: EtapesActuelleType;
+  nombre_postulations: number;
+  nombre_referents: number;
+  postulations_scores: PostulationsScoreType[];
+};
