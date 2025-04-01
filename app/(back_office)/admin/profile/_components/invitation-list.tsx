@@ -8,7 +8,7 @@ import type { Invitation } from '@/lib/types/invitations';
 import { invitationService } from '@/lib/services/invitations';
 
 interface InvitationListProps {
-  organisationId: number | null;
+  organisationId: number[];
 }
 
 export default function InvitationList({ organisationId } : InvitationListProps) {
@@ -17,7 +17,7 @@ export default function InvitationList({ organisationId } : InvitationListProps)
   const [error, setError] = useState<string | null>(null);
 
   const filteredInvitations = invitations.filter(
-    (invitation) => invitation.organisation_id === organisationId
+    (invitation) => organisationId.includes(invitation.organisation_id)
   );
 
   const fetchInvitations = async () => {

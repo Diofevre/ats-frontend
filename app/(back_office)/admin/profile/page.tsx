@@ -11,6 +11,10 @@ export default function Profile() {
   const { user, loading, refreshUser } = useAuth();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
+  const organisationIds = user?.organisations?.map(org => org.id) ?? [];
+
+  console.log(organisationIds);
+
   return (
     <div className="min-h-screen">
       <main className="max-w-4xl mx-auto px-4 space-y-12">
@@ -30,7 +34,7 @@ export default function Profile() {
           </button>
         </div>
 
-        <InvitationList organisationId={user?.organisation_id ? Number(user.organisation_id) : null} />
+        <InvitationList organisationId={organisationIds} />
       </main>
 
       <InvitationModal

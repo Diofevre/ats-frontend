@@ -2,25 +2,29 @@
 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { CreateOffreDto, Devise, Offre, Status } from '@/lib/types/offres/offres.type';
+import { useOrganization } from '@/hooks/use-organization';
+import { CreateOffreDto, Devise, Offre } from '@/lib/types/offres/offres.type';
 import { Edit, ImageIcon, Plus, Upload } from 'lucide-react';
 import React, { useRef } from 'react';
+import { Combobox } from '../_components/combobox';
 
 interface OffreFormProps {
   initialData?: Offre;
-  onSubmit: (data: CreateOffreDto) => Promise<void>;
+  onSubmit: (data: CreateOffreDto | Offre) => Promise<void>;
   onCancel: () => void;
 }
 
-export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
-  const [isLoading, setIsLoading] = React.useState(false);
+export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { organizations, isLoadingOrganizations } = useOrganization();
+  
   const [formData, setFormData] = React.useState<CreateOffreDto>({
+    organisation_id: initialData?.organisation_id || '',
     titre: initialData?.titre || '',
     description: initialData?.description || '',
     date_limite: initialData?.date_limite?.split('T')[0] || '',
-    status: initialData?.status || 'CREE',
     nombre_requis: initialData?.nombre_requis || 1,
     lieu: initialData?.lieu || '',
     pays: initialData?.pays || '',
@@ -32,13 +36,60 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
     image_url: initialData?.image_url || '',
   });
 
+  const organizationOptions = React.useMemo(() => {
+    return organizations?.map(org => ({
+      value: org.id.toString(),
+      label: org.nom
+    })) || [];
+  }, [organizations]);
+
+  const typeEmploiOptions = [
+    { value: 'CDI', label: 'CDI' },
+    { value: 'CDD', label: 'CDD' },
+    { value: 'STAGE', label: 'Stage' },
+    { value: 'ALTERNANCE', label: 'Alternance' },
+    { value: 'FREELANCE', label: 'Freelance' },
+    { value: 'INTERIM', label: 'Intérim' },
+  ];
+
+  const deviseOptions = [
+    { value: 'EURO', label: 'Euro (€)' },
+    { value: 'DOLLAR', label: 'Dollar ($)' },
+    { value: 'DOLLAR_CANADIEN', label: 'Dollar Canadien (C$)' },
+    { value: 'LIVRE', label: 'Livre Sterling (£)' },
+    { value: 'YEN', label: 'Yen (¥)' },
+    { value: 'ROUPIE', label: 'Roupie (₹)' },
+    { value: 'ARIARY', label: 'Ariary (Ar)' },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    if (!formData.organisation_id) {
+      alert('Veuillez sélectionner une organisation');
+      return;
+    }
+
+    if (!formData.type_emploi) {
+      alert('Veuillez sélectionner un type d\'emploi');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      if (initialData) {
+        await onSubmit({
+          ...initialData,
+          ...formData,
+        });
+      } else {
+        await onSubmit(formData);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Une erreur est survenue lors de la création de l\'offre');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -48,6 +99,18 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
     if (name === 'image_url') {
       setImageError(false);
     }
+  };
+
+  const handleOrganizationChange = (value: string) => {
+    setFormData(prev => ({ ...prev, organisation_id: value }));
+  };
+
+  const handleTypeEmploiChange = (value: string) => {
+    setFormData(prev => ({ ...prev, type_emploi: value }));
+  };
+
+  const handleDeviseChange = (value: string) => {
+    setFormData(prev => ({ ...prev, devise: value as Devise }));
   };
 
   const handleImageError = () => {
@@ -71,12 +134,50 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
     }
   };
 
-  const devises: Devise[] = ['EURO', 'DOLLAR', 'DOLLAR_CANADIEN', 'LIVRE', 'YEN', 'ROUPIE', 'ARIARY'];
-  const statuses: Status[] = ['OUVERT', 'FERME', 'CREE'];
+  const handleBack = () => {
+    window.history.back();
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-4">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 uppercase">CRÉATION DE L&apos;ANNONCE</h2>
+          <p className="mt-1 text-sm text-gray-500">Organisez et gérez vos annonces facilement.</p>
+        </div>
+
+        {initialData ? (
+          <>
+          </>
+        ) : (
+          <span
+            onClick={handleBack}
+            className="flex items-center text-gray-600 hover:text-gray-900 mb-6 cursor-pointer"
+          >
+            ⟵
+            Retour aux offres
+          </span>
+        )}
+      </div>
+
       <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Organisation</label>
+          {isLoadingOrganizations ? (
+            <div className="h-12 flex items-center px-3 bg-gray-50 rounded-md">
+              <span className="text-sm text-gray-500">Chargement des organisations...</span>
+            </div>
+          ) : (
+            <Combobox
+              value={formData.organisation_id}
+              onChange={handleOrganizationChange}
+              options={organizationOptions}
+              placeholder="Sélectionnez une organisation"
+              emptyMessage="Aucune organisation trouvée"
+            />
+          )}
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Titre</label>
           <Input
@@ -175,23 +276,6 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-              disabled={!isLoading || isLoading}
-              className="mt-1 h-12 p-2 block w-full rounded-md border border-gray-300/20 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              {statuses.map(status => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-gray-700">Nombre requis</label>
             <Input
               type="number"
@@ -228,14 +312,13 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Type d&apos;emploi</label>
-            <Input
-              type="text"
-              name="type_emploi"
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type d&apos;emploi</label>
+            <Combobox
               value={formData.type_emploi}
-              onChange={handleChange}
-              required
-              className="mt-1 h-12 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onChange={handleTypeEmploiChange}
+              options={typeEmploiOptions}
+              placeholder="Sélectionnez un type d'emploi"
+              emptyMessage="Aucun type d'emploi trouvé"
             />
           </div>
 
@@ -252,19 +335,14 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
           </div>
 
           <div>
-            <label htmlFor='devise' className="block text-sm font-medium text-gray-700">Devise</label>
-            <select
-              id='devise'
-              name="devise"
+            <label className="block text-sm font-medium text-gray-700 mb-1">Devise</label>
+            <Combobox
               value={formData.devise}
-              onChange={handleChange}
-              required
-              className="mt-1 h-12 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              {devises.map(devise => (
-                <option key={devise} value={devise}>{devise}</option>
-              ))}
-            </select>
+              onChange={handleDeviseChange}
+              options={deviseOptions}
+              placeholder="Sélectionnez une devise"
+              emptyMessage="Aucune devise trouvée"
+            />
           </div>
 
           <div>
@@ -294,31 +372,44 @@ export function OffreForm({ initialData, onSubmit, onCancel }: OffreFormProps) {
       </div>
 
       <div className="flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-[12px] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          Annuler
-        </button>
+        {initialData && (
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={isSubmitting}
+            className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-[12px] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Annuler
+          </button>
+        )}
         <button
           type="submit"
-          className="flex px-5 py-2.5 text-sm font-medium text-white bg-[#1E1F22] border border-transparent rounded-[12px] hover:bg-[#313338] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          disabled={isLoading}
+          className="flex items-center px-5 py-2.5 text-sm font-medium text-white bg-[#1E1F22] border border-transparent rounded-[12px] hover:bg-[#313338] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95"
+          disabled={isSubmitting}
         >
-          {isLoading ? (
-            <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
+          {isSubmitting ? (
+            <>
+              <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              <span>Création en cours...</span>
+            </>
           ) : initialData ? (
-            <Edit className="w-5 h-5 mr-2" />
+            <>
+              <Edit className="w-4 h-4 mr-2" />
+              <span>Modifier</span>
+            </>
           ) : (
-            <Plus className="w-5 h-5 mr-2" />
+            <>
+              <Plus className="w-4 h-4 mr-2" />
+              <span>Créer</span>
+            </>
           )}
-          {isLoading ? 'Chargement...' : initialData ? 'Modifier' : 'Créer'}
         </button>
       </div>
     </form>
   );
 }
+
+export { CreateForm }

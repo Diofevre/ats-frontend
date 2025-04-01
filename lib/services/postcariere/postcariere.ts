@@ -3,26 +3,26 @@ import api from "../api";
 
 export const PostCariereService = {
   getAll: async (): Promise<PostCariere[]> => {
-    const { data } = await api.get('/postcarrieres');
+    const { data } = await api.get('/api/postcarrieres');
     return data;
   },
 
   getById: async (id: number): Promise<PostCariere> => {
-    const { data } = await api.get(`/postcarrieres/${id}`);
+    const { data } = await api.get(`/api/postcarrieres/${id}`);
     return data;
   },
 
   create: async (postCariere: CreatePostCariereDto): Promise<PostCariere> => {
-    const { data } = await api.post('/postcarrieres', postCariere);
+    const { data } = await api.post('/api/postcarrieres', postCariere);
     return data;
   },
 
   update: async (id: number, postCariere: UpdatePostCariereDto): Promise<PostCariere> => {
-    const { data } = await api.put(`/postcarrieres/${id}`, postCariere);
+    const { data } = await api.put(`/api/postcarrieres/${id}`, postCariere);
     return data;
   },
 
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/postcarrieres/${id}`);
+    await api.delete(`/api/postcarrieres/${id}`);
   },
 };

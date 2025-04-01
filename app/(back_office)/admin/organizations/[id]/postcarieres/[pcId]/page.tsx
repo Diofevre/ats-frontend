@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation';
-import PostCariereDetails from '../_components/PCDeails';
+import PostCariereDetails from '../_components/PCDetails';
 
 export default function PostCariereDetailsPage() {
   const params = useParams();

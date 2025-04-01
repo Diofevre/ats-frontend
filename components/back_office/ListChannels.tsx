@@ -1,12 +1,19 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ChevronDown, Loader2, AlertCircle } from 'lucide-react';
+import { 
+  ChevronDown, 
+  Loader2, 
+  AlertCircle,
+  Check,
+  X
+} from 'lucide-react';
 import { ORGANIZATION_ROUTES } from '@/lib/constants/back_office/constants';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useOrganization } from '@/hooks/use-organization';
 import UserInfo from './UserInfo';
+import Link from 'next/link';
 
 interface ChannelListProps {
   isOpen: boolean;
@@ -22,6 +29,9 @@ export default function ChannelList({
 }: ChannelListProps) {
   const router = useRouter();
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['dashboard']);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   
   const { 
     organization,
@@ -32,7 +42,8 @@ export default function ChannelList({
     postCarieres,
     isLoadingUsers,
     isLoadingOffres,
-    isLoadingPostCarieres
+    isLoadingPostCarieres,
+    updateOrganization
   } = useOrganization(activeServer ? parseInt(activeServer) : undefined);
 
   const toggleCategory = (categoryId: string) => {
@@ -41,6 +52,42 @@ export default function ChannelList({
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     );
+  };
+
+  const handleStartEdit = () => {
+    if (organization) {
+      setEditedName(organization.nom);
+      setIsEditing(true);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!organization || !editedName.trim()) return;
+    
+    setIsUpdating(true);
+    try {
+      await updateOrganization(organization.id, { nom: editedName.trim() });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating organization name:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    if (organization) {
+      setEditedName(organization.nom);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
   };
 
   if (isLoading) {
@@ -88,7 +135,7 @@ export default function ChannelList({
     },
     {
       id: 'postcarieres',
-      label: 'POST-CARRIERES',
+      label: `ORGANISATION`,
       route: ORGANIZATION_ROUTES.postcarieres,
       count: isLoadingPostCarieres ? null : postCarieres?.length
     }
@@ -99,11 +146,58 @@ export default function ChannelList({
       "w-60 bg-[#2B2D31] h-screen",
       isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
     )}>
-      <div className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22]">
-        <h2 className="font-semibold text-white uppercase truncate" title={organization.nom}>
-          {organization.nom}
-        </h2>
+      <div className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22]/50">
+        {isEditing ? (
+          <div className="flex items-center w-full gap-2">
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="flex-1 bg-[#1E1F22] text-white px-2 py-1 rounded text-sm font-semibold"
+              placeholder="Nom de l'organisation"
+              autoFocus
+            />
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleSave}
+                disabled={isUpdating}
+                className="text-green-500 hover:text-green-400 disabled:text-gray-500"
+                title="Sauvegarder"
+              >
+                {isUpdating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={isUpdating}
+                className="text-red-500 hover:text-red-400 disabled:text-gray-500"
+                title="Annuler"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <h2 
+            className="font-semibold text-white uppercase truncate cursor-pointer hover:text-gray-300"
+            title="Cliquez pour modifier"
+            onClick={handleStartEdit}
+          >
+            {organization.nom}
+          </h2>
+        )}
       </div>
+
+      {/* Dashboard ATS */}
+      <Link href='/admin' className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22]/50">
+        <h2 className="text-xs text-white uppercase truncate">
+          Tableau de bord général
+        </h2>
+      </Link>
 
       <div className="p-2 text-[#949BA4] overflow-y-auto h-[calc(100vh-64px)]">
         {sections.map(section => (

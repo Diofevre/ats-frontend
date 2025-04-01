@@ -1,3 +1,13 @@
+export interface Organization {
+  id: number;
+  nom: string;
+  adresse: string;
+  ville: string;
+  users: number[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -6,6 +16,7 @@ export interface User {
   profile?: string;
   role: 'ADMINISTRATEUR' | 'MODERATEUR';
   organisation_id?: string;
+  organisations?: Organization[];
   is_active: boolean;
   created_at: string;
   updated_at: string;

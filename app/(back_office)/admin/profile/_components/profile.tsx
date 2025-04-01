@@ -105,7 +105,7 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
             <button
               onClick={handleSubmit}
               disabled={updating}
-              className="h-9 px-4 text-sm font-medium text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all disabled:opacity-50"
+              className="h-9 px-6 text-sm font-medium text-gray-900 border border-gray-200 rounded-full hover:bg-gray-50 transition-all disabled:opacity-50"
             >
               {updating ? "Enregistrement..." : "Enregistrer"}
             </button>

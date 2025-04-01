@@ -19,9 +19,11 @@ export type OffreType = {
   type_emploi: string;
   updated_at: string;
   user_id: number;
+  organisation_id: string;
 };
 
 export interface Offre {
+  organisation_id: string;
   id: number;
   titre: string;
   user_id: number;
@@ -42,10 +44,10 @@ export interface Offre {
 }
 
 export interface CreateOffreDto {
+  organisation_id: string;
   titre: string;
   description: string;
   date_limite: string;
-  status: Status;
   nombre_requis?: number;
   lieu: string;
   pays: string;

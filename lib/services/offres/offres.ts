@@ -133,4 +133,24 @@ export const offreService = {
     });
     return response.data;
   },
+
+  publish: async (id: number, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.put<Offre>(`/api/offres/${id}/publish`);
+      return response.data;
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
+  },
+
+  fermer: async (id: number, token: string | null): Promise<Offre> => {
+    setAuthHeader(token);
+    try {
+      const response = await api.post<Offre>(`/api/offres/${id}/fermer`);
+      return response.data;
+    } finally {
+      setAuthHeader(null); // Clear token after request
+    }
+  },
 };
