@@ -1,10 +1,22 @@
+export interface Organization {
+  id: number;
+  nom: string;
+  adresse: string;
+  ville: string;
+  users: number[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: number;
   name: string;
   email: string;
   phone: string;
   profile?: string;
-  role: 'ADMIN' | 'MODERATEUR';
+  role: 'ADMINISTRATEUR' | 'MODERATEUR';
+  organisation_id?: string;
+  organisations?: Organization[];
   is_active: boolean;
   created_at: string;
   updated_at: string;

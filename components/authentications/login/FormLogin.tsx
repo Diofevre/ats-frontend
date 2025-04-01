@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { Lock, Mail, Loader2 } from 'lucide-react';
-import { FcGoogle } from "react-icons/fc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -24,11 +23,10 @@ const formSchema = z.object({
 
 interface FormLoginProps {
   onSubmit: (credentials: { email: string; password: string }) => Promise<void>;
-  onSocialLogin: (provider: string) => void;
   onForgotPassword: () => void;
 }
 
-const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onSocialLogin, onForgotPassword }) => {
+const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onForgotPassword }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,7 +57,7 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onSocialLogin, onForgot
       </div>
 
       <div className="p-8">
-        <div className="space-y-3 mb-8">
+        {/* <div className="space-y-3 mb-8">
           <button
             onClick={() => onSocialLogin('google')}
             className="w-full flex items-center justify-center space-x-3 py-3 rounded-xl text-gray-700 bg-white border transition-colors hover:bg-gray-50"
@@ -67,16 +65,16 @@ const FormLogin: React.FC<FormLoginProps> = ({ onSubmit, onSocialLogin, onForgot
             <FcGoogle className="w-5 h-5" />
             <span className="font-medium">Continue with Google</span>
           </button>
-        </div>
+        </div> */}
 
-        <div className="relative my-8">
+        {/* <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 text-gray-500 bg-white">Or continue with</span>
           </div>
-        </div>
+        </div> */}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

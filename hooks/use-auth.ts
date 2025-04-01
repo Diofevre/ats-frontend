@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import api from '@/lib/services/api';
 import { getCurrentUser, getToken, logout } from '@/lib/services/authentications/user';
-import { User } from '@/lib/types/authentications/user.types';
+import { UpdateProfilePayload, User } from '@/lib/types/authentications/user.types';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
@@ -23,7 +24,7 @@ export function useAuth() {
   }, []);
 
   // Fetch user data only if we have a token
-  const { data: userData, error: fetchError } = useSWR(
+  const { data: userData, error: fetchError,mutate } = useSWR(
     token ? '/api/users/me' : null,
     getCurrentUser,
     {
@@ -44,6 +45,33 @@ export function useAuth() {
       }
     }
   );
+
+  const updateUser = async (userId: string, payload: UpdateProfilePayload) => {
+    try {
+      const formData = new FormData();
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      await api.put(`/api/users/${userId}`, formData);
+      await mutate(); // Refresh the users list
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to update user');
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    try {
+      await api.delete(`/api/users/${userId}`);
+      await mutate(); // Refresh the users list
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to delete user');
+    }
+  };
 
   // Update user when userData changes
   useEffect(() => {
@@ -105,7 +133,9 @@ export function useAuth() {
     token,
     isInitialized,
     logout: handleLogout,
-    refreshUser
+    refreshUser,
+    deleteUser,
+    updateUser
   };
 }
 
