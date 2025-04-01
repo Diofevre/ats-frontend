@@ -1,22 +1,26 @@
 import useSWR from "swr";
 import axios from "axios";
-import { OffreType, CreateOffreDto, Offre, UpdateOffreDto } from "@/lib/types/offres/offres.type";
+import {
+  OffreType,
+  CreateOffreDto,
+  Offre,
+  UpdateOffreDto,
+} from "@/lib/types/offres/offres.type";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Function to set the authorization header
 const setAuthHeader = (token: string | null) => {
   if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    delete api.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common["Authorization"];
   }
 };
 
@@ -86,7 +90,7 @@ export const useOneOffre = (id: number | undefined) => {
 
 export const offreService = {
   getAll: async (): Promise<Offre[]> => {
-    const response = await api.get<Offre[]>('/api/offres');
+    const response = await api.get<Offre[]>("/api/offres");
     return response.data;
   },
 
@@ -95,17 +99,24 @@ export const offreService = {
     return response.data;
   },
 
-  create: async (offre: CreateOffreDto, token: string | null): Promise<Offre> => {
+  create: async (
+    offre: CreateOffreDto,
+    token: string | null
+  ): Promise<Offre> => {
     setAuthHeader(token);
     try {
-      const response = await api.post<Offre>('/api/offres', offre);
+      const response = await api.post<Offre>("/api/offres", offre);
       return response.data;
     } finally {
       setAuthHeader(null); // Clear token after request
     }
   },
 
-  update: async (id: number, offre: UpdateOffreDto, token: string | null): Promise<Offre> => {
+  update: async (
+    id: number,
+    offre: UpdateOffreDto,
+    token: string | null
+  ): Promise<Offre> => {
     setAuthHeader(token);
     try {
       const response = await api.put<Offre>(`/api/offres/${id}`, offre);

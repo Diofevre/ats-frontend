@@ -1,4 +1,5 @@
 "use client";
+
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,6 +15,9 @@ import {
   Cell,
 } from "recharts";
 import { CheckCircle, Clock, Target, Trophy } from "lucide-react";
+// import { useMyStats } from "@/lib/services/client/client";
+import { useClientStore } from "@/lib/store-user";
+import { useEffect } from "react";
 
 const applicationStats = {
   total: 12,
@@ -24,7 +28,7 @@ const applicationStats = {
 };
 
 const applicationStatusData = [
-  { name: "En attente", value: 5, color: "#EAB308" },
+  { name: "En attente", value: 5, color: "#FACC15" },
   { name: "Entretien", value: 3, color: "#3B82F6" },
   { name: "Acceptées", value: 2, color: "#22C55E" },
   { name: "Refusées", value: 2, color: "#EF4444" },
@@ -59,80 +63,87 @@ export default function ProgressSection() {
     },
   };
 
+  const { client, loadClient } = useClientStore();
+
+  useEffect(() => {
+    if (!client) {
+      loadClient();
+    }
+  }, [client, loadClient]);
+
+  // const { myStats, isLoading } = useMyStats(client?.token_candidat);
+
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Ma progression</h2>
+        <h2 className="text-3xl font-bold text-gray-900">Ma progression</h2>
       </div>
 
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid md:grid-cols-4 gap-4">
+        className="grid md:grid-cols-4 gap-6">
         <motion.div variants={itemVariants}>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <Target className="h-8 w-8 text-blue-600 mb-2" />
-                <h3 className="text-xl font-bold">{applicationStats.total}</h3>
-                <p className="text-gray-600">Candidatures totales</p>
-              </div>
+          <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-blue-300">
+            <CardContent className="pt-6 pb-4 flex flex-col items-center">
+              <Target className="h-8 w-8 text-blue-500 mb-3" />
+              <h3 className="text-2xl font-semibold text-gray-900">
+                {applicationStats.total}
+              </h3>
+              <p className="text-sm text-gray-600">Candidatures totales</p>
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <Clock className="h-8 w-8 text-yellow-500 mb-2" />
-                <h3 className="text-xl font-bold">
-                  {applicationStats.enAttente}
-                </h3>
-                <p className="text-gray-600">En attente</p>
-              </div>
+          <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-yellow-300">
+            <CardContent className="pt-6 pb-4 flex flex-col items-center">
+              <Clock className="h-8 w-8 text-yellow-500 mb-3" />
+              <h3 className="text-2xl font-semibold text-gray-900">
+                {applicationStats.enAttente}
+              </h3>
+              <p className="text-sm text-gray-600">En attente</p>
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <CheckCircle className="h-8 w-8 text-green-500 mb-2" />
-                <h3 className="text-xl font-bold">
-                  {applicationStats.entretien}
-                </h3>
-                <p className="text-gray-600">Entretiens</p>
-              </div>
+          <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-green-300">
+            <CardContent className="pt-6 pb-4 flex flex-col items-center">
+              <CheckCircle className="h-8 w-8 text-green-500 mb-3" />
+              <h3 className="text-2xl font-semibold text-gray-900">
+                {applicationStats.entretien}
+              </h3>
+              <p className="text-sm text-gray-600">Entretiens</p>
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <Trophy className="h-8 w-8 text-purple-500 mb-2" />
-                <h3 className="text-xl font-bold">
-                  {applicationStats.acceptees}
-                </h3>
-                <p className="text-gray-600">Offres acceptées</p>
-              </div>
+          <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-purple-300">
+            <CardContent className="pt-6 pb-4 flex flex-col items-center">
+              <Trophy className="h-8 w-8 text-purple-500 mb-3" />
+              <h3 className="text-2xl font-semibold text-gray-900">
+                {applicationStats.acceptees}
+              </h3>
+              <p className="text-sm text-gray-600">Offres acceptées</p>
             </CardContent>
           </Card>
         </motion.div>
       </motion.div>
 
+      {/* Graphiques */}
       <div className="grid md:grid-cols-2 gap-6">
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Statut des candidatures</CardTitle>
+          <Card className="bg-white border border-gray-200 rounded-xl h-full transition-all duration-200 hover:border-blue-300">
+            <CardHeader className="border-b border-gray-100 px-6 py-4">
+              <CardTitle className="text-lg font-semibold text-gray-800">
+                Statut des candidatures
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-6">
+              <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -150,7 +161,14 @@ export default function ProgressSection() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        padding: "8px",
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -159,12 +177,14 @@ export default function ProgressSection() {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Scores des quiz</CardTitle>
+          <Card className="bg-white border border-gray-200 rounded-xl h-full transition-all duration-200 hover:border-blue-300">
+            <CardHeader className="border-b border-gray-100 px-6 py-4">
+              <CardTitle className="text-lg font-semibold text-gray-800">
+                Scores des quiz
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-6">
+              <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={quizScoresData}
@@ -174,11 +194,18 @@ export default function ProgressSection() {
                       left: 20,
                       bottom: 5,
                     }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Bar dataKey="score" fill="#3B82F6" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" stroke="#6b7280" />
+                    <YAxis domain={[0, 100]} stroke="#6b7280" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        padding: "8px",
+                      }}
+                    />
+                    <Bar dataKey="score" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
