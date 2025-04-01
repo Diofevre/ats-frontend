@@ -46,7 +46,7 @@ export const NavClient = [
   },
   {
     href: "/client/quiz",
-    label: "Quiz",
+    label: "Evaluation",
   },
   {
     href: "/client/progress",
