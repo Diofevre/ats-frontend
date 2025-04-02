@@ -223,7 +223,7 @@ export default function ChannelList({
               <div className="space-y-0.5">
                 <button 
                   onClick={() => {
-                    router.push(`/admin/organizations/${organization.id}${section.route.path}`);
+                    router.push(`/admin/organizations/${organization.id}/${section.route.path}`);
                     setIsMobileMenuOpen(false);
                   }}
                   className="flex items-center w-full px-2 py-1.5 rounded text-[#949BA4] hover:bg-[#35363C] hover:text-white group"

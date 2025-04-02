@@ -26,9 +26,9 @@ import CreateForm from '../_components/form-annonce';
 import { useProcessus } from '@/hooks/use-processus-admin';
 import { useParams, useRouter } from 'next/navigation';
 import { Postulation, TypeProcessus } from '@/lib/types/offre-details';
-import { ProcessSection } from '../[offreId]/_components/processus-details';
 import { CandidateDetails } from '../[offreId]/_components/candidats-details';
 import { ProcessusType } from '@/lib/types/processus-admin/processus-admin';
+import ProcessSection from '../[offreId]/_components/processus-details';
 
 interface CreateProcessusDto {
   titre: string;

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React from 'react';
@@ -5,10 +6,12 @@ import Link from 'next/link';
 import { usePostCariere } from '@/hooks/use-postcariere';
 import { useParams } from 'next/navigation';
 import Nothings from '@/components/nothings';
-import { Briefcase, Trash2, Eye, Plus } from 'lucide-react';
+import { Trash2, Eye, Plus, Calendar } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const CardSkeleton = () => (
-  <div className="bg-white rounded-2xl border border-gray-200 p-6 animate-pulse">
+  <div className="bg-white rounded-2xl p-6 animate-pulse">
     <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-4"></div>
     <div className="space-y-2 mb-6">
       <div className="h-4 bg-gray-200 rounded w-full"></div>
@@ -35,81 +38,102 @@ const PostCarieresList = () => {
 
   if (isLoadingPostCarieres) {
     return (
-      <div className="min-h-screen">
-        <div className="flex justify-between items-center mb-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded-lg w-48"></div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex justify-between items-center mb-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded-lg w-48"></div>
+            </div>
+            <div className="h-10 bg-gray-200 rounded-full w-36 animate-pulse"></div>
           </div>
-          <div className="h-10 bg-gray-200 rounded-full w-36 animate-pulse"></div>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Briefcase className="h-6 w-6" />
-            Career Posts
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage and publish career opportunities
-          </p>
-        </div>
-        <Link 
-          href={`/admin/organizations/${organizationId}/postcarieres/create`}
-          className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-full hover:bg-gray-800 
-            transition-all duration-200 font-medium shadow-sm hover:shadow-md active:transform active:scale-95 text-xs lg:text-sm"
-        >
-          <Plus className="h-4 w-4" />
-          Create Post
-        </Link>
-      </div>
-
+    <div className="min-h-screen max-w-6xl mx-auto">
       {(!postCarieres || postCarieres.length === 0) ? (
-        <Nothings title='Carrieres' />
+        <div className="flex flex-col items-center justify-center">
+          <Nothings title="Carrières" />
+          <Link
+            href={`/admin/organizations/${organizationId}/postcarieres/create`}
+            className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-full 
+              hover:bg-gray-800 transition-all duration-200 font-medium"
+          >
+            <Plus className="h-4 w-4" />
+            Create Post
+          </Link>
+        </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-16">
           {postCarieres.map((post) => (
-            <div 
-              key={post.id} 
-              className="group bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200
-                hover:border-gray-300 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100 opacity-0 
-                group-hover:opacity-100 transition-opacity duration-200" 
-              />
-              <div className="relative">
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 line-clamp-2">
-                  {post.titre}
-                </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  {post.contenu}
-                </p>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href={`/admin/organizations/${organizationId}/postcarieres/${post.id}/edit`}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 
-                      text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200
-                      font-medium text-sm group/button"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-red-200 
-                      text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200
-                      font-medium text-sm"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+            <div key={post.id} className="group">
+              <div className="flex flex-col md:flex-row gap-8">
+                {post.images?.[0] && (
+                  <div className="md:w-1/3 overflow-hidden rounded-lg">
+                    <img 
+                      src={post.images[0]} 
+                      alt={post.titre}
+                      className="w-full h-full object-cover aspect-[4/3]"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                    <Calendar className="h-4 w-4" />
+                    <span>Posted {new Date(post.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-6 text-gray-900">
+                    {post.titre}
+                  </h3>
+                  <div className="prose prose-lg max-w-none mb-8">
+                    <div className="text-gray-600">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({...props}) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
+                          h1: ({...props}) => <h1 className="text-2xl font-bold mb-4" {...props} />,
+                          h2: ({...props}) => <h2 className="text-xl font-bold mb-3" {...props} />,
+                          ul: ({...props}) => <ul className="list-disc pl-4 mb-4 space-y-2" {...props} />,
+                          ol: ({...props}) => <ol className="list-decimal pl-4 mb-4 space-y-2" {...props} />,
+                          li: ({...props}) => <li className="leading-relaxed" {...props} />,
+                          a: ({...props}) => (
+                            <a 
+                              className="text-blue-600 hover:text-blue-800" 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {post.contenu}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Link
+                      href={`/admin/organizations/${organizationId}/postcarieres/${post.id}/edit`}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-[12px]
+                        hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+                    >
+                      <Eye className="h-4 w-4" />
+                      View Details
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(post.id)}
+                      className="inline-flex items-center justify-center p-2.5 text-gray-500 hover:text-red-600
+                        transition-colors duration-200"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -118,6 +142,6 @@ const PostCarieresList = () => {
       )}
     </div>
   );
-};
+}
 
 export default PostCarieresList;

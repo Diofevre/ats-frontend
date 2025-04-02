@@ -7,7 +7,7 @@ import { usePostCariere } from '@/hooks/use-postcariere';
 import { useOrganization } from '@/hooks/use-organization';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ImagePlus, X, Loader2, Building2 } from 'lucide-react';
+import { ImagePlus, X, Loader2, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Combobox } from '../../offres/_components/combobox';
 
@@ -94,7 +94,7 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
         await createPostCariere(formData as CreatePostCariereDto);
         toast.success("Post created successfully");
       }
-      router.push(`/admin/organizations/${formData.organisation_id}/postcarrieres`);
+      router.push(`/admin/organizations/${formData.organisation_id}/postcarieres`);
     } catch (error) {
       console.error('Error saving post:', error);
       toast.error("Failed to save post");
@@ -129,7 +129,7 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 group"
         >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          ⟵
           Back to Career Posts
         </button>
 
