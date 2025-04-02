@@ -1,222 +1,348 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, ChevronRight, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
+import {
+  ArrowLeft,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Loader2,
+} from "lucide-react";
+import HeaderSection from "@/components/back_office/quiz/headerSection";
+import { useClientStore } from "@/lib/store-user";
+import { useQuizById } from "@/lib/services/client/procecus";
 
-const staticQuiz = {
-  id: 1,
-  title: "Quiz 1: React & Next.js",
-  questions: [
-    {
-      id: 1,
-      text: "Quel est le rôle de useEffect dans React ?",
-      options: [
-        { id: "a", text: "Gérer les états" },
-        { id: "b", text: "Exécuter du code après le rendu" },
-        { id: "c", text: "Créer des composants" },
-        { id: "d", text: "Styliser les éléments" },
-      ],
-      correctAnswer: "b",
-    },
-    {
-      id: 2,
-      text: "Que fait Next.js par défaut avec les pages ?",
-      options: [
-        { id: "a", text: "Les rend côté client" },
-        { id: "b", text: "Les pré-rend côté serveur" },
-        { id: "c", text: "Les compile en Python" },
-        { id: "d", text: "Les supprime après chargement" },
-      ],
-      correctAnswer: "b",
-    },
-    {
-      id: 3,
-      text: "Quel hook gère les états dans React ?",
-      options: [
-        { id: "a", text: "useState" },
-        { id: "b", text: "useEffect" },
-        { id: "c", text: "useContext" },
-        { id: "d", text: "useReducer" },
-      ],
-      correctAnswer: "a",
-    },
-  ],
-};
+// Types
+interface Reponse {
+  id: number;
+  is_true: boolean;
+  label: string;
+  question_id: number;
+}
 
-const INITIAL_TIME = 300;
+interface Question {
+  id: number;
+  label: string;
+  ordre: number;
+  processus_id: number;
+  reponses: Reponse[];
+}
 
-export default function StartQuizPage() {
+interface Quiz {
+  id: number;
+  titre: string;
+  type: string;
+  description: string;
+  statut: string;
+  duree: number;
+  offre_id: number;
+  ordre: number;
+  created_at: string;
+  updated_at: string;
+  questions: Question[];
+}
+
+// Composant Loader personnalisé
+const QuizLoader = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="container mx-auto px-6 py-8 flex flex-col items-center justify-center min-h-[50vh]">
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+      <Loader2 className="h-12 w-12 text-blue-500" />
+    </motion.div>
+    <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">
+      Chargement du quiz en cours...
+    </p>
+  </motion.div>
+);
+
+export default function QuizPage() {
+  const params = useParams();
+  const router = useRouter();
+  const quizId = params.id as string;
+
+  const { client, loadClient } = useClientStore();
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
-  const [submitted, setSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const savedTime = localStorage.getItem("quizTimeLeft");
-    return savedTime ? parseInt(savedTime, 10) : INITIAL_TIME;
-  });
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalQuestions = staticQuiz.questions.length;
-  const currentQuestion = staticQuiz.questions[currentQuestionIndex];
+  const { quiz: fetchedQuiz, isLoading } = useQuizById(Number(quizId));
+
+  const formatTime = useCallback((seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours > 0 ? `${hours}:` : ""}${
+      minutes < 10 && hours > 0 ? "0" : ""
+    }${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  }, []);
 
   useEffect(() => {
-    if (submitted || timeLeft <= 0) return;
+    if (!client) loadClient();
+
+    const loadQuiz = async () => {
+      try {
+        if (fetchedQuiz) {
+          setQuiz(fetchedQuiz);
+          setTimeLeft(fetchedQuiz.duree * 60);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du quiz:", error);
+      }
+    };
+
+    loadQuiz();
+  }, [quizId, client, loadClient, fetchedQuiz]);
+
+  // Gestion du timer
+  useEffect(() => {
+    if (!quiz || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        const newTime = prev - 1;
-        localStorage.setItem("quizTimeLeft", newTime.toString());
-        if (newTime <= 0) {
-          setSubmitted(true);
-          localStorage.removeItem("quizTimeLeft");
-        }
-        return newTime;
-      });
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
+    if (timeLeft === 0) handleSubmitQuiz();
+
     return () => clearInterval(timer);
-  }, [timeLeft, submitted]);
+  }, [quiz, timeLeft]);
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  // Gestion des réponses
+  const handleSelectAnswer = (questionId: number, reponseId: number) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: reponseId }));
   };
 
-  const handleAnswerChange = (value: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: value,
-    }));
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      setSubmitted(true);
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < (quiz?.questions.length ?? 0) - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
-  const handleSubmit = () => {
-    localStorage.removeItem("quizTimeLeft");
-    alert("Quiz soumis !");
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
   };
 
-  return (
-    <div className="container mx-auto px-6 py-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (
-                confirm(
-                  "Voulez-vous vraiment quitter le quiz ? Votre progression ne sera pas sauvegardée."
-                )
-              ) {
-                window.history.back();
-              }
-            }}
-            className="text-gray-600 border hover:text-red-600 hover:bg-red-100 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200">
-            <AlertTriangle className="h-5 w-5" />
-            Quitter
-          </Button>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {staticQuiz.title}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2 text-gray-700 font-medium">
-          <Clock className="h-5 w-5 text-blue-500" />
-          <span>{formatTime(timeLeft)}</span>
-        </div>
-      </div>
+  const handleSubmitQuiz = useCallback(() => {
+    setIsSubmitting(true);
+    setTimeout(() => {
+      router.push(`/quiz/${quizId}/results`);
+    }, 1500);
+  }, [quizId, router]);
 
-      {/* Contenu du quiz */}
-      <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-blue-300">
-        <CardHeader className="border-b border-gray-100 px-6 py-4">
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            {submitted
-              ? "Quiz terminé"
-              : `Question ${currentQuestionIndex + 1} sur ${totalQuestions}`}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 flex flex-col md:flex-row gap-6">
-          {/* Question à gauche */}
-          <div className="flex-1 space-y-6">
-            {submitted || timeLeft <= 0 ? (
-              <div className="text-center space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {timeLeft <= 0 ? "Temps écoulé !" : "Prêt à soumettre"}
-                </h2>
-                <Button
-                  onClick={handleSubmit}
-                  className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-blue-200 w-full">
-                  Soumettre
-                </Button>
+  if (isLoading) {
+    return <QuizLoader />;
+  }
+
+  if (!quiz) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="container mx-auto px-6 py-8 flex flex-col items-center justify-center min-h-[50vh]">
+        <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+        <p className="text-lg text-slate-600 dark:text-slate-300 mb-4">
+          Une erreur est survenue lors du chargement du quiz.
+        </p>
+        <Button
+          onClick={() => router.push("/client/candidature")}
+          className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Retour aux candidatures
+        </Button>
+      </motion.div>
+    );
+  }
+
+  const currentQuestion = quiz.questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
+  const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
+  const isQuestionAnswered = answers[currentQuestion.id] !== undefined;
+  const allQuestionsAnswered = quiz.questions.every(
+    (q) => answers[q.id] !== undefined
+  );
+
+  return (
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <HeaderSection
+        title={quiz.titre}
+        description={quiz.description}
+        onBack={() => router.push("/client/candidature")}
+        timeLeft={formatTime(timeLeft)}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mt-8">
+        <Card className="rounded-xl border-0 bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600" />
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-slate-900 dark:text-white text-xl">
+                  Question {currentQuestionIndex + 1} / {quiz.questions.length}
+                </CardTitle>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  {quiz.type === "QUESTIONNAIRE"
+                    ? "Choisissez une réponse"
+                    : "Répondez"}
+                </p>
               </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 transition-all duration-200 hover:bg-gray-100 hover:border-blue-300">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    {currentQuestion.text}
-                  </h3>
-                  <RadioGroup
-                    value={answers[currentQuestion.id] || ""}
-                    onValueChange={handleAnswerChange}
-                    className="space-y-3">
-                    {currentQuestion.options.map((option) => (
-                      <div key={option.id} className="flex items-center gap-2">
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="mb-6">
+              <Progress value={progress} className="h-2" />
+              <div className="flex justify-between mt-1 text-xs text-slate-500">
+                <span>Progression</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestion.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6">
+                <h3 className="text-xl font-medium text-slate-900 dark:text-white p-4 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200 dark:border-slate-700">
+                  {currentQuestion.label}
+                </h3>
+
+                <RadioGroup
+                  value={answers[currentQuestion.id]?.toString()}
+                  onValueChange={(value) =>
+                    handleSelectAnswer(currentQuestion.id, Number(value))
+                  }
+                  className="space-y-3">
+                  {currentQuestion.reponses.map((reponse, idx) => (
+                    <motion.div
+                      key={reponse.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: idx * 0.1 }}>
+                      <div className="flex items-center space-x-2">
                         <RadioGroupItem
-                          value={option.id}
-                          id={`${currentQuestion.id}-${option.id}`}
-                          className="text-blue-500 border-gray-300 focus:ring-blue-200"
+                          value={reponse.id.toString()}
+                          id={`option-${reponse.id}`}
+                          className="peer"
                         />
                         <Label
-                          htmlFor={`${currentQuestion.id}-${option.id}`}
-                          className="text-gray-700 cursor-pointer hover:text-blue-600 transition-colors duration-200">
-                          {option.text}
+                          htmlFor={`option-${reponse.id}`}
+                          className="flex-1 cursor-pointer rounded-xl border-2 p-4 peer-data-[state=checked]:border-blue-500 dark:peer-data-[state=checked]:border-blue-400 peer-data-[state=checked]:bg-blue-50 dark:peer-data-[state=checked]:bg-blue-900/20 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-all duration-200">
+                          {reponse.label}
                         </Label>
                       </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-                <Button
-                  onClick={handleNext}
-                  disabled={!answers[currentQuestion.id]}
-                  className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-blue-200 w-full">
-                  {currentQuestionIndex === totalQuestions - 1
-                    ? "Terminer"
-                    : "Suivant"}
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
+                    </motion.div>
+                  ))}
+                </RadioGroup>
+              </motion.div>
+            </AnimatePresence>
 
-          {/* Grille des numéros de questions à droite */}
-          <div className="">
-            <div className="flex flex-wrap gap-4 justify-end">
-              {staticQuiz.questions.map((question, index) => (
-                <div
-                  key={question.id}
-                  className={cn(
-                    "flex items-center justify-center h-12 w-12 rounded-xl border border-gray-200 text-gray-700 font-medium transition-all duration-200",
-                    index === currentQuestionIndex &&
-                      "bg-blue-500 text-white border-blue-500",
-                    index < currentQuestionIndex &&
-                      "bg-gray-200 text-gray-500 opacity-50 cursor-not-allowed"
-                  )}>
-                  {index + 1}
-                </div>
-              ))}
+            <div className="flex justify-between mt-8 gap-4">
+              <Button
+                variant="outline"
+                onClick={handlePreviousQuestion}
+                disabled={currentQuestionIndex === 0}
+                className="flex-1 rounded-xl">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Précédent
+              </Button>
+              {isLastQuestion ? (
+                <Button
+                  onClick={handleSubmitQuiz}
+                  disabled={!allQuestionsAnswered || isSubmitting}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
+                  {isSubmitting ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="mr-2">
+                        <Clock className="h-4 w-4" />
+                      </motion.div>
+                      Soumission...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Terminer
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNextQuestion}
+                  disabled={!isQuestionAnswered}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
+                  Suivant
+                  <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
+                </Button>
+              )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-wrap gap-2 justify-center mt-6">
+          {quiz.questions.map((question, index) => (
+            <Button
+              key={question.id}
+              variant={answers[question.id] ? "default" : "outline"}
+              size="sm"
+              className={`w-10 h-10 p-0 rounded-full ${
+                answers[question.id]
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600"
+                  : "border-2"
+              } ${
+                currentQuestionIndex === index ? "ring-2 ring-blue-500" : ""
+              }`}
+              onClick={() => setCurrentQuestionIndex(index)}>
+              {index + 1}
+            </Button>
+          ))}
+        </motion.div>
+
+        <AnimatePresence>
+          {!allQuestionsAnswered && isLastQuestion && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 flex items-center justify-center text-amber-600 bg-amber-50 p-3 rounded-lg">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              <span className="text-sm">
+                Répondez à toutes les questions avant de soumettre
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

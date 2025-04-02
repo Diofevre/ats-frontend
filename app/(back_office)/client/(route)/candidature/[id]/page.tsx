@@ -42,10 +42,8 @@ export default function ApplicationDetailPage() {
         <h1 className="text-2xl font-bold mb-4">Candidature non trouvée</h1>
         <Button
           onClick={() => router.push("/client/candidature")}
-          className="flex items-center gap-2"
-        >
-          ⟵
-          Retour aux candidatures
+          className="flex items-center gap-2">
+          ⟵ Retour aux candidatures
         </Button>
       </div>
     );
@@ -56,7 +54,7 @@ export default function ApplicationDetailPage() {
       <HeaderSection application={application} onBack={() => router.back()} />
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <DetailsSection application={application} />
+          <DetailsSection application={application} client={client} />
         </div>
         <div className="space-y-6">
           <ActionsSection application={application} />
