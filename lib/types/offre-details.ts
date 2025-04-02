@@ -1,6 +1,6 @@
 export type TypeTemps = 'PLEIN_TEMPS' | 'TEMPS_PARTIEL';
 export type StatusOffre = 'CREE' | 'OUVERT' | 'FERME';
-export type TypeProcessus = 'TACHE' | 'ENTRETIEN' | 'TEST';
+export type TypeProcessus = 'VISIO_CONFERENCE' | 'TACHE' | 'QUESTIONNAIRE';
 export type StatusProcessus = 'A_VENIR' | 'EN_COURS' | 'TERMINE';
 export type Devise = 'EURO' | 'USD' | 'GBP';
 export type TypeEmploi = 'CDI' | 'CDD' | 'STAGE' | 'ALTERNANCE';

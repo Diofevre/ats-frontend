@@ -3,6 +3,7 @@
 import { usePostCariere } from '@/hooks/use-postcariere';
 import { useParams } from 'next/navigation';
 import PostCariereForm from '../../_components/PCForm';
+import Nothings from '@/components/nothings';
 
 export default function EditPostCarierePage() {
   const params = useParams();
@@ -14,7 +15,9 @@ export default function EditPostCarierePage() {
   }
 
   if (!postCariere) {
-    return <div className="text-center">Post not found</div>;
+    return <div className="text-center">
+      <Nothings title='organisations' />
+    </div>;
   }
 
   return <PostCariereForm initialData={postCariere} isEditing />;
