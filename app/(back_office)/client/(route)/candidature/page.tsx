@@ -49,7 +49,7 @@ export default function Candidature() {
 
         {/* Content Section */}
         <div className="bg-white overflow-hidden">
-          <div className="p-6">
+          <>
             {isLoading ? (
               <div className="space-y-4">
                 {Array(3)
@@ -70,7 +70,7 @@ export default function Candidature() {
                 />
               </div>
             )}
-          </div>
+          </>
         </div>
       </div>
     </div>

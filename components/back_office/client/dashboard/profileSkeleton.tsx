@@ -5,9 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfileSkeleton() {
   return (
-    <div className="container mx-auto   min-h-screen">
+    <div className="max-w-7xl mx-auto min-h-screen mt-4">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Mon profil</h2>
+        <h2 className="text-xl font-bold text-gray-900 uppercase">Mon profil</h2>
         <Skeleton className="h-10 w-28 rounded-lg bg-gray-200" />
       </div>
 
