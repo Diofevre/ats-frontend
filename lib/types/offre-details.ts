@@ -1,4 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+export type TypeTemps = 'PLEIN_TEMPS' | 'TEMPS_PARTIEL';
+export type StatusOffre = 'CREE' | 'OUVERT' | 'FERME';
+export type TypeProcessus = 'TACHE' | 'ENTRETIEN' | 'TEST';
+export type StatusProcessus = 'A_VENIR' | 'EN_COURS' | 'TERMINE';
+export type Devise = 'EURO' | 'USD' | 'GBP';
+export type TypeEmploi = 'CDI' | 'CDD' | 'STAGE' | 'ALTERNANCE';
+
 export interface User {
   id: number;
   name: string;
@@ -12,17 +18,29 @@ export interface Organisation {
   ville: string;
 }
 
+export interface ProcessusPassage {
+  id: number;
+  processus_id: number;
+  postulation_id: number;
+  statut: StatusProcessus;
+  score: number;
+  lien_web?: string;
+  lien_fichier?: string;
+  lien_vision?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Processus {
   id: number;
   titre: string;
-  type: string;
+  type: TypeProcessus;
   description: string;
-  statut: string;
+  statut: StatusProcessus;
   offre_id: number;
   duree: number;
   created_at: string;
   updated_at: string;
-  questions: any[];
 }
 
 export interface Candidat {
@@ -33,34 +51,10 @@ export interface Candidat {
   image: string;
 }
 
-export interface Admin {
-  id: number;
-  name: string;
-}
-
-export interface Remarque {
-  id: number;
-  admin: Admin;
-  postulation_id: number;
-  text: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Postulation {
   id: number;
   candidat: Candidat;
-  offre_id: number;
-  date_soumission: string;
-  etape_actuelle: string;
-  cv: string;
-  lettre_motivation: string;
-  telephone: string;
-  source_site: string;
-  note: number;
-  created_at: string;
-  updated_at: string;
-  remarques: Remarque[];
+  processus_passer: ProcessusPassage[];
 }
 
 export interface Offres {
@@ -71,17 +65,44 @@ export interface Offres {
   image_url: string;
   description: string;
   date_limite: string;
-  status: 'OUVERT' | 'FERME';
+  status: StatusOffre;
   nombre_requis: number;
   lieu: string;
   pays: string;
-  type_emploi: string;
+  type_emploi: TypeEmploi;
+  type_temps: TypeTemps;
   salaire: string;
-  devise: string;
+  devise: Devise;
   horaire_ouverture: string;
   horaire_fermeture: string;
   created_at: string;
   updated_at: string;
   processus: Processus[];
   postulations: Postulation[];
+}
+
+// Response types for API calls
+export interface CreateOffreDto extends Omit<Offres, 
+  'id' | 'created_at' | 'updated_at' | 'processus' | 'postulations' | 'user'
+> {
+  user_id: number;
+}
+
+export interface UpdateOffreDto extends Partial<CreateOffreDto> {
+  id: number;
+}
+
+export interface OffreResponse {
+  data: Offres;
+  message: string;
+}
+
+export interface OffresResponse {
+  data: Offres[];
+  message: string;
+}
+
+export interface DeleteOffreResponse {
+  message: string;
+  success: boolean;
 }

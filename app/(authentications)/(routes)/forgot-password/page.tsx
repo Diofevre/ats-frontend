@@ -113,7 +113,7 @@ const ForgotPassword = () => {
               <div className="flex items-center justify-between">
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-green-600 hover:text-green-500"
+                  className="text-sm font-medium text-cyan-600 hover:text-cyan-500"
                 >
                   Retour à la connexion
                 </Link>
@@ -123,7 +123,7 @@ const ForgotPassword = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex items-center justify-center rounded-[12px] uppercase text-sm w-full h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30"
+                  className="flex items-center justify-center rounded-[12px] uppercase text-xs w-full h-12 bg-[#2C9CC6] hover:bg-[#2C9CC6]/80 text-slate-900 font-semibold transform transition-all"
                 >
                   {isLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />

@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { useOrganization } from '@/hooks/use-organization';
 import UserInfo from './UserInfo';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 interface ChannelListProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export default function ChannelList({
   setIsMobileMenuOpen,
   activeServer
 }: ChannelListProps) {
+  const { user } = useAuth();
   const router = useRouter();
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['dashboard']);
   const [isEditing, setIsEditing] = useState(false);
@@ -193,11 +195,13 @@ export default function ChannelList({
       </div>
 
       {/* Dashboard ATS */}
-      <Link href='/admin' className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22]/50">
-        <h2 className="text-xs text-white uppercase truncate">
-          Tableau de bord général
-        </h2>
-      </Link>
+      {user?.role === 'ADMINISTRATEUR' && (
+        <Link href='/admin' className="h-12 px-4 flex items-center justify-between border-b border-[#1E1F22]/50">
+          <h2 className="text-xs text-white uppercase truncate">
+            Tableau de bord général
+          </h2>
+        </Link>
+      )}
 
       <div className="p-2 text-[#949BA4] overflow-y-auto h-[calc(100vh-64px)]">
         {sections.map(section => (

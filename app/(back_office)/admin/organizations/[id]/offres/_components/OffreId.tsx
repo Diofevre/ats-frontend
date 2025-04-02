@@ -10,49 +10,48 @@ import {
   Users, 
   Building, 
   Mail,
-  MessageSquare,
   Loader2,
   Edit,
   Send,
   X,
-  ArrowUpDown,
   Eye,
-  ChevronUp,
-  ChevronDown,
-  UserPlus,
-  Video,
-  FileText,
-  Trash2,
-  Play,
-  Plus
+  UserPlus
 } from 'lucide-react';
 import { useOffresDetails } from '@/hooks/use-offre-details';
-import { UpdateOffreDto, Offre, Devise } from '@/lib/types/offres/offres.type';
+import { UpdateOffreDto, Offre, Devise, TypeTemps } from '@/lib/types/offres/offres.type';
 import { offreService } from '@/lib/services/offres/offres';
 import { useAuth } from '@/hooks/use-auth';
 import { useOffres } from '@/hooks/use-offre';
 import CreateForm from '../_components/form-annonce';
-import { ProcessusType } from '@/lib/types/processus-admin/processus-admin';
 import { useProcessus } from '@/hooks/use-processus-admin';
+import { useParams, useRouter } from 'next/navigation';
+import { Postulation, TypeProcessus } from '@/lib/types/offre-details';
+import { ProcessSection } from '../[offreId]/_components/processus-details';
+import { CandidateDetails } from '../[offreId]/_components/candidats-details';
+import { ProcessusType } from '@/lib/types/processus-admin/processus-admin';
+
+interface CreateProcessusDto {
+  titre: string;
+  type: TypeProcessus;
+  description: string;
+  duree: number;
+}
 
 const OffreId = () => {
+  const router = useRouter();
   const { token } = useAuth();
   const [offreId, setOffreId] = useState<number | null>(null);
   const [editingOffre, setEditingOffre] = React.useState<Offre | null>(null);
   const [isPublishing, setIsPublishing] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [selectedView, setSelectedView] = useState<'details' | 'process' | 'candidates'>('details');
+  const [selectedCandidate, setSelectedCandidate] = useState<Postulation | null>(null);
   const { mutate } = useOffres();
   const { createProcessus, deleteProcessus, makeTop, makeBottom, startProcessus } = useProcessus();
-  const [isCreatingProcess, setIsCreatingProcess] = useState(false);
-  const [processError, setProcessError] = useState('');
-  const [newProcess, setNewProcess] = useState({
-    titre: '',
-    type: 'VISIO_CONFERENCE' as ProcessusType,
-    description: '',
-    duree: 30
-  });
   const { offre, isLoading } = useOffresDetails(offreId || 0);
+
+  const { id } = useParams();
+  const organizationId = Number(id);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -62,64 +61,53 @@ const OffreId = () => {
     }
   }, []);
 
-  const handleCreateProcess = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateProcess = async (processData: CreateProcessusDto) => {
     if (!offreId) return;
-
-    setIsCreatingProcess(true);
-    setProcessError('');
 
     try {
       await createProcessus({
         offre_id: String(offreId),
-        ...newProcess
-      });
-      setNewProcess({
-        titre: '',
-        type: 'VISIO_CONFERENCE',
-        description: '',
-        duree: 30
+        ...processData,
+        type: processData.type as unknown as ProcessusType
       });
       await mutate();
     } catch (err) {
       console.error('Error creating process:', err);
-      setProcessError('Une erreur est survenue lors de la création du processus.');
-    } finally {
-      setIsCreatingProcess(false);
+      throw err;
     }
   };
 
-  const handleDeleteProcess = async (processId: string) => {
+  const handleDeleteProcess = async (processId: number) => {
     try {
-      await deleteProcessus(processId);
+      await deleteProcessus(String(processId));
       await mutate();
     } catch (err) {
       console.error('Error deleting process:', err);
-      alert('Une erreur est survenue lors de la suppression du processus.');
+      throw err;
     }
   };
 
-  const handleMoveProcess = async (processId: string, direction: 'up' | 'down') => {
+  const handleMoveProcess = async (processId: number, direction: 'up' | 'down') => {
     try {
       if (direction === 'up') {
-        await makeTop(processId);
+        await makeTop(String(processId));
       } else {
-        await makeBottom(processId);
+        await makeBottom(String(processId));
       }
       await mutate();
     } catch (err) {
       console.error('Error moving process:', err);
-      alert('Une erreur est survenue lors du déplacement du processus.');
+      throw err;
     }
   };
 
-  const handleStartProcess = async (processId: string) => {
+  const handleStartProcess = async (processId: number) => {
     try {
-      await startProcessus(processId);
+      await startProcessus(String(processId));
       await mutate();
     } catch (err) {
       console.error('Error starting process:', err);
-      alert('Une erreur est survenue lors du démarrage du processus.');
+      throw err;
     }
   };
 
@@ -129,6 +117,8 @@ const OffreId = () => {
       await offreService.update(editingOffre.id, data, token);
       await mutate();
       setEditingOffre(null);
+      
+      router.push(`/admin/organizations/${organizationId}/offres`)
     } catch (error) {
       console.error('Error updating offer:', error);
       alert('Une erreur est survenue lors de la modification de l\'offre.');
@@ -177,20 +167,10 @@ const OffreId = () => {
         ...offre,
         organisation_id: offre.organisation.id.toString(),
         user_id: offre.user?.id ?? 0,
-        devise: offre.devise as Devise
+        devise: offre.devise as Devise,
+        type_temps: offre.type_temps as TypeTemps,
       };
       setEditingOffre(offreToEdit);
-    }
-  };
-
-  const getProcessTypeIcon = (type: ProcessusType) => {
-    switch (type) {
-      case 'VISIO_CONFERENCE':
-        return <Video className="w-4 h-4" />;
-      case 'QUESTIONNAIRE':
-        return <FileText className="w-4 h-4" />;
-      case 'TACHE':
-        return <Briefcase className="w-4 h-4" />;
     }
   };
 
@@ -216,162 +196,6 @@ const OffreId = () => {
     );
   }
 
-  const renderProcessSection = () => (
-    <section>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Processus de recrutement</h2>
-        <button
-          onClick={() => setSelectedView('process')}
-          className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors text-xs"
-        >
-          <ArrowUpDown className="w-4 h-4 mr-2" />
-          Gérer le processus
-        </button>
-      </div>
-
-      {selectedView === 'process' && (
-        <form onSubmit={handleCreateProcess} className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Ajouter une étape</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Titre
-              </label>
-              <input
-                type="text"
-                value={newProcess.titre}
-                onChange={(e) => setNewProcess({ ...newProcess, titre: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type
-              </label>
-              <select
-                value={newProcess.type}
-                onChange={(e) => setNewProcess({ ...newProcess, type: e.target.value as ProcessusType })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="VISIO_CONFERENCE">Visioconférence</option>
-                <option value="QUESTIONNAIRE">Questionnaire</option>
-                <option value="TACHE">Tâche</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                value={newProcess.description}
-                onChange={(e) => setNewProcess({ ...newProcess, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={3}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Durée (minutes)
-              </label>
-              <input
-                type="number"
-                value={newProcess.duree}
-                onChange={(e) => setNewProcess({ ...newProcess, duree: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                min="1"
-                required
-              />
-            </div>
-          </div>
-
-          {processError && (
-            <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
-              {processError}
-            </div>
-          )}
-
-          <div className="mt-6">
-            <button
-              type="submit"
-              disabled={isCreatingProcess}
-              className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-lg hover:bg-[#2C9CC6]/80 transition-colors"
-            >
-              {isCreatingProcess ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Plus className="w-4 h-4 mr-2" />
-              )}
-              {isCreatingProcess ? 'Création...' : 'Ajouter l\'étape'}
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-4">
-        {offre.processus.map((etape, index) => (
-          <div key={etape.id} className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    {getProcessTypeIcon(etape.type as ProcessusType)}
-                    <span className="ml-1">{etape.type}</span>
-                  </span>
-                  <h4 className="text-lg font-medium text-gray-900 ml-3">{etape.titre}</h4>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">{etape.description}</p>
-                <div className="mt-2 flex items-center text-sm text-gray-500">
-                  <Clock className="w-4 h-4 mr-1" />
-                  <span>{etape.duree} minutes</span>
-                </div>
-              </div>
-
-              {selectedView === 'process' && (
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleStartProcess(String(etape.id))}
-                    className="p-1 text-gray-400 hover:text-green-600 transition-colors"
-                    title="Démarrer"
-                  >
-                    <Play className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleMoveProcess(String(etape.id), 'up')}
-                    disabled={index === 0}
-                    className={`p-1 ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
-                    title="Déplacer vers le haut"
-                  >
-                    <ChevronUp className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleMoveProcess(String(etape.id), 'down')}
-                    disabled={index === offre.processus.length - 1}
-                    className={`p-1 ${index === offre.processus.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
-                    title="Déplacer vers le bas"
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProcess(String(etape.id))}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-
   const renderCandidatesSection = () => (
     <section>
       <div className="flex justify-between items-center mb-4">
@@ -392,6 +216,7 @@ const OffreId = () => {
                 src={postulation.candidat.image}
                 alt={postulation.candidat.nom}
                 className="w-12 h-12 rounded-full object-cover"
+                onError={(e) => (e.currentTarget.src = "/processus.png")}
               />
               <div className="ml-4">
                 <h3 className="font-medium text-[#1E1F22]">{postulation.candidat.nom}</h3>
@@ -402,22 +227,22 @@ const OffreId = () => {
               </div>
               <div className="ml-auto">
                 <span className="text-sm font-medium text-gray-500">
-                  Note: {postulation.note}/5
+                  Note: A-Venir/5
                 </span>
               </div>
             </div>
-            {postulation.remarques.length > 0 && (
+            {/* {postulation.remarques.length > 0 && ( */}
               <div className="mt-4 pl-16">
                 <p className="text-sm text-gray-600">
-                  <MessageSquare className="w-4 h-4 inline mr-1" />
-                  {postulation.remarques[0].text}
+                  {/* {postulation.remarques[0].text} */}
+                  TODO: Postulation remaque a venir
                 </p>
               </div>
-            )}
+            {/* )} */}
             {selectedView === 'candidates' && (
               <div className="mt-4 pl-16">
                 <button
-                  onClick={() => {/* Handle view candidate details */}}
+                  onClick={() => setSelectedCandidate(postulation)}
                   className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-xs"
                 >
                   <Eye className="w-3 h-3 mr-1" />
@@ -534,9 +359,28 @@ const OffreId = () => {
                 </section>
               )}
 
-              {selectedView === 'process' ? renderProcessSection() : selectedView === 'candidates' ? renderCandidatesSection() : (
+              {selectedView === 'process' ? (
+                <ProcessSection
+                  processus={offre.processus}
+                  isEditing={true}
+                  onCreateProcess={handleCreateProcess}
+                  onDeleteProcess={handleDeleteProcess}
+                  onMoveProcess={handleMoveProcess}
+                  onStartProcess={handleStartProcess}
+                />
+              ) : selectedView === 'candidates' ? (
+                renderCandidatesSection()
+              ) : (
                 <>
-                  {renderProcessSection()}
+                  <ProcessSection
+                    processus={offre.processus}
+                    isEditing={false}
+                    onCreateProcess={handleCreateProcess}
+                    onDeleteProcess={handleDeleteProcess}
+                    onMoveProcess={handleMoveProcess}
+                    onStartProcess={handleStartProcess}
+                    onViewChange={() => setSelectedView('process')}
+                  />
                   {renderCandidatesSection()}
                 </>
               )}
@@ -618,6 +462,13 @@ const OffreId = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {selectedCandidate && (
+        <CandidateDetails
+          postulation={selectedCandidate}
+          onClose={() => setSelectedCandidate(null)}
+        />
       )}
     </div>
   );

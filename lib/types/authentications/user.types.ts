@@ -1,3 +1,5 @@
+export type Role = 'ADMINISTRATEUR' | 'MODERATEUR';
+
 export interface Organization {
   id: number;
   nom: string;
@@ -14,7 +16,7 @@ export interface User {
   email: string;
   phone: string;
   profile?: string;
-  role: 'ADMINISTRATEUR' | 'MODERATEUR';
+  role: Role;
   organisation_id?: string;
   organisations?: Organization[];
   is_active: boolean;
@@ -70,5 +72,10 @@ export interface UpdateProfilePayload {
   password?: string;
   phone?: string;
   profile?: File;
-  role?: string;
+  role?: Role;
+}
+
+export interface RoleUpdatePayload {
+  role: Role;
+  organisations?: number[];
 }

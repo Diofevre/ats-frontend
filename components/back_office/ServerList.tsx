@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { Plus, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOrganization } from '@/hooks/use-organization';
+import { useAuth } from '@/hooks/use-auth';
 
 interface ServerListProps {
   activeServer: string;
@@ -22,6 +23,7 @@ export default function ServerList({
     isErrorOrganizations,
     deleteOrganization 
   } = useOrganization();
+  const { user } = useAuth();
 
   // Automatically select first server when organizations load
   useEffect(() => {
@@ -50,15 +52,19 @@ export default function ServerList({
 
   return (
     <div className="w-[72px] bg-[#1E1F22] flex flex-col items-center py-3 space-y-2 h-screen">
-      <button
-        onClick={() => setIsCreateModalOpen(true)}
-        className="w-12 h-12 rounded-[24px] bg-[#23A559] hover:bg-[#248046] flex items-center justify-center transition-all duration-200 mb-2"
-        title="Ajouter une organisation"
-      >
-        <Plus className="w-6 h-6 text-white" />
-      </button>
+      {user?.role === 'ADMINISTRATEUR' && (
+        <>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="w-12 h-12 rounded-[24px] bg-[#23A559] hover:bg-[#248046] flex items-center justify-center transition-all duration-200 mb-2"
+            title="Ajouter une organisation"
+          >
+            <Plus className="w-6 h-6 text-white" />
+          </button>
 
-      <div className="w-8 h-[2px] bg-[#313338] rounded-full mb-2" />
+          <div className="w-8 h-[2px] bg-[#313338] rounded-full mb-2" />
+        </>
+      )}
 
       <div className="flex-1 overflow-y-auto w-full px-2">
         {isLoadingOrganizations ? (
@@ -101,13 +107,15 @@ export default function ServerList({
                 )} style={{ transform: 'translateX(-50%)' }} />
 
                 {/* Delete button - only shows on hover */}
-                <button
-                  onClick={(e) => handleDeleteOrganization(org.id, e)}
-                  className="absolute top-0 right-0 -mr-1 -mt-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center text-white opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 text-xs flex"
-                  title="Supprimer l'organisation"
-                >
-                  ×
-                </button>
+                { user?.role === 'ADMINISTRATEUR' && (
+                  <button
+                    onClick={(e) => handleDeleteOrganization(org.id, e)}
+                    className="absolute top-0 right-0 -mr-1 -mt-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center text-white opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 text-xs flex"
+                    title="Supprimer l'organisation"
+                  >
+                    ×
+                  </button>
+                ) }
               </button>
             ))}
           </div>

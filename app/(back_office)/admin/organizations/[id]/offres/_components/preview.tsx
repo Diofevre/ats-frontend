@@ -70,7 +70,7 @@ export function Preview({ offreData, onBack, onFinish, isLoading }: PreviewProps
       <div className="mt-8 flex justify-end">
         <Button
           onClick={onFinish}
-          className="flex items-center rounded-full h-12"
+          className="flex items-center rounded-[12px] h-12 px-6"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -80,7 +80,7 @@ export function Preview({ offreData, onBack, onFinish, isLoading }: PreviewProps
             </>
           ) : (
             <>
-              <Check className="w-5 h-5 mr-2" />
+              <Check className="w-5 h-5 mr-1" />
               Ajout de l&apos;annonce
             </>
           )}

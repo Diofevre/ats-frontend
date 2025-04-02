@@ -11,6 +11,7 @@ import {
   ResetPasswordPayload,
   UpdateProfilePayload,
   OtpResendConfirmationPayload,
+  RoleUpdatePayload,
 } from '@/lib/types/authentications/user.types';
 import axios from 'axios';
 
@@ -91,6 +92,17 @@ export const updateProfile = async (payload: UpdateProfilePayload): Promise<User
   const formData = createFormData(payload);
   return handleRequest(api.put('/api/users/me', formData));
 };
+
+// Update Role Users - Fixed to use JSON instead of FormData
+export const updateRoleUsers = async (id: number, payload: RoleUpdatePayload): Promise<User> => {
+  // Ensure the payload includes organizations for MODERATEUR role
+  if (payload.role === 'MODERATEUR' && (!payload.organisations || payload.organisations.length === 0)) {
+    throw new Error('Les organisations doivent être spécifiées pour un Modérateur');
+  }
+  
+  return handleRequest(api.put(`/api/users/${id}/change/role`, payload));
+};
+
 
 // Admin Only
 export const getAllUsers = async (): Promise<User[]> => {

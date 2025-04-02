@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -8,6 +9,7 @@ import {
   Calendar,
   Clock,
   Users,
+  Sparkles,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -27,6 +29,7 @@ import * as z from "zod";
 import { OffreFilters, useAllOffres } from "@/lib/services/offres/offres";
 import { OffreType } from "@/lib/types/offres/offres.type";
 import Link from "next/link";
+import Nothings from "../nothings";
 
 const searchSchema = z.object({
   text: z.string().nullable().default(null),
@@ -112,48 +115,53 @@ const Hero = () => {
       initial="hidden"
       animate="visible"
       variants={staggerChildren}
-      className="py-12">
-      <div className="grid  md:grid-cols-2 gap-8 items-center">
-        <motion.div variants={fadeInUp} className="space-y-6">
-          <motion.h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+      className="container mx-auto py-16 md:py-28">
+      <div className="grid md:grid-cols-2 gap-12 items-center">
+        <motion.div variants={fadeInUp} className="space-y-8">
+          <div className="inline-flex items-center space-x-2 bg-white/10 rounded-full px-4 py-2 text-white">
+            <Sparkles size={16} />
+            <span className="text-sm font-medium">Nouvelles opportunités</span>
+          </div>
+          <motion.h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
             Rejoignez notre équipe et{" "}
             <motion.span
-              initial={{ color: "#4AC9B5" }}
-              animate={{ color: ["#4AC9B5", "#3DB4A2", "#4AC9B5"] }}
+              initial={{ color: "#FFFFFF" }}
+              animate={{ color: ["#FFFFFF", "#E2E8F0", "#FFFFFF"] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="inline-block">
               développez
             </motion.span>{" "}
             votre potentiel
           </motion.h1>
-          <motion.p variants={fadeInUp} className="text-lg text-white">
+          <motion.p variants={fadeInUp} className="text-lg text-white/80">
             Trouvez l&apos;opportunité qui vous correspond et construisez votre
             avenir professionnel avec nous.
           </motion.p>
-          <Link href={"/offres-lists"}>
+          <Link href="/offres-lists">
             <motion.button
               variants={fadeInUp}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="rounded-[24px] px-8 h-12 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30">
-              Voir nos offres d&apos;emploi
+              className="rounded-[12px] mt-8 px-8 h-12 bg-white text-black/80 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 transform transition-all">
+              Voir Plus +
             </motion.button>
           </Link>
         </motion.div>
-        <motion.div variants={scaleIn} className="hidden md:block">
+        <motion.div variants={scaleIn} className="hidden md:block relative">
+          <div className="absolute inset-0 bg-white/20 rounded-3xl blur-3xl opacity-20"></div>
           <motion.img
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
             src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
             alt="Équipe au travail"
-            className="rounded-lg shadow-xl"
+            className="rounded-3xl shadow-2xl relative z-10"
           />
         </motion.div>
       </div>
 
       <motion.div
         variants={fadeInUp}
-        className="mt-24 bg-white p-8 rounded-[12px] border">
+        className="mt-24 bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-xl">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid md:grid-cols-4 gap-4 items-center">
@@ -161,7 +169,7 @@ const Hero = () => {
             whileHover={{ scale: 1.02 }}
             className="relative flex items-center">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60"
               size={20}
             />
             <Controller
@@ -171,22 +179,19 @@ const Hero = () => {
                 <Input
                   type="text"
                   placeholder="Titre du poste"
-                  className="w-full pl-10 pr-4 h-9 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 h-12 bg-white/10 border-white/20 rounded-xl text-white placeholder:text-white/80 focus:border-transparent"
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(e.target.value || null)}
                 />
               )}
             />
-            {errors.text && (
-              <p className="text-red-500 text-sm mt-1">{errors.text.message}</p>
-            )}
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="relative flex items-center">
             <MapPin
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 z-10"
               size={20}
             />
             <Controller
@@ -196,10 +201,10 @@ const Hero = () => {
                 <Select
                   onValueChange={field.onChange}
                   value={field.value ?? undefined}>
-                  <SelectTrigger className="w-full pl-10 pr-4 h-12 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500">
+                  <SelectTrigger className="w-full pl-10 h-12 bg-white/10 border-white/20 rounded-xl text-white">
                     <SelectValue placeholder="Toutes les emplacements" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#4BB3DA] border-white/20 text-white">
                     <SelectItem value="All">Tout</SelectItem>
                     <SelectItem value="France">France</SelectItem>
                     <SelectItem value="Madagascar">Madagascar</SelectItem>
@@ -207,16 +212,13 @@ const Hero = () => {
                 </Select>
               )}
             />
-            {errors.pays && (
-              <p className="text-red-500 text-sm mt-1">{errors.pays.message}</p>
-            )}
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="relative flex items-center">
             <Briefcase
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 z-10"
               size={20}
             />
             <Controller
@@ -226,10 +228,10 @@ const Hero = () => {
                 <Select
                   onValueChange={field.onChange}
                   value={field.value ?? undefined}>
-                  <SelectTrigger className="w-full pl-10 pr-4 h-12 border rounded-lg focus:ring-0 focus:ring-blue-500 focus:border-blue-500">
+                  <SelectTrigger className="w-full pl-10 h-12 bg-white/10 border-white/20 rounded-xl text-white">
                     <SelectValue placeholder="Type d'emplois" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#4BB3DA] border-white/20 text-white">
                     <SelectItem value="All">Tout</SelectItem>
                     <SelectItem value="CDI">CDI</SelectItem>
                     <SelectItem value="CDD">CDD</SelectItem>
@@ -238,11 +240,6 @@ const Hero = () => {
                 </Select>
               )}
             />
-            {errors.type_emploi && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.type_emploi.message}
-              </p>
-            )}
           </motion.div>
 
           <motion.div
@@ -251,28 +248,37 @@ const Hero = () => {
             className="flex items-center">
             <Button
               type="submit"
-              className="w-full h-9 rounded-[12px] px-6 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-900 hover:from-teal-300 hover:to-cyan-300 font-semibold shadow-xl shadow-cyan-500/20 transition-all">
-              Valider
+              className="w-full h-12 rounded-xl bg-white text-black/80 hover:bg-white/90 transition-all">
+              Rechercher
             </Button>
           </motion.div>
         </form>
       </motion.div>
-      <motion.div variants={staggerChildren} className="mt-6 space-y-4">
+
+      <motion.div variants={staggerChildren} className="mt-12 space-y-4">
         {!hasSearched ? (
-          <p className="text-center text-gray-600">
-            Faites une recherche pour voir les offres.
-          </p>
+          <>
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-8 w-8 text-gray-400" />
+            </div>
+            <p className="text-center text-white/60">
+              Faites une recherche pour voir les offres disponibles
+            </p>
+          </>
+          
         ) : isLoading ? (
-          <p className="text-center text-gray-600">Chargement des offres...</p>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
         ) : mockJobs && mockJobs.length > 0 ? (
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {mockJobs.map((job: OffreType) => (
               <motion.div
                 key={job.id}
                 variants={itemVariants}
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}>
-                <Card className="hover:shadow-xl transition-all duration-300 rounded-[12px]">
+                <Card className="bg-white/10 backdrop-blur-xl border-white/20 hover:shadow-2xl hover:shadow-black/10 transition-all duration-300 rounded-2xl overflow-hidden">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
                       <div className="flex-1 space-y-4">
@@ -282,17 +288,17 @@ const Hero = () => {
                             transition={{ duration: 0.2 }}>
                             <Badge
                               variant="secondary"
-                              className="mb-2 bg-blue-50 text-blue-700 hover:bg-blue-100">
+                              className="mb-2 bg-white/20 text-white hover:bg-white/30">
                               {job.status}
                             </Badge>
                           </motion.div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          <h3 className="text-xl font-semibold text-white mb-2">
                             {job.titre}
                           </h3>
-                          <div className="text-lg font-medium text-blue-600">
+                          <div className="text-lg font-medium text-white">
                             {`${job.salaire} ${job.devise}`}
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-white/80">
                             {job.description}
                           </p>
                         </div>
@@ -300,32 +306,32 @@ const Hero = () => {
                         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600">
-                            <MapPin className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
+                            className="flex items-center text-white/80">
+                            <MapPin className="h-5 w-5 mr-2 text-white/60 flex-shrink-0" />
                             {`${job.lieu}, ${job.pays}`}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600">
-                            <Briefcase className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
+                            className="flex items-center text-white/80">
+                            <Briefcase className="h-5 w-5 mr-2 text-white/60 flex-shrink-0" />
                             {job.type_emploi}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600">
-                            <Calendar className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
+                            className="flex items-center text-white/80">
+                            <Calendar className="h-5 w-5 mr-2 text-white/60 flex-shrink-0" />
                             {new Date(job.created_at).toLocaleDateString()}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600">
-                            <Clock className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
+                            className="flex items-center text-white/80">
+                            <Clock className="h-5 w-5 mr-2 text-white/60 flex-shrink-0" />
                             {`${job.horaire_ouverture} - ${job.horaire_fermeture}`}
                           </motion.div>
                           <motion.div
                             whileHover={{ x: 5 }}
-                            className="flex items-center text-gray-600 col-span-2">
-                            <Users className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0" />
+                            className="flex items-center text-white/80 col-span-2">
+                            <Users className="h-5 w-5 mr-2 text-white/60 flex-shrink-0" />
                             {`${job.nombre_requis} poste(s)`}
                           </motion.div>
                         </div>
@@ -336,7 +342,7 @@ const Hero = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}>
                           <Link href={`/offres-lists/${job.id}/postuler`}>
-                            <Button className="flex-1 bg-blue-600/90 hover:bg-blue-700 rounded-[12px] w-full h-10">
+                            <Button className="flex-1 bg-white text-black hover:bg-white/90 rounded-xl w-full h-10">
                               Postuler
                             </Button>
                           </Link>
@@ -351,7 +357,7 @@ const Hero = () => {
                             className="outline-none">
                             <Button
                               variant="outline"
-                              className="flex-1 rounded-[12px] w-full h-10">
+                              className="flex-1 border-white/20 text-black hover:bg-white/10 rounded-xl w-full h-10">
                               Détails
                             </Button>
                           </Link>
@@ -364,7 +370,9 @@ const Hero = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-600">Aucune offre trouvée.</p>
+          <Nothings 
+            title="Offre(s)"
+          />
         )}
       </motion.div>
     </motion.div>

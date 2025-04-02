@@ -246,7 +246,7 @@ const FeaturesSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex justify-center mt-16">
-          <Button className="rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white hover:from-cyan-400 hover:to-teal-400 font-medium px-8 h-12 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all duration-300">
+          <Button className="rounded-[12px] bg-gradient-to-r from-cyan-500 to-teal-500 text-white hover:from-cyan-400 hover:to-teal-400 font-medium px-8 h-12 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all duration-300">
             <span>Toutes les fonctionnalités</span>
             <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
