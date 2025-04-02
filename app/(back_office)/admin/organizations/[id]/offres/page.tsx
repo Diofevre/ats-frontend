@@ -93,7 +93,7 @@ const Offres = () => {
           <Nothings title='Offres' />
           <button
             onClick={handleAddOffre}
-            className="mt-6 inline-flex items-center px-6 py-2.5 bg-[#1E1F22] text-white rounded-full hover:bg-[#1E1F22]/90 transition-colors"
+            className="mt-6 inline-flex items-center px-6 py-2.5 bg-[#313338] text-white rounded-full hover:bg-[#313338]/90 transition-colors"
           >
             <Plus className="w-5 h-5 mr-2" />
             Ajouter une offre

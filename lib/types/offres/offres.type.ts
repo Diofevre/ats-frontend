@@ -1,5 +1,6 @@
 export type Devise = 'EURO' | 'DOLLAR' | 'DOLLAR_CANADIEN' | 'LIVRE' | 'YEN' | 'ROUPIE' | 'ARIARY';
 export type Status = 'OUVERT' | 'FERME' | 'CREE';
+export type TypeTemps = 'PLEIN_TEMPS' | 'TEMPS_PARTIEL';
 
 export type OffreType = {
   created_at: string;
@@ -17,6 +18,7 @@ export type OffreType = {
   status: string;
   titre: string;
   type_emploi: string;
+  type_temps: TypeTemps;
   updated_at: string;
   user_id: number;
   organisation_id: string;
@@ -35,6 +37,7 @@ export interface Offre {
   lieu: string;
   pays: string;
   type_emploi: string;
+  type_temps: TypeTemps;
   salaire: string;
   devise: Devise;
   horaire_ouverture: string;
@@ -52,6 +55,7 @@ export interface CreateOffreDto {
   lieu: string;
   pays: string;
   type_emploi: string;
+  type_temps: TypeTemps;
   salaire: string;
   devise: Devise;
   horaire_ouverture: string;

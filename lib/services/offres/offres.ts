@@ -137,6 +137,7 @@ export const offreService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
+
     return response.data;
   },
 

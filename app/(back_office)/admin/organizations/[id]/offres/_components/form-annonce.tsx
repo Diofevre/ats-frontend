@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useOrganization } from '@/hooks/use-organization';
-import { CreateOffreDto, Devise, Offre } from '@/lib/types/offres/offres.type';
+import { CreateOffreDto, Devise, Offre, TypeTemps } from '@/lib/types/offres/offres.type';
 import { Edit, ImageIcon, Plus, Upload } from 'lucide-react';
 import React, { useRef } from 'react';
 import { Combobox } from '../_components/combobox';
@@ -29,6 +29,7 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
     lieu: initialData?.lieu || '',
     pays: initialData?.pays || '',
     type_emploi: initialData?.type_emploi || '',
+    type_temps: initialData?.type_temps || 'PLEIN_TEMPS',
     salaire: initialData?.salaire || '',
     devise: initialData?.devise || 'EURO',
     horaire_ouverture: initialData?.horaire_ouverture || '09:00:00',
@@ -52,6 +53,11 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
     { value: 'INTERIM', label: 'Intérim' },
   ];
 
+  const typeTempsOptions = [
+    { value: 'PLEIN_TEMPS', label: 'Temps plein' },
+    { value: 'TEMPS_PARTIEL', label: 'Temps partiel' },
+  ];
+
   const deviseOptions = [
     { value: 'EURO', label: 'Euro (€)' },
     { value: 'DOLLAR', label: 'Dollar ($)' },
@@ -71,6 +77,11 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
     }
 
     if (!formData.type_emploi) {
+      alert('Veuillez sélectionner un type d\'emploi');
+      return;
+    }
+
+    if (!formData.type_temps) {
       alert('Veuillez sélectionner un type d\'emploi');
       return;
     }
@@ -107,6 +118,10 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
 
   const handleTypeEmploiChange = (value: string) => {
     setFormData(prev => ({ ...prev, type_emploi: value }));
+  };
+
+  const handleTypeTempsChange = (value: string) => {
+    setFormData(prev => ({ ...prev, type_temps: value as TypeTemps }));
   };
 
   const handleDeviseChange = (value: string) => {
@@ -318,7 +333,18 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
               onChange={handleTypeEmploiChange}
               options={typeEmploiOptions}
               placeholder="Sélectionnez un type d'emploi"
-              emptyMessage="Aucun type d'emploi trouvé"
+              emptyMessage="Aucun type trouvé"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type de contrat</label>
+            <Combobox
+              value={formData.type_temps}
+              onChange={handleTypeTempsChange}
+              options={typeTempsOptions}
+              placeholder="Sélectionnez un type d'emploi"
+              emptyMessage="Aucun type trouvé"
             />
           </div>
 
@@ -346,7 +372,7 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Horaire d&apos;ouverture</label>
+            <label className="block text-sm font-medium text-gray-700">Heure d&apos;ouverture du travail</label>
             <Input
               type="time"
               name="horaire_ouverture"
@@ -358,7 +384,7 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Horaire de fermeture</label>
+            <label className="block text-sm font-medium text-gray-700">Heure de fermeture du travail</label>
             <Input
               type="time"
               name="horaire_fermeture"
@@ -411,5 +437,3 @@ export default function CreateForm({ initialData, onSubmit }: OffreFormProps) {
     </form>
   );
 }
-
-export { CreateForm }

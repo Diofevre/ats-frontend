@@ -25,7 +25,7 @@ const Dashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p className="text-gray-600">Error loading dashboard data</p>
+          <p className="text-gray-600">Erreur lors du chargement des données du tableau de bord.</p>
         </div>
       </div>
     );
@@ -37,9 +37,9 @@ const Dashboard = () => {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 uppercase">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-gray-900 uppercase">TABLEAU DE BORD</h1>
           <div className="text-sm text-gray-500">
-            Last updated: {new Date().toLocaleDateString()}
+          Dernière mise à jour: {new Date().toLocaleDateString()}
           </div>
         </div>
         

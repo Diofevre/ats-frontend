@@ -7,21 +7,13 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import { navLinks } from "@/lib/constants/front_office/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 const baseTextClasses = "transition-colors text-white group-hover:text-white";
 const baseHoverClasses = "hover:text-indigo-600 transition-colors";
 
-const demoButton = (
-  <Link href="/login-client">
-    <Button
-      size="lg"
-      className="rounded-[12px] text-black px-8 bg-gradient-to-r from-teal-400 to-cyan-400 font-medium shadow-lg shadow-indigo-500/20 transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-teal-300 hover:to-cyan-300">
-      Mon profile
-    </Button>
-  </Link>
-);
-
 const Navbar = () => {
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
@@ -70,8 +62,8 @@ const Navbar = () => {
           </div>
           <div className="flex items-center space-x-6">
             <span className={baseTextClasses + " cursor-pointer"}>Support</span>
-            <Link href="/admin" className={`flex items-center group ${baseTextClasses}`}>
-              <User size={16} className="mr-2" /> Espace Client
+            <Link href="/login-client" className={`flex items-center group ${baseTextClasses}`}>
+              <User size={16} className="mr-2" /> Espace Candidature
             </Link>
           </div>
         </div>
@@ -95,7 +87,20 @@ const Navbar = () => {
                   {link.label}
                 </a>
               ))}
-              {demoButton}
+              
+              {/* Button */}
+              <Link href="/admin">
+                <Button
+                  size="lg"
+                  className="rounded-[12px] text-black px-8 bg-gradient-to-r from-teal-400 to-cyan-400 font-medium shadow-lg shadow-indigo-500/20 transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-teal-300 hover:to-cyan-300"
+                >
+                  { user ? (
+                    <>Se connecter</>
+                  ) : (
+                    <>Administrateur</>
+                  ) }
+                </Button>
+              </Link>
             </div>
 
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={baseHoverClasses + " md:hidden flex items-center"}>
@@ -116,7 +121,22 @@ const Navbar = () => {
                     {link.label}
                   </a>
                 ))}
-                <div className="px-3 py-2">{demoButton}</div>
+
+                {/* Button */}
+                <div className="px-3 py-2">
+                <Link href="/admin">
+                  <Button
+                    size="lg"
+                    className="rounded-[12px] text-black px-8 bg-gradient-to-r from-teal-400 to-cyan-400 font-medium shadow-lg shadow-indigo-500/20 transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-teal-300 hover:to-cyan-300"
+                  >
+                    { user ? (
+                      <>Se connecter</>
+                    ) : (
+                      <>Administrateur</>
+                    ) }
+                  </Button>
+                </Link>
+                </div>
               </div>
             </div>
           )}

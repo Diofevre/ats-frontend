@@ -14,19 +14,23 @@ import {
 } from 'lucide-react';
 import { useOrganization } from '@/hooks/use-organization';
 import Nothings from '@/components/nothings';
-import { User } from '@/lib/types/authentications/user.types';
+import { Role, User } from '@/lib/types/authentications/user.types';
 import EditUserModal from './modalUser';
 import { useAuth } from '@/hooks/use-auth';
+import { useUserRole } from '@/hooks/use-change-role';
+import { useRouter } from 'next/navigation';
 
 interface UsersProps {
   organizationId: number;
 }
 
 const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
+  const router = useRouter();
   const { users, isLoadingUsers, isErrorUsers } = useOrganization(organizationId);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const { updateUser } = useAuth();
+  const { user: userRoles } = useAuth();
+  const { updateRole } = useUserRole();
 
   const filteredUsers = useMemo(() => {
     if (!users) return [];
@@ -63,17 +67,26 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
     setEditingUser(user);
   };
 
-  const handleUpdateUser = async (userId: string, data: { name: string; role: string; is_active: boolean }) => {
-    await updateUser(userId, data);
-    setEditingUser(null);
+  const handleUpdateUser = async (userId: number, data: { role: string; organisations: number[] }) => {
+    try {
+      await updateRole(userId, {
+        role: data.role.toUpperCase() as Role,
+        organisations: data.organisations,
+      });
+      setEditingUser(null);
+      router.refresh();
+    } catch (error) {
+      console.error('Failed to update user role:', error);
+    }
   };
+  
 
   if (isLoadingUsers) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto" />
-          <p className="mt-2 text-sm text-gray-500">Loading users...</p>
+          <p className="mt-2 text-sm text-gray-500">Chargement des utilisateurs ...</p>
         </div>
       </div>
     );
@@ -86,8 +99,8 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <X className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="text-lg font-medium text-red-900">Error Loading Users</h3>
-          <p className="mt-2 text-sm text-red-600">Please try again later or contact support if the problem persists.</p>
+          <h3 className="text-lg font-medium text-red-900">Erreur lors du chargement des utilisateurs</h3>
+          <p className="mt-2 text-sm text-red-600">Veuillez réessayer plus tard ou contacter le support si le problème persiste.</p>
         </div>
       </div>
     );
@@ -115,10 +128,10 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 uppercase">
-                Organization Users
+                Utilisateurs de l&apos;organisation
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                Manage and view all users in your organization
+                Gérez et affichez tous les utilisateurs de votre organisation.
               </p>
             </div>
             <div className="relative w-full sm:w-72">
@@ -129,7 +142,7 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, email, or role..."
+                placeholder="Rechercher par nom, e-mail ou rôle..."
                 className="block w-full pl-10 pr-8 py-2 bg-white border border-gray-200 rounded-xl text-sm placeholder-gray-400 
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
               />
@@ -147,8 +160,8 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
               <Circle className="h-2 w-2 fill-current" />
               <span>
-                Showing <span className="font-medium text-gray-900">{filteredUsers.length}</span> of{' '}
-                <span className="font-medium text-gray-900">{users.length}</span> users
+                Affichage <span className="font-medium text-gray-900">{filteredUsers.length}</span> des{' '}
+                <span className="font-medium text-gray-900">{users.length}</span> utilisateurs
               </span>
             </div>
           )}
@@ -210,15 +223,14 @@ const UsersList: React.FC<UsersProps> = ({ organizationId }) => {
                           <RoleIcon className="h-3.5 w-3.5" />
                           {user.role}
                         </div>
-                        <button
-                          onClick={() => handleEditUser({
-                            ...user,
-                            role: user.role.toUpperCase() as "ADMINISTRATEUR" | "MODERATEUR",
-                          })}
-                          className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
+                        {userRoles?.role === 'ADMINISTRATEUR' && (
+                          <button
+                            onClick={() => handleEditUser({ ...user, role: user.role.toUpperCase() as Role })}
+                            className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
