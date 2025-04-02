@@ -1,21 +1,20 @@
-import { motion } from "framer-motion";
-import { Frown } from "lucide-react";
+import { Search } from 'lucide-react'
+import React from 'react'
 
-export default function EmptyState() {
+interface Props {
+  title: string
+}
+
+export default function EmptyState ({ title } : Props) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="text-center py-12">
-      <Frown className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-        Aucune candidature trouvée
-      </h3>
-      <p className="text-gray-600">
-        Vous n&apos;avez pas encore postulé à des offres ou votre recherche
-        n&apos;a donné aucun résultat.
+    <div className="px-6 py-6 text-center">
+      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <Search className="h-8 w-8 text-gray-400" />
+      </div>
+      <h3 className="text-lg font-medium text-gray-900">Aucun {title} correspondant</h3>
+      <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
+        Essayez d&apos;ajuster votre requête de recherche ou vos filtres pour trouver ce que vous cherchez.
       </p>
-    </motion.div>
-  );
+    </div>
+  )
 }

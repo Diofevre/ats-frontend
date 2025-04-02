@@ -2,7 +2,11 @@ import {
   LayoutDashboard,
   Users,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  FileText,
+  User,
+  Brain,
+  LineChart
 } from 'lucide-react';
 
 export const ORGANIZATION_ROUTES = {
@@ -39,17 +43,21 @@ export const NavClient = [
   {
     href: "/client/candidature",
     label: "Mes candidatures",
+    icon: FileText
   },
   {
     href: "/client/profile",
     label: "Mon profil",
+    icon: User
   },
   {
     href: "/client/quiz",
     label: "Evaluation",
+    icon: Brain
   },
   {
     href: "/client/progress",
     label: "Ma progression",
-  },
+    icon: LineChart
+  }
 ];

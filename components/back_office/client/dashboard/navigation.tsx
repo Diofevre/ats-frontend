@@ -1,48 +1,41 @@
-"use client";
+'use client';
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { NavClient } from "@/lib/constants/back_office/constants";
-import { Home, User, FileText } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-const Navigation = () => {
+export const Navigation = () => {
   const pathName = usePathname();
 
-  const getIcon = (label: string) => {
-    switch (label) {
-      case "Accueil":
-        return <Home size={20} />;
-      case "Profile":
-        return <User size={20} />;
-      case "Candidatures":
-        return <FileText size={20} />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="h-16 my-5 rounded-xl bg-[#1e1f22] flex items-center px-4">
-      <nav className="flex items-center gap-2">
-        {NavClient.map((link, index) => (
-          <Link
-            key={index}
-            href={link.href}
-            className={cn(
-              "h-10 px-4 rounded-lg flex items-center gap-2 group relative transition-all",
-              pathName.startsWith(link.href)
-                ? "bg-[#5865f2] text-white"
-                : "bg-[#2b2d31] text-gray-400 hover:bg-[#5865f2] hover:text-white"
-            )}>
-            {getIcon(link.label)}
-            <span className="text-sm font-medium">{link.label}</span>
-          </Link>
-        ))}
-      </nav>
+    <div className="w-full bg-white border-b mt-4">
+      <div className="max-w-7xl mx-auto">
+        <nav className="flex items-center gap-3 h-14">
+          {NavClient.map((link, index) => {
+            const Icon = link.icon;
+            const isActive = pathName.startsWith(link.href);
+            
+            return (
+              <Button
+                key={index}
+                variant="ghost"
+                className={cn(
+                  "h-14 px-4 rounded-none border-b-2 gap-2 transition-all duration-200",
+                  isActive
+                    ? "border-blue-500 text-blue-600 bg-blue-50/50 hover:bg-blue-50"
+                    : "border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50/50"
+                )}
+                onClick={() => window.location.href = link.href}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="text-sm font-medium">{link.label}</span>
+              </Button>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 };
-
-export default Navigation;

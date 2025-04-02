@@ -2,6 +2,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { OffreType, CreateOffreDto, Offre, UpdateOffreDto } from "@/lib/types/offres/offres.type";
 import { Offres } from "@/lib/types/offre-details";
+import { Processus } from "@/lib/types/processus-admin/processus-admin";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
@@ -138,6 +139,16 @@ export const offreService = {
       }
     });
 
+    return response.data;
+  },
+
+  getProcessus: async (offre_id: number): Promise<Processus[]> => {
+    const response = await api.get<Processus[]>(`/api/offres/${offre_id}/processus`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    
     return response.data;
   },
 

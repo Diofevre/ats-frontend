@@ -62,14 +62,16 @@ export default function ProfileSection() {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8 bg-gray-50 rounded-xl min-h-screen">
+    <div className="container mx-auto py-8 rounded-xl min-h-screen">
       {/* En-tête */}
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Mon profil</h2>
+        <h2 className="text-xl font-bold text-gray-900 uppercase">
+          Mon profil
+        </h2>
         {!isEditing ? (
           <Button
             onClick={handleEdit}
-            className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-blue-200">
+            className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 rounded-[12px] px-6 py-2 h-10 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-blue-200">
             <Edit2 className="h-4 w-4" />
             Modifier
           </Button>
@@ -77,14 +79,14 @@ export default function ProfileSection() {
           <div className="flex gap-3">
             <Button
               onClick={handleSave}
-              className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-green-200">
+              className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 rounded-[12px] px-6 py-2 h-10 text-sm font-medium transition-all duration-200 hover:ring-2 hover:ring-green-200">
               <Save className="h-4 w-4" />
               Enregistrer
             </Button>
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200">
+              className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 flex items-center gap-2 rounded-[12px] px-4 py-2 h-10 text-sm font-medium transition-all duration-200">
               <X className="h-4 w-4" />
               Annuler
             </Button>
@@ -95,7 +97,7 @@ export default function ProfileSection() {
       {/* Carte Profil */}
       <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-blue-300">
         <CardHeader className="border-b border-gray-100 px-6 py-4">
-          <CardTitle className="text-xl font-semibold text-gray-800">
+          <CardTitle className="text-xl font-semibold text-gray-800 uppercase">
             Informations personnelles
           </CardTitle>
         </CardHeader>
@@ -133,7 +135,7 @@ export default function ProfileSection() {
                     name="nom"
                     value={tempUserData.nom}
                     onChange={handleChange}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 h-12 text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -146,7 +148,7 @@ export default function ProfileSection() {
                     type="email"
                     value={tempUserData.email}
                     onChange={handleChange}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 h-12 text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -161,7 +163,7 @@ export default function ProfileSection() {
                     value={tempUserData.telephone || ""}
                     onChange={handleChange}
                     placeholder="Non spécifié"
-                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-2 h-12  text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-blue-300"
                   />
                 </div>
               </div>

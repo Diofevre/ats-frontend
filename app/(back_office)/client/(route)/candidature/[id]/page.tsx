@@ -10,7 +10,6 @@ import DetailsSection from "@/components/back_office/client/candidature/detailsS
 import ActionsSection from "@/components/back_office/client/candidature/actionsSection";
 import { PostulationType } from "@/lib/types/client/client.types";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -43,8 +42,9 @@ export default function ApplicationDetailPage() {
         <h1 className="text-2xl font-bold mb-4">Candidature non trouvée</h1>
         <Button
           onClick={() => router.push("/client/candidature")}
-          className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
+          className="flex items-center gap-2"
+        >
+          ⟵
           Retour aux candidatures
         </Button>
       </div>

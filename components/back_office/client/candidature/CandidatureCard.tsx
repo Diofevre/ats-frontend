@@ -22,10 +22,10 @@ interface ApplicationCardProps {
 }
 
 const statusStyles = {
-  SOUMIS: "bg-yellow-100 text-yellow-800",
-  Entretien: "bg-blue-100 text-blue-800",
-  Acceptée: "bg-green-100 text-green-800",
-  Refusée: "bg-red-100 text-red-800",
+  SOUMIS: "bg-blue-50 text-blue-700 border border-blue-100",
+  Entretien: "bg-indigo-50 text-indigo-700 border border-indigo-100",
+  Acceptée: "bg-emerald-50 text-emerald-700 border border-emerald-100",
+  Refusée: "bg-rose-50 text-rose-700 border border-rose-100",
 };
 
 export default function CandidatureCard({
@@ -38,49 +38,51 @@ export default function CandidatureCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="group">
-      <Card className="overflow-hidden border border-gray-200 bg-white rounded-xl shadow-sm transition-all duration-300  hover:border-blue-300">
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-5">
-            {/* En-tête */}
-            <div className="flex items-start justify-between">
+      <Card className="overflow-hidden p-4 bg-white rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-blue-50/50 border border-blue-100/50">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-3">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
                 <Badge
                   className={cn(
-                    "px-3 py-1 text-xs font-semibold rounded-full",
+                    "px-2 py-1 text-xs font-medium rounded-full",
                     statusStyles[
                       application.etape_actuelle as keyof typeof statusStyles
                     ]
                   )}>
                   {application.etape_actuelle}
                 </Badge>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-base font-semibold text-gray-900 leading-tight">
                   {application.offre.titre}
                 </h3>
-                <div className="text-sm font-medium text-blue-600">
+                <div className="text-xs font-medium text-blue-600/90">
                   {application.source_site}
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2 shrink-0">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}>
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}>
                   <Button
-                    className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    size="sm"
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200"
                     onClick={() => onViewDetails(application.id)}>
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-3.5 w-3.5" />
                     Détails
                   </Button>
                 </motion.div>
                 {application.etape_actuelle === "Entretien" && (
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}>
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}>
                     <Link href={`/client/quiz/${application.offre.id}`}>
                       <Button
+                        size="sm"
                         variant="outline"
-                        className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-blue-500 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        className="border-blue-100 text-blue-700 hover:bg-blue-50 hover:border-blue-200 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200">
                         Quiz
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
                   </motion.div>
@@ -89,28 +91,28 @@ export default function CandidatureCard({
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed border-y border-blue-50 py-3">
               {application.offre.description}
             </p>
 
-            {/* Détails en grille */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Details Grid */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <motion.div
-                whileHover={{ x: 4 }}
-                className="flex items-center text-sm text-gray-700">
-                <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                whileHover={{ x: 2 }}
+                className="flex items-center text-gray-700 bg-blue-50/50 p-2 rounded-md">
+                <MapPin className="h-3.5 w-3.5 mr-1.5 text-blue-500" />
                 {`${application.offre.lieu}, ${application.offre.pays}`}
               </motion.div>
               <motion.div
-                whileHover={{ x: 4 }}
-                className="flex items-center text-sm text-gray-700">
-                <Briefcase className="h-4 w-4 mr-2 text-blue-500" />
+                whileHover={{ x: 2 }}
+                className="flex items-center text-gray-700 bg-blue-50/50 p-2 rounded-md">
+                <Briefcase className="h-3.5 w-3.5 mr-1.5 text-blue-500" />
                 {application.offre.type_emploi}
               </motion.div>
               <motion.div
-                whileHover={{ x: 4 }}
-                className="flex items-center text-sm text-gray-700">
-                <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+                whileHover={{ x: 2 }}
+                className="flex items-center text-gray-700 bg-blue-50/50 p-2 rounded-md">
+                <Calendar className="h-3.5 w-3.5 mr-1.5 text-blue-500" />
                 {`Soumis: ${new Date(
                   application.date_soumission
                 ).toLocaleDateString("fr-FR", {
@@ -120,9 +122,9 @@ export default function CandidatureCard({
                 })}`}
               </motion.div>
               <motion.div
-                whileHover={{ x: 4 }}
-                className="flex items-center text-sm text-gray-700">
-                <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                whileHover={{ x: 2 }}
+                className="flex items-center text-gray-700 bg-blue-50/50 p-2 rounded-md">
+                <Clock className="h-3.5 w-3.5 mr-1.5 text-blue-500" />
                 {`Limite: ${new Date(
                   application.offre.date_limite
                 ).toLocaleDateString("fr-FR", {
