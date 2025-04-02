@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PostulationType } from "@/lib/types/client/client.types";
 
@@ -14,16 +12,16 @@ export default function HeaderSection({
   onBack,
 }: HeaderSectionProps) {
   return (
-    <div className="bg-white my-5 border rounded-xl border-gray-200 px-6 py-4 transition-all duration-200">
+    <div className="bg-white my-5 border rounded-xl border-gray-100 px-6 py-4 transition-all duration-200">
       <div className="flex flex-col gap-4">
         {/* Bouton Retour */}
-        <Button
-          variant="ghost"
+        <span
+          className="hover:text-black/80 cursor-pointer text-sm"
           onClick={onBack}
-          className="text-gray-600 hover:text-blue-600 bg-gray-100 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 w-fit">
-          <ArrowLeft className="h-5 w-5" />
+        >
+          ⟵
           Retour aux candidatures
-        </Button>
+        </span>
 
         {/* Titre et Badge */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -37,7 +35,7 @@ export default function HeaderSection({
           </div>
           <Badge
             className={cn(
-              "mt-2 md:mt-0 text-sm font-semibold px-3 py-1 rounded-full transition-colors duration-200",
+              "mt-2 md:mt-0 text-xs px-4 font-semibold py-1 rounded-full transition-colors duration-200",
               application.etape_actuelle === "SOUMIS" &&
                 "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
               application.etape_actuelle === "Entretien" &&

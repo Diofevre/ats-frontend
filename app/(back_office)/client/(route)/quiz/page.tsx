@@ -3,103 +3,140 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Clock, PlayCircle } from "lucide-react";
+import { CheckCircle, Clock, PlayCircle, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 const staticQuizData = [
   {
     id: 1,
-    title: "Quiz 1: React & Next.js",
-    status: "Terminé",
+    title: "Modern Web Development with React & Next.js",
+    description: "Test your knowledge of React fundamentals and Next.js features",
+    status: "completed",
     score: 15,
     total: 20,
+    timeEstimate: "20 min",
+    questions: 20,
   },
   {
     id: 2,
-    title: "Quiz 2: Principes UX",
-    status: "À faire",
+    title: "UX Design Principles & Best Practices",
+    description: "Evaluate your understanding of user experience design principles",
+    status: "pending",
     score: null,
     total: 20,
+    timeEstimate: "25 min",
+    questions: 20,
   },
   {
     id: 3,
-    title: "Quiz 3: Node.js & Express",
-    status: "En cours",
+    title: "Backend Development with Node.js",
+    description: "Test your Node.js and Express.js knowledge",
+    status: "in-progress",
     score: null,
     total: 20,
+    timeEstimate: "30 min",
+    questions: 20,
   },
 ];
 
+const getStatusConfig = (status: string) => {
+  const configs = {
+    completed: {
+      icon: CheckCircle,
+      iconClass: "text-emerald-500",
+      badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      label: "Completed",
+    },
+    pending: {
+      icon: PlayCircle,
+      iconClass: "text-blue-500",
+      badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
+      label: "Available",
+    },
+    "in-progress": {
+      icon: Clock,
+      iconClass: "text-amber-500",
+      badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
+      label: "In Progress",
+    },
+  };
+  return configs[status as keyof typeof configs];
+};
+
 export default function QuizPage() {
   const router = useRouter();
+
   return (
-    <div className="mx-auto px-6 py-8 bg-gray-50 rounded-xl min-h-screen">
+    <div className="py-12">
       <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold text-gray-900">Evaluations</h1>
+        <div className="space-y-1">
+          <h1 className="text-xl font-bold text-gray-900 uppercase">Knowledge Assessment</h1>
+          <p className="text-gray-500">Test your skills and track your progress</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Trophy className="h-5 w-5 text-amber-500" />
+          <span className="text-gray-700 font-medium">Your Average: 75%</span>
         </div>
       </div>
 
-      <Card className="bg-white border border-gray-200 rounded-xl transition-all duration-200 hover:border-blue-300">
+      <Card className="bg-white border border-gray-100">
         <CardHeader className="border-b border-gray-100 px-6 py-4">
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Liste des quiz
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+            Available Assessments
+            <Badge variant="secondary" className="ml-2">
+              {staticQuizData.length} Quizzes
+            </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          {staticQuizData.map((quiz) => (
-            <div
-              key={quiz.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all duration-200 hover:bg-gray-100 hover:border-blue-300">
-              <div className="flex items-center gap-4">
-                {quiz.status === "Terminé" && (
-                  <CheckCircle className="h-6 w-6 text-green-500" />
-                )}
-                {quiz.status === "À faire" && (
-                  <PlayCircle className="h-6 w-6 text-blue-500" />
-                )}
-                {quiz.status === "En cours" && (
-                  <Clock className="h-6 w-6 text-yellow-500" />
-                )}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {quiz.title}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      className={cn(
-                        "px-2 py-0.5 text-xs font-medium rounded-full",
-                        quiz.status === "Terminé" &&
-                          "bg-green-100 text-green-800",
-                        quiz.status === "À faire" &&
-                          "bg-blue-100 text-blue-800",
-                        quiz.status === "En cours" &&
-                          "bg-yellow-100 text-yellow-800"
-                      )}>
-                      {quiz.status}
-                    </Badge>
-                    {quiz.score !== null && (
-                      <span className="text-sm text-gray-600">
-                        {quiz.score}/{quiz.total} -{" "}
-                        {((quiz.score / quiz.total) * 100).toFixed(0)}%
-                      </span>
-                    )}
+        <CardContent className="p-6 space-y-4">
+          {staticQuizData.map((quiz) => {
+            const statusConfig = getStatusConfig(quiz.status);
+            const StatusIcon = statusConfig.icon;
+
+            return (
+              <div
+                key={quiz.id}
+                className="group relative bg-white rounded-lg border border-gray-100 p-6 transition-all duration-200 hover:border-blue-300 hover:shadow-lg">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex gap-4">
+                    <div className={cn("mt-1", statusConfig.iconClass)}>
+                      <StatusIcon className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {quiz.title}
+                        </h3>
+                        <p className="text-gray-500 text-sm mt-1">{quiz.description}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge
+                          variant="secondary"
+                          className={cn("border", statusConfig.badgeClass)}>
+                          {statusConfig.label}
+                        </Badge>
+                        <span className="text-sm text-gray-500">
+                          {quiz.timeEstimate} • {quiz.questions} questions
+                        </span>
+                        {quiz.score !== null && (
+                          <span className="text-sm font-medium text-gray-700">
+                            Score: {quiz.score}/{quiz.total} ({((quiz.score / quiz.total) * 100).toFixed(0)}%)
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                  <Button
+                    onClick={() => router.push(`/quiz/${quiz.id}/start`)}
+                    variant={quiz.status === "completed" ? "secondary" : "default"}
+                    className="min-w-[120px] rounded-[12px]">
+                    {quiz.status === "completed" ? "Review" : "Start Quiz"}
+                  </Button>
                 </div>
               </div>
-              <Button
-                onClick={() => router.push("/quiz/1/start")}
-                className={cn(
-                  "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
-                  quiz.status === "Terminé"
-                    ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    : "bg-blue-500 text-white hover:bg-blue-600 hover:ring-2 hover:ring-blue-200"
-                )}>
-                {quiz.status === "Terminé" ? "Revoir" : "Commencer"}
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
     </div>
