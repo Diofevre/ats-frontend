@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { getDecryptedCookie } from "./get-cookie";
 
-type ClientData = {
+export type ClientData = {
   candidat_nom: string;
   message: string;
   success: boolean;
