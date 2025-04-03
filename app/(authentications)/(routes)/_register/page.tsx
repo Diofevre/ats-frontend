@@ -14,7 +14,7 @@ const Register = () => {
     email: string;
     password: string;
     phone: string;
-    profile: File | undefined;
+    profile: string;
   }) => {
     try {
       await register(formData);

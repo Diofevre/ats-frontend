@@ -53,4 +53,8 @@ export const ProcessusService = {
   reverseOrder: async (id1: string, id2: string): Promise<void> => {
     await api.put(`/api/processus/${id1}/reverse-order/${id2}`);
   },
+
+  terminate: async (id: string): Promise<void> => {
+    await api.post(`/api/processus/${id}/terminate`);
+  },
 };

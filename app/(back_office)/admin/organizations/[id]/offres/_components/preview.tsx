@@ -1,34 +1,25 @@
 'use client'
 
 import React from 'react';
-import { ArrowLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { CreateOffreDto } from '@/lib/types/offres/offres.type';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 interface PreviewProps {
   offreData: CreateOffreDto | null;
-  onBack: () => void;
+  onBack?: () => void;
   onFinish: () => void;
   isLoading: boolean;
 }
 
-export function Preview({ offreData, onBack, onFinish, isLoading }: PreviewProps) {
+export function Preview({ offreData, onFinish, isLoading }: PreviewProps) {
   if (!offreData) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-[#1E1F22]">Aperçu de l&apos;annonce</h2>
-        <Button
-          onClick={onBack}
-          variant="ghost"
-          className="flex items-center text-gray-600 hover:text-gray-900"
-          disabled={isLoading}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
-        </Button>
       </div>
 
       <div className="space-y-8">
@@ -70,7 +61,7 @@ export function Preview({ offreData, onBack, onFinish, isLoading }: PreviewProps
       <div className="mt-8 flex justify-end">
         <Button
           onClick={onFinish}
-          className="flex items-center rounded-[12px] h-12 px-6"
+          className="flex items-center h-11 rounded-full px-6"
           disabled={isLoading}
         >
           {isLoading ? (

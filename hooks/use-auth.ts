@@ -3,7 +3,7 @@
 
 import api from '@/lib/services/api';
 import { getCurrentUser, getToken, logout } from '@/lib/services/authentications/user';
-import { UpdateProfilePayload, User } from '@/lib/types/authentications/user.types';
+import { User } from '@/lib/types/authentications/user.types';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
@@ -45,23 +45,6 @@ export function useAuth() {
       }
     }
   );
-
-  const updateUser = async (userId: string, payload: UpdateProfilePayload) => {
-    try {
-      const formData = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      await api.put(`/api/users/${userId}`, formData);
-      await mutate(); // Refresh the users list
-    } catch (error) {
-      console.log(error);
-      throw new Error('Failed to update user');
-    }
-  };
 
   const deleteUser = async (userId: string) => {
     try {
@@ -135,7 +118,6 @@ export function useAuth() {
     logout: handleLogout,
     refreshUser,
     deleteUser,
-    updateUser
   };
 }
 

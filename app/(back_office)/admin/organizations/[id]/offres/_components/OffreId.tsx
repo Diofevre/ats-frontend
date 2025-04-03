@@ -35,6 +35,7 @@ interface CreateProcessusDto {
   type: TypeProcessus;
   description: string;
   duree: number;
+  start_at: string;
 }
 
 const OffreId = () => {
@@ -47,7 +48,7 @@ const OffreId = () => {
   const [selectedView, setSelectedView] = useState<'details' | 'process' | 'candidates'>('details');
   const [selectedCandidate, setSelectedCandidate] = useState<Postulation | null>(null);
   const { mutate } = useOffres();
-  const { createProcessus, deleteProcessus, startProcessus } = useProcessus();
+  const { createProcessus, deleteProcessus, startProcessus, terminateProcessus } = useProcessus();
   const { offre, isLoading } = useOffresDetails(offreId || 0);
 
   const { id } = useParams();
@@ -63,13 +64,12 @@ const OffreId = () => {
 
   const handleCreateProcess = async (processData: CreateProcessusDto) => {
     if (!offreId) return;
-
+  
     try {
       await createProcessus({
         offre_id: String(offreId),
         ...processData,
         type: processData.type as unknown as ProcessusType,
-        start_at: new Date().toISOString()
       });
       await mutate();
     } catch (err) {
@@ -94,6 +94,16 @@ const OffreId = () => {
       await mutate();
     } catch (err) {
       console.error('Error starting process:', err);
+      throw err;
+    }
+  };
+
+  const handleTerminateProcess = async (processId: number) => {
+    try {
+      await terminateProcessus(String(processId));
+      await mutate();
+    } catch (err) {
+      console.error('Error deleting process:', err);
       throw err;
     }
   };
@@ -358,6 +368,7 @@ const OffreId = () => {
                   onCreateProcess={handleCreateProcess}
                   onDeleteProcess={handleDeleteProcess}
                   onStartProcess={handleStartProcess}
+                  onTerminateProcess={handleTerminateProcess}
                 />
               ) : selectedView === 'candidates' ? (
                 renderCandidatesSection()
@@ -370,6 +381,7 @@ const OffreId = () => {
                     onCreateProcess={handleCreateProcess}
                     onDeleteProcess={handleDeleteProcess}
                     onStartProcess={handleStartProcess}
+                    onTerminateProcess={handleTerminateProcess}
                     onViewChange={() => setSelectedView('process')}
                   />
                   {renderCandidatesSection()}
