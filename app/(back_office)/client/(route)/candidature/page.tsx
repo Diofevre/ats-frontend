@@ -8,6 +8,7 @@ import { useClientStore } from "@/lib/store-user";
 import ApplicationList from "@/components/back_office/client/candidature/CandidatureList";
 import CandidatureCardSkeleton from "@/components/back_office/client/candidature/CandidatureCardSkeleton";
 import EmptyState from "@/components/back_office/client/candidature/emptyState";
+import Link from "next/link";
 
 export default function Candidature() {
   const router = useRouter();
@@ -59,8 +60,12 @@ export default function Candidature() {
                   ))}
               </div>
             ) : myPostulations?.length === 0 ? (
-              <div className="py-12">
+              <div className="flex flex-col items-center justify-center hover:text-blue-600">
                 <EmptyState title="Candidature" />
+                <Link href='/offres-lists'>
+                  ⟶
+                  Voir plus
+                </Link>
               </div>
             ) : (
               <div className="space-y-4">

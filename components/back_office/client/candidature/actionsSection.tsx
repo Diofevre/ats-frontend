@@ -1,4 +1,4 @@
-import { FileText, Mail, XCircle } from "lucide-react";
+import { FileText } from "lucide-react";
 import { PostulationType } from "@/lib/types/client/client.types";
 
 interface ActionsSectionProps {
@@ -26,7 +26,7 @@ export default function ActionsSection({ application }: ActionsSectionProps) {
           <span className="text-xs text-gray-400 group-hover:text-gray-600">PDF</span>
         </button>
 
-        <button 
+        {/* <button 
           className="w-full flex items-center justify-between px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg group transition-colors mt-1"
         >
           <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export default function ActionsSection({ application }: ActionsSectionProps) {
             </div>
             <span className="text-xs text-gray-400 group-hover:text-red-600">Annuler</span>
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );

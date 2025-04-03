@@ -7,7 +7,6 @@ import { useClientStore } from "@/lib/store-user";
 import DetailSkeleton from "@/components/back_office/client/candidature/detailSkeleton";
 import HeaderSection from "@/components/back_office/client/candidature/headerSection";
 import DetailsSection from "@/components/back_office/client/candidature/detailsSection";
-import ActionsSection from "@/components/back_office/client/candidature/actionsSection";
 import { PostulationType } from "@/lib/types/client/client.types";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,9 +69,6 @@ export default function ApplicationDetailPage() {
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <DetailsSection application={application} client={client} />
-        </div>
-        <div className="space-y-6">
-          <ActionsSection application={application} />
         </div>
       </div>
     </div>
