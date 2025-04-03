@@ -20,6 +20,7 @@ export const ProcessusForm: React.FC<ProcessusFormProps> = ({ onSubmit, onCancel
     type: 'VISIO_CONFERENCE',
     description: '',
     duree: 60,
+    start_at: new Date().toISOString(), 
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

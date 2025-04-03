@@ -39,6 +39,7 @@ export interface Processus {
   statut: StatusProcessus;
   offre_id: number;
   duree: number;
+  start_at: string;
   created_at: string;
   updated_at: string;
 }

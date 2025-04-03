@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
+'use client'
+
 import React, { useState } from 'react';
-import { Camera, Phone, Mail, User as UserIcon, Building2, Calendar } from 'lucide-react';
+import { Camera, Phone, Mail, User as UserIcon, Building2, Calendar, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { updateProfile } from '@/lib/services/authentications/user';
 import ProfileSkeleton from './SkeletonProfile';
+import { FileUpload } from '@/components/file-upload';
 
 type FormData = {
   name: string;
@@ -28,9 +31,28 @@ interface UserProfileProps {
   refreshUser: () => Promise<void>;
 }
 
+const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg w-full max-w-lg mx-4 relative p-6">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function UserProfile({ user, loading, refreshUser }: UserProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -47,14 +69,6 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
       });
     }
   }, [user]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, profile: file }));
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +96,21 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
 
   return (
     <div className="space-y-8">
+      <Modal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)}>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Modifier la photo de profil</h3>
+          <FileUpload
+            onUpload={(fileUrl) => {
+              setPreviewUrl(fileUrl);
+              const file = new File([fileUrl], "profile.jpg", { type: "image/jpeg" });
+              setFormData(prev => ({ ...prev, profile: file }));
+              setIsUploadModalOpen(false);
+            }}
+            accept="image"
+          />
+        </div>
+      </Modal>
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-lg font-medium text-gray-900 uppercase">Informations personnelles</h2>
@@ -118,16 +147,18 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
           <div className="relative">
             <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-50">
               <img
-                src={isEditing ? (previewUrl || user?.profile || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop') : (user?.profile || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop')}
+                src={isEditing ? (previewUrl || user?.profile) : (user?.profile)}
                 alt={user?.name}
                 className="w-full h-full object-cover"
               />
             </div>
             {isEditing && (
-              <label className="absolute -bottom-2 -right-2 p-2 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-all border border-gray-200">
+              <button
+                onClick={() => setIsUploadModalOpen(true)}
+                className="absolute -bottom-2 -right-2 p-2 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-all border border-gray-200"
+              >
                 <Camera className="w-4 h-4 text-gray-600" />
-                <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-              </label>
+              </button>
             )}
           </div>
           <div>

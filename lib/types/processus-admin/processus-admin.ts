@@ -34,6 +34,7 @@ export interface ProcessusDetail {
   titre: string;
   statut: StatusType;
   offre: Offre;
+  start_at: string;
   postulations: Postulation[];
 }
 
@@ -46,6 +47,7 @@ export interface Processus {
   statut: StatusType;
   duree: number;
   ordre: number;
+  start_at: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -56,6 +58,7 @@ export interface CreateProcessusDto {
   type: ProcessusType;
   description: string;
   duree: number;
+  start_at: string;
 }
 
 export interface AddQuizzDto {

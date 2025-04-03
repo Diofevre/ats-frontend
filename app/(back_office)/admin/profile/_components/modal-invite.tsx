@@ -1,23 +1,36 @@
+'use client'
+
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvitations } from '@/hooks/use-invitations';
 import type { UserRole } from '@/lib/types/invitations';
 import { useOrganization } from '@/hooks/use-organization';
+import { Combobox } from '../../organizations/[id]/offres/_components/combobox';
 
 interface InvitationModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const roleOptions = [
+  { value: 'MODERATEUR', label: 'Modérateur' },
+  { value: 'ADMINISTRATEUR', label: 'Administrateur' },
+];
+
 export default function InvitationModal({ isOpen, onClose }: InvitationModalProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<UserRole>('MODERATEUR');
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<number | ''>('');
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { sendInvitation } = useInvitations();
   const { organizations, isLoadingOrganizations, isErrorOrganizations } = useOrganization();
+
+  const organizationOptions = organizations?.map(org => ({
+    value: org.id.toString(),
+    label: org.nom
+  })) || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +43,7 @@ export default function InvitationModal({ isOpen, onClose }: InvitationModalProp
       setIsSubmitting(true);
       await sendInvitation({
         invitee_email: email,
-        organisation_id: selectedOrganizationId,
+        organisation_id: Number(selectedOrganizationId),
         role,
       });
       toast.success("L'invitation a été envoyée avec succès");
@@ -69,25 +82,19 @@ export default function InvitationModal({ isOpen, onClose }: InvitationModalProp
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Organisation
             </label>
-            <select
+            <Combobox
+              options={organizationOptions}
               value={selectedOrganizationId}
-              onChange={(e) => setSelectedOrganizationId(Number(e.target.value) || '')}
-              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 transition-colors"
-              required
-            >
-              <option value="">Sélectionner une organisation</option>
-              {organizations?.map((org) => (
-                <option key={org.id} value={org.id}>
-                  {org.nom}
-                </option>
-              ))}
-            </select>
-            {isLoadingOrganizations && (
-              <p className="text-sm text-gray-500 mt-1">Chargement des organisations...</p>
-            )}
-            {isErrorOrganizations && (
-              <p className="text-sm text-red-500 mt-1">Erreur lors du chargement des organisations</p>
-            )}
+              onChange={setSelectedOrganizationId}
+              placeholder="Sélectionner une organisation"
+              emptyMessage={
+                isLoadingOrganizations
+                  ? "Chargement des organisations..."
+                  : isErrorOrganizations
+                  ? "Erreur lors du chargement des organisations"
+                  : "Aucune organisation trouvée"
+              }
+            />
           </div>
 
           <div>
@@ -108,14 +115,12 @@ export default function InvitationModal({ isOpen, onClose }: InvitationModalProp
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Rôle
             </label>
-            <select
+            <Combobox
+              options={roleOptions}
               value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 transition-colors"
-            >
-              <option value="MODERATEUR">Modérateur</option>
-              <option value="ADMINISTRATEUR">Administrateur</option>
-            </select>
+              onChange={(value) => setRole(value as UserRole)}
+              placeholder="Sélectionner un rôle"
+            />
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
