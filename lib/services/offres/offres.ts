@@ -1,6 +1,11 @@
 import useSWR from "swr";
 import axios from "axios";
-import { OffreType, CreateOffreDto, Offre, UpdateOffreDto } from "@/lib/types/offres/offres.type";
+import {
+  OffreType,
+  CreateOffreDto,
+  Offre,
+  UpdateOffreDto,
+} from "@/lib/types/offres/offres.type";
 import { Offres } from "@/lib/types/offre-details";
 import { Processus } from "@/lib/types/processus-admin/processus-admin";
 
@@ -34,7 +39,6 @@ export interface OffreFilters {
 }
 
 const buildUrl = (baseUrl: string, filters: OffreFilters): string => {
-  const url = new URL(`${baseUrl}/filter`);
   const params = new URLSearchParams();
 
   if (filters.status) params.append("status", filters.status);
@@ -47,15 +51,20 @@ const buildUrl = (baseUrl: string, filters: OffreFilters): string => {
   if (filters.date_publication)
     params.append("date_publication", filters.date_publication);
   if (filters.text) params.append("text", filters.text);
-  if (filters) url.search = params.toString();
+
+  const hasFilters = Array.from(params.keys()).length > 0;
+  const url = new URL(`${baseUrl}${hasFilters ? "/filter" : ""}`);
+
+  if (hasFilters) {
+    url.search = params.toString();
+  }
+
   return url.toString();
 };
 
 export const useAllOffres = (filters: OffreFilters) => {
-  const baseUrl = `${API_URL}/api/offres`;
+  const baseUrl = `${API_URL}/api/offres/available`;
   const urlWithFilters = buildUrl(baseUrl, filters);
-
-  console.log(urlWithFilters);
 
   const { data, error, mutate } = useSWR(urlWithFilters, fetcher, {
     revalidateOnFocus: false,
@@ -135,20 +144,23 @@ export const offreService = {
   getDetailsById: async (id: number): Promise<Offres> => {
     const response = await api.get<Offres>(`/api/offres/${id}/details`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
 
     return response.data;
   },
 
   getProcessus: async (offre_id: number): Promise<Processus[]> => {
-    const response = await api.get<Processus[]>(`/api/offres/${offre_id}/processus`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    const response = await api.get<Processus[]>(
+      `/api/offres/${offre_id}/processus`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
-    });
-    
+    );
+
     return response.data;
   },
 

@@ -33,8 +33,6 @@ export default function RecruitmentProcess({
               const IconComponent = processTypeIcons[step.type];
               const isLast = index === processSteps.length - 1;
 
-              console.log(step);
-
               return (
                 <div key={step.id} className="relative flex items-start gap-4">
                   <div className="flex flex-col items-center">
@@ -84,18 +82,13 @@ export default function RecruitmentProcess({
                           ? "En cours"
                           : "À venir"}
                       </Badge>
-                      {/* {step.statut === "EN_COURS" && (
+                      {step.statut === "EN_COURS" && (
                         <Badge
                           onClick={() => handleStepAction(step)}
                           className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 px-3 py-1 rounded-md">
                           Commencer
                         </Badge>
-                      )} */}
-                      <Badge
-                        onClick={() => handleStepAction(step)}
-                        className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 px-3 py-1 rounded-md">
-                        Commencer
-                      </Badge>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -10,6 +10,10 @@ import DetailsSection from "@/components/back_office/client/candidature/detailsS
 import ActionsSection from "@/components/back_office/client/candidature/actionsSection";
 import { PostulationType } from "@/lib/types/client/client.types";
 import { Button } from "@/components/ui/button";
+import {
+  usePostulationDetail,
+  useProccecusPassed,
+} from "@/lib/services/client/procecus";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -17,6 +21,10 @@ export default function ApplicationDetailPage() {
   const applicationId = params.id as string;
 
   const { client, loadClient } = useClientStore();
+
+  const { detailPostulation } = usePostulationDetail(Number(applicationId));
+
+  console.log(detailPostulation);
 
   useEffect(() => {
     if (!client) {
@@ -27,6 +35,13 @@ export default function ApplicationDetailPage() {
   const { myPostulations, isLoading } = useMyPostulation(
     client?.token_candidat
   );
+
+  const { passedProcessus } = useProccecusPassed(
+    Number(applicationId),
+    client?.token_candidat ?? ""
+  );
+
+  console.log(passedProcessus);
 
   const application = myPostulations?.find(
     (app: PostulationType) => app.id === Number(applicationId)

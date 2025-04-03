@@ -8,18 +8,14 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import {
-  ArrowLeft,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import HeaderSection from "@/components/back_office/quiz/headerSection";
 import { useClientStore } from "@/lib/store-user";
-import { useQuizById } from "@/lib/services/client/procecus";
+import {
+  submitQuiz,
+  useProcessusByIdProces,
+} from "@/lib/services/client/procecus";
 
-// Types
 interface Reponse {
   id: number;
   is_true: boolean;
@@ -49,7 +45,11 @@ interface Quiz {
   questions: Question[];
 }
 
-// Composant Loader personnalisé
+interface QuizScore {
+  nombre_total_question: number;
+  score: number;
+}
+
 const QuizLoader = () => (
   <motion.div
     initial={{ opacity: 0 }}
@@ -78,8 +78,11 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quizResult, setQuizResult] = useState<QuizScore | null>(null);
 
-  const { quiz: fetchedQuiz, isLoading } = useQuizById(Number(quizId));
+  const { proces: fetchedQuiz, isLoading } = useProcessusByIdProces(
+    Number(quizId)
+  );
 
   const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -97,7 +100,7 @@ export default function QuizPage() {
       try {
         if (fetchedQuiz) {
           setQuiz(fetchedQuiz);
-          setTimeLeft(fetchedQuiz.duree * 60);
+          setTimeLeft(fetchedQuiz.duree);
         }
       } catch (error) {
         console.error("Erreur lors du chargement du quiz:", error);
@@ -107,7 +110,6 @@ export default function QuizPage() {
     loadQuiz();
   }, [quizId, client, loadClient, fetchedQuiz]);
 
-  // Gestion du timer
   useEffect(() => {
     if (!quiz || timeLeft <= 0) return;
 
@@ -120,7 +122,6 @@ export default function QuizPage() {
     return () => clearInterval(timer);
   }, [quiz, timeLeft]);
 
-  // Gestion des réponses
   const handleSelectAnswer = (questionId: number, reponseId: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: reponseId }));
   };
@@ -137,12 +138,30 @@ export default function QuizPage() {
     }
   };
 
-  const handleSubmitQuiz = useCallback(() => {
+  const handleSubmitQuiz = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      router.push(`/quiz/${quizId}/results`);
-    }, 1500);
-  }, [quizId, router]);
+
+    const formattedAnswers = Object.entries(answers).map(
+      ([questionId, reponseId]) => ({
+        question: Number(questionId),
+        reponse: reponseId,
+      })
+    );
+
+    try {
+      const result = await submitQuiz(
+        Number(quizId),
+        formattedAnswers,
+        client?.token_candidat ?? ""
+      );
+      setQuizResult(result);
+      console.log("Résultat de la soumission :", result);
+    } catch (error) {
+      console.error("Erreur lors de la soumission du quiz :", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return <QuizLoader />;
@@ -168,6 +187,52 @@ export default function QuizPage() {
     );
   }
 
+  // Si le quiz est soumis et un résultat est disponible, afficher le score
+  if (quizResult) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}>
+          <Card className="rounded-xl border-0 bg-white dark:bg-slate-800 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-2xl text-slate-900 dark:text-white">
+                Résultat du Quiz
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <CheckCircle className="h-16 w-16 text-emerald-500 mx-auto" />
+                <p className="text-lg text-slate-600 dark:text-slate-300">
+                  Vous avez terminé le quiz !
+                </p>
+                <div className="text-xl font-semibold">
+                  Score : {quizResult.score} /{" "}
+                  {quizResult.nombre_total_question}
+                </div>
+                <div className="text-sm text-slate-500">
+                  {quizResult.score === quizResult.nombre_total_question
+                    ? "Félicitations, vous avez tout juste !"
+                    : "Merci d'avoir participé."}
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  onClick={() => router.push("/client/candidature")}
+                  className="rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Retour aux candidatures
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Affichage normal du quiz
   const currentQuestion = quiz.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
@@ -191,7 +256,6 @@ export default function QuizPage() {
         transition={{ duration: 0.5 }}
         className="mt-8">
         <Card className="rounded-xl border-0 bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600" />
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <div>
@@ -270,19 +334,10 @@ export default function QuizPage() {
                 <Button
                   onClick={handleSubmitQuiz}
                   disabled={!allQuestionsAnswered || isSubmitting}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
+                  className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 flex items-center justify-center">
                   {isSubmitting ? (
                     <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="mr-2">
-                        <Clock className="h-4 w-4" />
-                      </motion.div>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Soumission...
                     </>
                   ) : (
