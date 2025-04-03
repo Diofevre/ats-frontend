@@ -37,7 +37,7 @@ interface FormRegisterProps {
     email: string;
     password: string;
     phone: string;
-    profile: File | undefined;
+    profile: string;
   }) => void;
   onSocialLogin: (provider: string) => void;
 }
@@ -73,7 +73,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({ onSubmit, onSocialLogin }) 
     try {
       await onSubmit({
         ...values,
-        profile: values.profile as File | undefined,
+        profile: values.profile as string,
       });
     } finally {
       setIsLoading(false);

@@ -15,7 +15,7 @@ type FormData = {
   name: string;
   email: string;
   phone: string;
-  profile?: File;
+  profile?: string;
 };
 
 type FormField = {
@@ -57,6 +57,7 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
     name: '',
     email: '',
     phone: '',
+    profile: '',
   });
   const [previewUrl, setPreviewUrl] = useState<string>('');
 
@@ -66,7 +67,9 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
         name: user.name,
         email: user.email,
         phone: user.phone,
+        profile: user.profile,
       });
+      setPreviewUrl(user.profile || '');
     }
   }, [user]);
 
@@ -86,6 +89,23 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
     }
   };
 
+  const handleProfileUpload = async (fileUrl: string) => {
+    try {
+      setPreviewUrl(fileUrl);
+      setFormData(prev => ({ ...prev, profile: fileUrl }));
+      
+      // Mise à jour immédiate du profil avec la nouvelle URL
+      await updateProfile({ profile: fileUrl });
+      await refreshUser();
+      
+      setIsUploadModalOpen(false);
+      toast.success("Photo de profil mise à jour avec succès");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de la mise à jour de la photo de profil");
+    }
+  };
+
   const formFields: FormField[] = [
     { icon: UserIcon, label: 'Nom', key: 'name', type: 'text' },
     { icon: Mail, label: 'Email', key: 'email', type: 'email' },
@@ -94,18 +114,15 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
 
   if (loading) return <ProfileSkeleton />;
 
+  const displayImage = isEditing ? (previewUrl || user?.profile) : user?.profile;
+
   return (
     <div className="space-y-8">
       <Modal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)}>
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Modifier la photo de profil</h3>
           <FileUpload
-            onUpload={(fileUrl) => {
-              setPreviewUrl(fileUrl);
-              const file = new File([fileUrl], "profile.jpg", { type: "image/jpeg" });
-              setFormData(prev => ({ ...prev, profile: file }));
-              setIsUploadModalOpen(false);
-            }}
+            onUpload={handleProfileUpload}
             accept="image"
           />
         </div>
@@ -126,7 +143,16 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
         ) : (
           <div className="flex gap-3">
             <button
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                setPreviewUrl(user?.profile || '');
+                setFormData({
+                  name: user.name,
+                  email: user.email,
+                  phone: user.phone,
+                  profile: user.profile,
+                });
+              }}
               className="h-9 px-4 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Annuler
@@ -146,11 +172,17 @@ export default function UserProfile({ user, loading, refreshUser }: UserProfileP
         <div className="flex items-start space-x-6">
           <div className="relative">
             <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-50">
-              <img
-                src={isEditing ? (previewUrl || user?.profile) : (user?.profile)}
-                alt={user?.name}
-                className="w-full h-full object-cover"
-              />
+              {displayImage ? (
+                <img
+                  src={displayImage}
+                  alt={user?.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                  <UserIcon className="w-8 h-8 text-gray-400" />
+                </div>
+              )}
             </div>
             {isEditing && (
               <button

@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Loader2, Plus, Play, Trash2, FileText, Clock, ArrowUpDown, X, Upload } from 'lucide-react';
+import { Loader2, Plus, Play, Trash2, FileText, Clock, ArrowUpDown, X, Upload, CheckCircle } from 'lucide-react';
 import { Processus, StatusOffre } from '@/lib/types/offre-details';
 import { Combobox } from '../../_components/combobox';
 
@@ -14,6 +14,7 @@ interface ProcessSectionProps {
   onCreateProcess: (process: CreateProcessDto) => Promise<void>;
   onDeleteProcess: (id: number) => Promise<void>;
   onStartProcess: (id: number) => Promise<void>;
+  onTerminateProcess?: (id: number) => Promise<void>;
   onViewChange?: () => void;
 }
 
@@ -66,6 +67,7 @@ const ProcessSection = ({
   onCreateProcess,
   onDeleteProcess,
   onStartProcess,
+  onTerminateProcess,
   onViewChange
 }: ProcessSectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,13 +75,14 @@ const ProcessSection = ({
   const [processError, setProcessError] = useState('');
   const [uploadingQuizId, setUploadingQuizId] = useState<number | null>(null);
   const [startingProcessId, setStartingProcessId] = useState<number | null>(null);
+  const [terminatingProcessId, setTerminatingProcessId] = useState<number | null>(null);
   const [deletingProcessId, setDeletingProcessId] = useState<number | null>(null);
   const [newProcess, setNewProcess] = useState<CreateProcessDto>({
     titre: '',
     type: 'QUESTIONNAIRE',
     description: '',
     duree: 30,
-    start_at: new Date().toISOString().slice(0, 16) // Format: "YYYY-MM-DDThh:mm"
+    start_at: new Date().toISOString().slice(0, 16),
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, processId: number) => {
@@ -142,13 +145,19 @@ const ProcessSection = ({
     setProcessError('');
 
     try {
-      await onCreateProcess(newProcess);
+      // Create a new object with the formatted date
+      const processData = {
+        ...newProcess,
+        start_at: new Date(newProcess.start_at).toISOString(), // Convert to ISO string
+      };
+
+      await onCreateProcess(processData);
       setNewProcess({
         titre: '',
         type: 'QUESTIONNAIRE',
         description: '',
         duree: 30,
-        start_at: new Date().toISOString().slice(0, 16)
+        start_at: new Date().toISOString().slice(0, 16),
       });
       setIsModalOpen(false);
     } catch (err) {
@@ -156,6 +165,16 @@ const ProcessSection = ({
       setProcessError('Une erreur est survenue lors de la création du processus.');
     } finally {
       setIsCreatingProcess(false);
+    }
+  };
+
+  const handleTerminateProcess = async (id: number) => {
+    if (!onTerminateProcess) return;
+    setTerminatingProcessId(id);
+    try {
+      await onTerminateProcess(id);
+    } finally {
+      setTerminatingProcessId(null);
     }
   };
 
@@ -202,6 +221,10 @@ const ProcessSection = ({
 
   const shouldShowUploadButton = (etape: Processus) => {
     return offreStatus === 'CREE';
+  };
+
+  const shouldShowTerminateButton = (etape: Processus) => {
+    return offreStatus === 'FERME' && etape.statut === 'EN_COURS';
   };
 
   const shouldShowDeleteButton = (etape: Processus) => {
@@ -309,18 +332,20 @@ const ProcessSection = ({
           )}
 
           <div className="mt-6 flex justify-end">
-            <button
-              type="submit"
-              disabled={isCreatingProcess}
-              className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-lg hover:bg-[#2C9CC6]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isCreatingProcess ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Plus className="w-4 h-4 mr-2" />
+            {offreStatus === 'CREE' && (
+              <button
+                type="submit"
+                disabled={isCreatingProcess}
+                className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-full text-xs hover:bg-[#2C9CC6]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCreatingProcess ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4 mr-2" />
+                )}
+                {isCreatingProcess ? 'Création...' : 'Ajouter l\'étape'}
+              </button>
               )}
-              {isCreatingProcess ? 'Création...' : 'Ajouter l\'étape'}
-            </button>
           </div>
         </form>
       </Modal>
@@ -394,6 +419,20 @@ const ProcessSection = ({
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <Play className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+                  {shouldShowTerminateButton(etape) && (
+                    <button
+                      onClick={() => handleTerminateProcess(etape.id)}
+                      className="p-1 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                      title="Terminer"
+                      disabled={terminatingProcessId === etape.id}
+                    >
+                      {terminatingProcessId === etape.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4" />
                       )}
                     </button>
                   )}

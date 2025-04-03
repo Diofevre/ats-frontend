@@ -28,21 +28,9 @@ const handleRequest = async <T>(request: Promise<{ data: T }>): Promise<T> => {
   }
 };
 
-// Helper function to create FormData
-const createFormData = (payload: any): FormData => {
-  const formData = new FormData();
-  Object.entries(payload).forEach(([key, value]) => {
-    if (value !== undefined) {
-      formData.append(key, value as string | Blob);
-    }
-  });
-  return formData;
-};
-
 // User Authentication
 export const register = async (payload: RegisterPayload): Promise<{ email: string; message: string }> => {
-  const formData = createFormData(payload);
-  return handleRequest(api.post('/api/users/register', formData));
+  return handleRequest(api.post('/api/users/register', payload));
 };
 
 // Confirm Registration OTP
@@ -89,20 +77,17 @@ export const getCurrentUser = async (): Promise<User> => {
 
 // Update Profile
 export const updateProfile = async (payload: UpdateProfilePayload): Promise<User> => {
-  const formData = createFormData(payload);
-  return handleRequest(api.put('/api/users/me', formData));
+  return handleRequest(api.put('/api/users/me', payload));
 };
 
-// Update Role Users - Fixed to use JSON instead of FormData
+// Update Role Users
 export const updateRoleUsers = async (id: number, payload: RoleUpdatePayload): Promise<User> => {
-  // Ensure the payload includes organizations for MODERATEUR role
   if (payload.role === 'MODERATEUR' && (!payload.organisations || payload.organisations.length === 0)) {
     throw new Error('Les organisations doivent être spécifiées pour un Modérateur');
   }
   
   return handleRequest(api.put(`/api/users/${id}/change/role`, payload));
 };
-
 
 // Admin Only
 export const getAllUsers = async (): Promise<User[]> => {

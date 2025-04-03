@@ -29,7 +29,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   phone: string;
-  profile?: File;
+  profile?: string;
 }
 
 export interface LoginPayload {
@@ -71,7 +71,7 @@ export interface UpdateProfilePayload {
   email?: string;
   password?: string;
   phone?: string;
-  profile?: File;
+  profile?: string;
   role?: Role;
 }
 

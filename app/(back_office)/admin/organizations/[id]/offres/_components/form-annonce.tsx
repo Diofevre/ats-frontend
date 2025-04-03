@@ -36,8 +36,8 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
     type_temps: initialData?.type_temps || 'PLEIN_TEMPS',
     salaire: initialData?.salaire || '',
     devise: initialData?.devise || 'EURO',
-    horaire_ouverture: initialData?.horaire_ouverture || '09:00',
-    horaire_fermeture: initialData?.horaire_fermeture || '17:00',
+    horaire_ouverture: initialData?.horaire_ouverture || '',
+    horaire_fermeture: initialData?.horaire_fermeture || '',
     image_url: initialData?.image_url || '',
     ...(initialData && { id: initialData.id }),
   });
@@ -72,7 +72,6 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
     { value: 'ROUPIE', label: 'Roupie (₹)' },
     { value: 'ARIARY', label: 'Ariary (Ar)' },
   ];
-  // ---
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,8 +93,8 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
     try {
       const dataToSend = {
           ...formData,
-          horaire_ouverture: `${formData.horaire_ouverture}:00`,
-          horaire_fermeture: `${formData.horaire_fermeture}:00`,
+          horaire_ouverture: `${formData.horaire_ouverture}`,
+          horaire_fermeture: `${formData.horaire_fermeture}`,
       };
       await onSubmit(dataToSend);
     } catch (error) {

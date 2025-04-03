@@ -80,6 +80,11 @@ export function useProcessus() {
     mutate();
   };
 
+  const terminateProcessus = async (id: string) => {
+    await ProcessusService.terminate(id);
+    mutate();
+  };
+
   return {
     processus,
     isLoading: !error && !processus,
@@ -94,5 +99,6 @@ export function useProcessus() {
     makeTop,
     makeBottom,
     reverseOrder,
+    terminateProcessus,
   };
 }
