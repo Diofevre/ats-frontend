@@ -22,13 +22,13 @@ import { UpdateOffreDto, Offre, Devise, TypeTemps } from '@/lib/types/offres/off
 import { offreService } from '@/lib/services/offres/offres';
 import { useAuth } from '@/hooks/use-auth';
 import { useOffres } from '@/hooks/use-offre';
-import CreateForm from '../_components/form-annonce';
+import CreateForm from './form-annonce';
 import { useProcessus } from '@/hooks/use-processus-admin';
 import { useParams, useRouter } from 'next/navigation';
 import { Postulation, TypeProcessus } from '@/lib/types/offre-details';
-import { ProcessSection } from '../[offreId]/_components/processus-details';
 import { CandidateDetails } from '../[offreId]/_components/candidats-details';
 import { ProcessusType } from '@/lib/types/processus-admin/processus-admin';
+import ProcessSection from '../[offreId]/_components/processus-details';
 
 interface CreateProcessusDto {
   titre: string;
@@ -47,7 +47,7 @@ const OffreId = () => {
   const [selectedView, setSelectedView] = useState<'details' | 'process' | 'candidates'>('details');
   const [selectedCandidate, setSelectedCandidate] = useState<Postulation | null>(null);
   const { mutate } = useOffres();
-  const { createProcessus, deleteProcessus, makeTop, makeBottom, startProcessus } = useProcessus();
+  const { createProcessus, deleteProcessus, startProcessus } = useProcessus();
   const { offre, isLoading } = useOffresDetails(offreId || 0);
 
   const { id } = useParams();
@@ -68,7 +68,8 @@ const OffreId = () => {
       await createProcessus({
         offre_id: String(offreId),
         ...processData,
-        type: processData.type as unknown as ProcessusType
+        type: processData.type as unknown as ProcessusType,
+        start_at: new Date().toISOString()
       });
       await mutate();
     } catch (err) {
@@ -83,20 +84,6 @@ const OffreId = () => {
       await mutate();
     } catch (err) {
       console.error('Error deleting process:', err);
-      throw err;
-    }
-  };
-
-  const handleMoveProcess = async (processId: number, direction: 'up' | 'down') => {
-    try {
-      if (direction === 'up') {
-        await makeTop(String(processId));
-      } else {
-        await makeBottom(String(processId));
-      }
-      await mutate();
-    } catch (err) {
-      console.error('Error moving process:', err);
       throw err;
     }
   };
@@ -270,23 +257,25 @@ const OffreId = () => {
           <div className="flex flex-row items-center gap-2 mb-4">
             {selectedView === 'details' && (
               <>
-                <button
-                  onClick={handlePublish}
-                  disabled={isPublishing || offre.status === 'OUVERT'}
-                  className={`inline-flex items-center px-4 py-2 rounded-[12px] transition-colors text-xs ${
-                    offre.status === 'OUVERT'
-                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                      : 'bg-green-500 text-white hover:bg-green-600'
-                  }`}
-                  aria-label="Publier"
-                >
-                  {isPublishing ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4 mr-2" />
-                  )}
-                  {isPublishing ? 'Publication...' : 'Publier'}
-                </button>
+                {offre.status === 'CREE' && (
+                  <button
+                    onClick={handlePublish}
+                    disabled={isPublishing || (offre.status as string) === 'OUVERT'}
+                    className={`inline-flex items-center px-4 py-2 rounded-[12px] transition-colors text-xs ${
+                      (offre.status as string) === 'OUVERT'
+                        ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                        : 'bg-green-500 text-white hover:bg-green-600'
+                    }`}
+                    aria-label="Publier"
+                  >
+                    {isPublishing ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4 mr-2" />
+                    )}
+                    {isPublishing ? 'Publication...' : 'Publier'}
+                  </button>
+                )}
                 
                 <button
                   onClick={handleFermer}
@@ -306,14 +295,16 @@ const OffreId = () => {
                   {isClosing ? 'Fermeture...' : offre.status === 'FERME' ? 'Fermé' : 'Fermer'}
                 </button>
 
-                <button
-                  onClick={handleEdit}
-                  className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors text-xs"
-                  aria-label="Modifier"
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Modifier
-                </button>
+                {offre.status === 'CREE' && (
+                  <button
+                    onClick={handleEdit}
+                    className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors text-xs"
+                    aria-label="Modifier"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Modifier
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -363,9 +354,9 @@ const OffreId = () => {
                 <ProcessSection
                   processus={offre.processus}
                   isEditing={true}
+                  offreStatus={offre.status}
                   onCreateProcess={handleCreateProcess}
                   onDeleteProcess={handleDeleteProcess}
-                  onMoveProcess={handleMoveProcess}
                   onStartProcess={handleStartProcess}
                 />
               ) : selectedView === 'candidates' ? (
@@ -374,10 +365,10 @@ const OffreId = () => {
                 <>
                   <ProcessSection
                     processus={offre.processus}
+                    offreStatus={offre.status}
                     isEditing={false}
                     onCreateProcess={handleCreateProcess}
                     onDeleteProcess={handleDeleteProcess}
-                    onMoveProcess={handleMoveProcess}
                     onStartProcess={handleStartProcess}
                     onViewChange={() => setSelectedView('process')}
                   />

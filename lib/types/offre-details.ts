@@ -1,6 +1,6 @@
 export type TypeTemps = 'PLEIN_TEMPS' | 'TEMPS_PARTIEL';
 export type StatusOffre = 'CREE' | 'OUVERT' | 'FERME';
-export type TypeProcessus = 'TACHE' | 'ENTRETIEN' | 'TEST';
+export type TypeProcessus = 'VISIO_CONFERENCE' | 'TACHE' | 'QUESTIONNAIRE';
 export type StatusProcessus = 'A_VENIR' | 'EN_COURS' | 'TERMINE';
 export type Devise = 'EURO' | 'USD' | 'GBP';
 export type TypeEmploi = 'CDI' | 'CDD' | 'STAGE' | 'ALTERNANCE';
@@ -39,6 +39,7 @@ export interface Processus {
   statut: StatusProcessus;
   offre_id: number;
   duree: number;
+  start_at: string;
   created_at: string;
   updated_at: string;
 }

@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreatePostCariereDto, UpdatePostCariereDto, PostCariere } from '@/lib/types/postcarieres';
 import { usePostCariere } from '@/hooks/use-postcariere';
 import { useOrganization } from '@/hooks/use-organization';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ImagePlus, X, Loader2, Building2 } from 'lucide-react';
+import { X, Loader2, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Combobox } from '../../offres/_components/combobox';
+import { FileUpload } from '@/components/file-upload';
 
 interface PostCariereFormProps {
   initialData?: PostCariere;
@@ -18,7 +19,6 @@ interface PostCariereFormProps {
 
 const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { createPostCariere, updatePostCariere } = usePostCariere();
   const { organizations, isLoadingOrganizations } = useOrganization();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,31 +43,12 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
     })) || [];
   }, [organizations]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length + previewImages.length > 5) {
-      toast.error("Maximum 5 images allowed");
-      return;
-    }
-
-    files.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`File ${file.name} is too large. Maximum size is 5MB`);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setPreviewImages(prev => [...prev, reader.result as string]);
-          setFormData(prev => ({
-            ...prev,
-            images: [...(prev.images || []), reader.result].filter((img): img is string => typeof img === 'string')
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+  const handleImageUpload = (fileUrl: string) => {
+    setPreviewImages(prev => [...prev, fileUrl]);
+    setFormData(prev => ({
+      ...prev,
+      images: [...(prev.images || []), fileUrl]
+    }));
   };
 
   const removeImage = (index: number) => {
@@ -94,7 +75,8 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
         await createPostCariere(formData as CreatePostCariereDto);
         toast.success("Post created successfully");
       }
-      router.push(`/admin/organizations/${formData.organisation_id}/postcarrieres`);
+
+      router.push(`/admin/organizations/${formData.organisation_id}/postcarieres`);
     } catch (error) {
       console.error('Error saving post:', error);
       toast.error("Failed to save post");
@@ -129,7 +111,7 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 group"
         >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          ⟵
           Back to Career Posts
         </button>
 
@@ -189,54 +171,46 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Images <span className="text-gray-400">(Max 5 images, 5MB each)</span>
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {previewImages.length < 5 && (
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="aspect-video border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center 
-                      justify-center gap-2 cursor-pointer hover:border-gray-300 transition-colors bg-gray-50/50"
-                  >
-                    <ImagePlus className="h-8 w-8 text-gray-400" />
-                    <span className="text-sm text-gray-500">Add Images</span>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  </div>
-                )}
+              
+              {previewImages.length < 5 && (
+                <FileUpload
+                  onUpload={handleImageUpload}
+                  accept="image"
+                  className="mb-4"
+                />
+              )}
 
-                {previewImages.map((image, index) => (
-                  <div key={index} className="relative group aspect-video">
-                    <Image
-                      src={image}
-                      alt={`Preview ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-xl"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1.5 bg-white rounded-lg shadow-sm opacity-0 
-                        group-hover:opacity-100 transition-opacity hover:bg-red-50"
-                    >
-                      <X className="h-4 w-4 text-red-500" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {previewImages.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {previewImages.map((image, index) => (
+                    <div key={index} className="relative group aspect-video">
+                      <Image
+                        src={image}
+                        alt={`Preview ${index + 1}`}
+                        fill
+                        className="rounded-xl object-cover"
+                        unoptimized
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 p-1.5 bg-white rounded-lg shadow-sm opacity-0 
+                          group-hover:opacity-100 transition-opacity hover:bg-red-50"
+                      >
+                        <X className="h-4 w-4 text-red-500" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-4 pt-6">
+            <div className="flex items-center gap-2 pt-6">
               <Button
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 
-                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 h-11"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isSubmitting ? 'Saving...' : isEditing ? 'Update Post' : 'Create Post'}
@@ -245,7 +219,7 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
                 type="button"
                 onClick={() => router.back()}
                 variant="outline"
-                className="px-6 py-3 rounded-full"
+                className="px-6 py-3 rounded-full h-11"
               >
                 Cancel
               </Button>
