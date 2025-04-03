@@ -26,7 +26,7 @@ export default function Profile() {
               </div>
               <button
                 onClick={() => setIsInviteModalOpen(true)}
-                className="flex items-center h-11 px-5 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
+                className="flex items-center h-9 px-6 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
               >
                 <Link className='h-4 w-4 mr-2' />
                 Inviter

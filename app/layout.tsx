@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Urbanist } from "next/font/google"
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Urbanist({
   subsets: ['latin'],
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body
         className={` ${poppins.className} antialiased`}
       >
+        <Toaster />
         <NextTopLoader height={3} color="#4BB3DA" />
         {children}
       </body>

@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
 import React, { useState } from 'react';
-import { Loader2, Plus, Play, ChevronUp, ChevronDown, Trash2, FileText, Clock, ArrowUpDown, X, Upload } from 'lucide-react';
+import { Loader2, Plus, Play, Trash2, FileText, Clock, ArrowUpDown, X, Upload } from 'lucide-react';
+import { Processus, StatusOffre } from '@/lib/types/offre-details';
+import { Combobox } from '../../_components/combobox';
 
 interface ProcessSectionProps {
   processus: Processus[];
   isEditing: boolean;
+  offreStatus: StatusOffre;
   onCreateProcess: (process: CreateProcessDto) => Promise<void>;
   onDeleteProcess: (id: number) => Promise<void>;
-  onMoveProcess: (id: number, direction: 'up' | 'down') => Promise<void>;
   onStartProcess: (id: number) => Promise<void>;
   onViewChange?: () => void;
 }
@@ -19,14 +22,7 @@ interface CreateProcessDto {
   type: TypeProcessus;
   description: string;
   duree: number;
-}
-
-interface Processus {
-  id: number;
-  titre: string;
-  type: TypeProcessus;
-  description: string;
-  duree: number;
+  start_at: string;
 }
 
 interface Question {
@@ -38,6 +34,12 @@ interface Question {
 }
 
 type TypeProcessus = 'VISIO_CONFERENCE' | 'TACHE' | 'QUESTIONNAIRE';
+
+const processTypeOptions = [
+  { value: 'VISIO_CONFERENCE', label: 'Entretien' },
+  { value: 'TACHE', label: 'Test technique' },
+  { value: 'QUESTIONNAIRE', label: 'Questionnaire' }
+];
 
 const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
   if (!isOpen) return null;
@@ -59,10 +61,10 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
 
 const ProcessSection = ({
   processus,
+  offreStatus,
   isEditing,
   onCreateProcess,
   onDeleteProcess,
-  onMoveProcess,
   onStartProcess,
   onViewChange
 }: ProcessSectionProps) => {
@@ -70,12 +72,14 @@ const ProcessSection = ({
   const [isCreatingProcess, setIsCreatingProcess] = useState(false);
   const [processError, setProcessError] = useState('');
   const [uploadingQuizId, setUploadingQuizId] = useState<number | null>(null);
-  const [movingProcessId, setMovingProcessId] = useState<number | null>(null);
+  const [startingProcessId, setStartingProcessId] = useState<number | null>(null);
+  const [deletingProcessId, setDeletingProcessId] = useState<number | null>(null);
   const [newProcess, setNewProcess] = useState<CreateProcessDto>({
     titre: '',
     type: 'QUESTIONNAIRE',
     description: '',
-    duree: 30
+    duree: 30,
+    start_at: new Date().toISOString().slice(0, 16) // Format: "YYYY-MM-DDThh:mm"
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, processId: number) => {
@@ -114,12 +118,21 @@ const ProcessSection = ({
     }
   };
 
-  const handleMoveProcess = async (id: number, direction: 'up' | 'down') => {
-    setMovingProcessId(id);
+  const handleStartProcess = async (id: number) => {
+    setStartingProcessId(id);
     try {
-      await onMoveProcess(id, direction);
+      await onStartProcess(id);
     } finally {
-      setMovingProcessId(null);
+      setStartingProcessId(null);
+    }
+  };
+
+  const handleDeleteProcess = async (id: number) => {
+    setDeletingProcessId(id);
+    try {
+      await onDeleteProcess(id);
+    } finally {
+      setDeletingProcessId(null);
     }
   };
 
@@ -134,7 +147,8 @@ const ProcessSection = ({
         titre: '',
         type: 'QUESTIONNAIRE',
         description: '',
-        duree: 30
+        duree: 30,
+        start_at: new Date().toISOString().slice(0, 16)
       });
       setIsModalOpen(false);
     } catch (err) {
@@ -158,10 +172,46 @@ const ProcessSection = ({
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'A_VENIR':
+        return 'bg-gray-100 text-gray-800';
+      case 'EN_COURS':
+        return 'bg-blue-100 text-blue-800';
+      case 'TERMINE':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Non défini';
+    return new Date(dateString).toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const shouldShowStartButton = (etape: Processus) => {
+    return offreStatus === 'FERME' && etape.statut === 'A_VENIR';
+  };
+
+  const shouldShowUploadButton = (etape: Processus) => {
+    return offreStatus === 'CREE';
+  };
+
+  const shouldShowDeleteButton = (etape: Processus) => {
+    return offreStatus === 'CREE';
+  };
+
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Processus de recrutement</h2>
+        <h2 className="text-xl font-semibold uppercase">Processus de recrutement</h2>
         <div className="flex gap-2">
           {isEditing && (
             <button
@@ -203,15 +253,12 @@ const ProcessSection = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type
               </label>
-              <select
+              <Combobox
+                options={processTypeOptions}
                 value={newProcess.type}
-                onChange={(e) => setNewProcess({ ...newProcess, type: e.target.value as TypeProcessus })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="VISIO_CONFERENCE">Entretien</option>
-                <option value="TACHE">Test technique</option>
-                <option value="QUESTIONNAIRE">Questionnaire</option>
-              </select>
+                onChange={(value) => setNewProcess({ ...newProcess, type: value as TypeProcessus })}
+                placeholder="Sélectionner un type"
+              />
             </div>
 
             <div>
@@ -223,6 +270,19 @@ const ProcessSection = ({
                 onChange={(e) => setNewProcess({ ...newProcess, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date et heure de début
+              </label>
+              <input
+                type="datetime-local"
+                value={newProcess.start_at}
+                onChange={(e) => setNewProcess({ ...newProcess, start_at: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
@@ -266,27 +326,41 @@ const ProcessSection = ({
       </Modal>
 
       <div className="space-y-4">
-        {processus.map((etape, index) => (
+        {processus.map((etape) => (
           <div key={etape.id} className="bg-white p-4 rounded-lg border border-gray-200">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    <FileText className="w-4 h-4 mr-1" />
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <FileText className="w-3 h-3 mr-1" />
                     {getProcessTypeLabel(etape.type)}
                   </span>
                   <h4 className="text-lg font-medium text-gray-900 ml-3">{etape.titre}</h4>
                 </div>
                 <p className="mt-1 text-sm text-gray-500">{etape.description}</p>
-                <div className="mt-2 flex items-center text-sm text-gray-500">
-                  <Clock className="w-4 h-4 mr-1" />
-                  <span>{etape.duree} minutes</span>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Clock className="w-4 h-4 mr-1" />
+                    <span>{etape.duree} minutes</span>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Début: {formatDate(etape.start_at)}
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(etape.statut)}`}>
+                    { 
+                      etape.statut === 'A_VENIR' ? 'À venir' : 
+                      etape.statut === 'EN_COURS' ? 'En cours' : 
+                      etape.statut === 'TERMINE' ? 'Terminé' : etape.statut
+                    }
+                  </span>
                 </div>
               </div>
 
               {isEditing && (
                 <div className="flex items-center space-x-2">
-                  {etape.type === 'QUESTIONNAIRE' && (
+                  {etape.type === 'QUESTIONNAIRE' && shouldShowUploadButton(etape) && (
                     <>
                       <input
                         type="file"
@@ -297,7 +371,7 @@ const ProcessSection = ({
                       />
                       <button
                         onClick={() => document.getElementById(`upload-${etape.id}`)?.click()}
-                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-50"
                         title="Uploader les questions"
                         disabled={uploadingQuizId === etape.id}
                       >
@@ -309,44 +383,34 @@ const ProcessSection = ({
                       </button>
                     </>
                   )}
-                  <button
-                    onClick={() => onStartProcess(etape.id)}
-                    className="p-1 text-gray-400 hover:text-green-600 transition-colors"
-                    title="Démarrer"
-                  >
-                    <Play className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleMoveProcess(etape.id, 'up')}
-                    disabled={index === 0 || movingProcessId === etape.id}
-                    className={`p-1 ${index === 0 || movingProcessId === etape.id ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
-                    title="Déplacer vers le haut"
-                  >
-                    {movingProcessId === etape.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ChevronUp className="w-4 h-4" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => handleMoveProcess(etape.id, 'down')}
-                    disabled={index === processus.length - 1 || movingProcessId === etape.id}
-                    className={`p-1 ${index === processus.length - 1 || movingProcessId === etape.id ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
-                    title="Déplacer vers le bas"
-                  >
-                    {movingProcessId === etape.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => onDeleteProcess(etape.id)}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {shouldShowStartButton(etape) && (
+                    <button
+                      onClick={() => handleStartProcess(etape.id)}
+                      className="p-1 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                      title="Démarrer"
+                      disabled={startingProcessId === etape.id}
+                    >
+                      {startingProcessId === etape.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+                  {shouldShowDeleteButton(etape) && (
+                    <button
+                      onClick={() => handleDeleteProcess(etape.id)}
+                      className="p-1 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                      title="Supprimer"
+                      disabled={deletingProcessId === etape.id}
+                    >
+                      {deletingProcessId === etape.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

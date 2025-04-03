@@ -4,9 +4,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePostCariere } from '@/hooks/use-postcariere';
-import { useParams } from 'next/navigation';
 import Nothings from '@/components/nothings';
-import { Trash2, Eye, Plus, Calendar } from 'lucide-react';
+import { Trash2, Plus, Calendar } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -25,10 +24,12 @@ const CardSkeleton = () => (
   </div>
 );
 
-const PostCarieresList = () => {
-  const { postCarieres, isLoadingPostCarieres, deletePostCariere } = usePostCariere();
-  const params = useParams();
-  const organizationId = params.id;
+interface Props {
+  organizationId: number
+}
+
+const PostCarieresList = ({ organizationId } : Props) => {
+  const { postCarieres, isLoadingPostCarieres, deletePostCariere } = usePostCariere(organizationId);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -56,15 +57,17 @@ const PostCarieresList = () => {
     );
   }
 
+  const filteredPostCarieres = postCarieres?.filter(post => post.organisation_id === organizationId);
+
   return (
     <div className="min-h-screen max-w-6xl mx-auto">
-      {(!postCarieres || postCarieres.length === 0) ? (
+      {(!filteredPostCarieres || filteredPostCarieres.length === 0) ? (
         <div className="flex flex-col items-center justify-center">
           <Nothings title="Carrières" />
           <Link
             href={`/admin/organizations/${organizationId}/postcarieres/create`}
-            className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-full 
-              hover:bg-gray-800 transition-all duration-200 font-medium"
+            className="inline-flex items-center gap-2 bg-[#1E1F22] text-white px-6 py-2.5 rounded-full 
+              hover:bg-[#313338] transition-all duration-200 font-medium"
           >
             <Plus className="h-4 w-4" />
             Create Post
@@ -72,7 +75,7 @@ const PostCarieresList = () => {
         </div>
       ) : (
         <div className="space-y-16">
-          {postCarieres.map((post) => (
+          {filteredPostCarieres.map((post) => (
             <div key={post.id} className="group">
               <div className="flex flex-col md:flex-row gap-8">
                 {post.images?.[0] && (
@@ -120,11 +123,11 @@ const PostCarieresList = () => {
                   <div className="flex items-center gap-4">
                     <Link
                       href={`/admin/organizations/${organizationId}/postcarieres/${post.id}/edit`}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-[12px]
-                        hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+                      prefetch={false}
+                      className="inline-flex items-center gap-2 transition-colors duration-200 text-sm font-medium underline underline-offset-4 hover:text-blue-500"
                     >
-                      <Eye className="h-4 w-4" />
-                      View Details
+                      ⟶
+                      Modifier les informations de l&apos;organisation.
                     </Link>
                     <button
                       onClick={() => handleDelete(post.id)}

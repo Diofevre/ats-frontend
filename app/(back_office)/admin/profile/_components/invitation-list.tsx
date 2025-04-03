@@ -1,31 +1,34 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Loader2, X } from 'lucide-react';
 import type { Invitation } from '@/lib/types/invitations';
 import { invitationService } from '@/lib/services/invitations';
+import { useRouter } from 'next/navigation';
 
 interface InvitationListProps {
   organisationId: number[];
 }
 
-export default function InvitationList({ organisationId } : InvitationListProps) {
+export default function InvitationList({ organisationId }: InvitationListProps) {
+  const router = useRouter();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cancellingIds, setCancellingIds] = useState<number[]>([]);
 
   const filteredInvitations = invitations.filter(
     (invitation) => organisationId.includes(invitation.organisation_id)
   );
 
-  const fetchInvitations = async () => {
+  const fetchInvitations = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       const response = await invitationService.getQueue();
-      // The response is directly an array of invitations
+
       if (Array.isArray(response)) {
         setInvitations(response);
       } else if (response?.invitations) {
@@ -33,6 +36,8 @@ export default function InvitationList({ organisationId } : InvitationListProps)
       } else {
         setInvitations([]);
       }
+
+      router.refresh();
     } catch (error) {
       console.error('Failed to fetch invitations:', error);
       setError('Failed to load invitations');
@@ -40,21 +45,24 @@ export default function InvitationList({ organisationId } : InvitationListProps)
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
+      setCancellingIds((prev) => [...prev, invitationId]);
       await invitationService.cancel(invitationId);
-      // Refresh the invitations list after cancellation
-      fetchInvitations();
+      
+      await fetchInvitations();
     } catch (error) {
       console.error('Failed to cancel invitation:', error);
+    } finally {
+      setCancellingIds((prev) => prev.filter((id) => id !== invitationId));
     }
   };
 
   useEffect(() => {
     fetchInvitations();
-  }, []);
+  }, [fetchInvitations]);
 
   if (isLoading) {
     return (
@@ -104,10 +112,15 @@ export default function InvitationList({ organisationId } : InvitationListProps)
           </div>
           <button
             onClick={() => handleCancelInvitation(invitation.id)}
-            className="p-1 text-gray-400 hover:text-gray-500"
+            disabled={cancellingIds.includes(invitation.id)}
+            className="p-1 text-gray-400 hover:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
             title="Annuler l'invitation"
           >
-            <X className="w-4 h-4" />
+            {cancellingIds.includes(invitation.id) ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <X className="w-4 h-4" />
+            )}
           </button>
         </div>
       ))}

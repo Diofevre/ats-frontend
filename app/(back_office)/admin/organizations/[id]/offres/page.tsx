@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Briefcase, MapPin, Clock, Search, ChevronLeft, ChevronRight, Loader2, Building2, Plus } from 'lucide-react';
 import { useOrganization } from '@/hooks/use-organization';
+import { useOffresDetails } from '@/hooks/use-offre-details';
 import Nothings from '@/components/nothings';
 import { useRouter } from 'next/navigation';
 
@@ -12,10 +13,14 @@ const ITEMS_PER_PAGE = 10;
 const Offres = () => {
   const router = useRouter();
   const [organizationId, setOrganizationId] = useState<number | null>(null);
-  const { offres, isLoadingOffres, organization } = useOrganization(organizationId || undefined);
+  const { offres: initialOffres, isLoadingOffres: initialLoading, organization } = useOrganization(organizationId || undefined);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'TOUS' | 'OUVERT' | 'CREE' | 'FERME'>('TOUS');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOffre, setSelectedOffre] = useState<number | null>(null);
+  
+  // Use the useOffresDetails hook for detailed offer data
+  const { offre: selectedOffreDetails, isLoading: isLoadingDetails } = useOffresDetails(selectedOffre || 0);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -26,6 +31,7 @@ const Offres = () => {
   }, []);
 
   const handleOffreClick = (offreId: number) => {
+    setSelectedOffre(offreId);
     router.push(`/admin/organizations/${organizationId}/offres/${offreId}`);
   };
 
@@ -34,9 +40,9 @@ const Offres = () => {
   };
 
   const filteredOffres = React.useMemo(() => {
-    if (!offres) return [];
+    if (!initialOffres) return [];
     
-    return offres.filter(offre => {
+    return initialOffres.filter(offre => {
       const matchesSearch = 
         offre.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         offre.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,7 +54,7 @@ const Offres = () => {
 
       return matchesSearch && matchesStatus;
     });
-  }, [offres, searchTerm, filterStatus]);
+  }, [initialOffres, searchTerm, filterStatus]);
 
   const totalPages = React.useMemo(() => 
     Math.ceil((filteredOffres?.length || 0) / ITEMS_PER_PAGE)
@@ -75,7 +81,7 @@ const Offres = () => {
     );
   }
 
-  if (isLoadingOffres) {
+  if (initialLoading || isLoadingDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -86,7 +92,7 @@ const Offres = () => {
     );
   }
 
-  if (!offres || offres.length === 0) {
+  if (!initialOffres || initialOffres.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="rounded-xl p-8 max-w-md w-full text-center">
@@ -116,7 +122,7 @@ const Offres = () => {
             </div>
             <button
               onClick={handleAddOffre}
-              className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors"
+              className="inline-flex items-center px-4 py-3 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors uppercase text-xs"
             >
               <Plus className="w-4 h-4 mr-2" />
               Ajouter
@@ -139,8 +145,8 @@ const Offres = () => {
                 onClick={() => setFilterStatus('TOUS')}
                 className={`px-4 py-2 rounded-[12px] font-medium transition-colors ${
                   filterStatus === 'TOUS'
-                    ? 'bg-[#2C9CC6] text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                    ? 'bg-[#2C9CC6] text-white uppercase text-xs'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 uppercase text-xs'
                 }`}
               >
                 Tous
@@ -149,8 +155,8 @@ const Offres = () => {
                 onClick={() => setFilterStatus('CREE')}
                 className={`px-4 py-2 rounded-[12px] font-medium transition-colors ${
                   filterStatus === 'CREE'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                    ? 'bg-rose-600 text-white uppercase text-xs'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 uppercase text-xs'
                 }`}
               >
                 En Attente
@@ -159,8 +165,8 @@ const Offres = () => {
                 onClick={() => setFilterStatus('OUVERT')}
                 className={`px-4 py-2 rounded-[12px] font-medium transition-colors ${
                   filterStatus === 'OUVERT'
-                    ? 'bg-black text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                    ? 'bg-green-600 text-white uppercase text-xs'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 uppercase text-xs'
                 }`}
               >
                 Ouvert
@@ -169,8 +175,8 @@ const Offres = () => {
                 onClick={() => setFilterStatus('FERME')}
                 className={`px-4 py-2 rounded-[12px] font-medium transition-colors ${
                   filterStatus === 'FERME'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                    ? 'bg-black text-white uppercase text-xs'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 uppercase text-xs'
                 }`}
               >
                 Fermé
@@ -183,63 +189,52 @@ const Offres = () => {
           ) : (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {paginatedOffres.map((offre) => (
-                  <div 
-                    key={offre.id} 
-                    onClick={() => handleOffreClick(offre.id)}
-                    className="group bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100"
-                  >
-                    {offre.image_url && (
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={offre.image_url}
-                          alt={offre.titre}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${
-                          offre.status === 'OUVERT' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {offre.status}
-                        </div>
-                      </div>
-                    )}
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {offre.titre}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-4">{offre.description}</p>
+                {paginatedOffres.map((offre) => {
+                  // Use detailed data if available, otherwise use the initial data
+                  const displayOffre = (selectedOffre === offre.id && selectedOffreDetails) || offre;
 
-                      <div className="space-y-3">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                          <span className="truncate">{offre.lieu}, {offre.pays}</span>
+                  return (
+                    <div 
+                      key={displayOffre.id} 
+                      onClick={() => handleOffreClick(displayOffre.id)}
+                      className="group bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100"
+                    >
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                          {displayOffre.titre}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-4">{displayOffre.description}</p>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                            <span className="truncate">{displayOffre.lieu}, {displayOffre.pays}</span>
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Briefcase className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                            <span className="truncate">{displayOffre.type_emploi} - {displayOffre.salaire} {displayOffre.devise}</span>
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Clock className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                            <span className="truncate">{displayOffre.horaire_ouverture} - {displayOffre.horaire_fermeture}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Briefcase className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                          <span className="truncate">{offre.type_emploi} - {offre.salaire} {offre.devise}</span>
+                        <div className="mt-4 flex items-center justify-between">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            displayOffre.status === 'OUVERT' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {displayOffre.status === 'CREE' ? 'EN ATTENTE' : displayOffre.status}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            Date limite: {new Date(displayOffre.date_limite).toLocaleDateString()}
+                          </span>
                         </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                          <span className="truncate">{offre.horaire_ouverture} - {offre.horaire_fermeture}</span>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          offre.status === 'OUVERT' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {offre.status}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          Date limite: {new Date(offre.date_limite).toLocaleDateString()}
-                        </span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {totalPages > 1 && (
