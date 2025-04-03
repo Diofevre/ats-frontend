@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC, ChangeEvent } from "react";
+import React, { useEffect, useState, FC } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Upload, Loader2, Info } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { FileUpload } from "../file-upload";
 
 export const applicationSchema = z.object({
   email: z.string().email("Email invalide").nonempty("Email requis"),
@@ -61,14 +62,11 @@ interface ApplicationFormulaireProps {
 const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cvFile, setCvFile] = useState<File | null>(null);
-  const [cvError, setCvError] = useState<string | null>(null);
-  const [lettreMotivationFile, setLettreMotivationFile] = useState<File | null>(
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [lettreMotivationUrl, setLettreMotivationUrl] = useState<string | null>(
     null
   );
-  const [lettreMotivationError, setLettreMotivationError] = useState<
-    string | null
-  >(null);
+  const [cvError, setCvError] = useState<string | null>(null);
 
   const {
     control,
@@ -97,89 +95,38 @@ const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
     }
   }, [idPost, setValue]);
 
-  const handleFileUpload = (
-    e: ChangeEvent<HTMLInputElement>,
-    type: "cv" | "lettre_motivation"
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const allowedTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        if (type === "cv") {
-          setCvError(
-            "Le CV doit être un fichier PDF, DOC, DOCX, PNG, JPEG ou JPG"
-          );
-          setCvFile(null);
-        } else {
-          setLettreMotivationError(
-            "La lettre de motivation doit être un fichier PDF, DOC, DOCX, PNG, JPEG ou JPG"
-          );
-          setLettreMotivationFile(null);
-        }
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        if (type === "cv") {
-          setCvError("Le CV ne doit pas dépasser 5MB");
-          setCvFile(null);
-        } else {
-          setLettreMotivationError(
-            "La lettre de motivation ne doit pas dépasser 5MB"
-          );
-          setLettreMotivationFile(null);
-        }
-        return;
-      }
-      if (type === "cv") {
-        setCvFile(file);
-        setCvError(null);
-      } else {
-        setLettreMotivationFile(file);
-        setLettreMotivationError(null);
-      }
-    }
-  };
-
   const onSubmit = async (data: ApplicationFormData) => {
-    if (!cvFile) {
+    if (!cvUrl) {
       setCvError("Le CV est requis");
-
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("cv", cvFile);
-      if (lettreMotivationFile)
-        formData.append("lettre_motivation", lettreMotivationFile);
-      formData.append("email", data.email);
-      formData.append("nom", data.nom);
-      if (data.telephone)
-        formData.append("telephone", data.telephone.replace("+261", "0"));
-      if (data.offre_id) formData.append("offre_id", data.offre_id.toString());
-      formData.append("source_site", data.source_site.toUpperCase());
-      formData.append(
-        "hasReferent",
-        data.hasReferent === "true" ? "true" : "false"
-      );
-      if (data.hasReferent === "true" && data.referents) {
-        formData.append("referents", data.referents);
-      }
+      const cv = cvUrl;
+      const lettre_motivation = lettreMotivationUrl;
+      const email = data.email;
+      const nom = data.nom;
+      const telephone = data.telephone?.replace("+261", "0");
+      const offre_id = data.offre_id?.toString();
+      const source_site = data.source_site.toUpperCase();
+      const hasReferent = data.referents;
 
-      const response = await Postulation(formData);
+      const response = await Postulation(
+        cv,
+        lettre_motivation,
+        email,
+        nom,
+        telephone,
+        offre_id,
+        source_site,
+        hasReferent
+      );
       console.log("Réponse:", response);
 
       reset();
-      setCvFile(null);
-      setLettreMotivationFile(null);
+      setCvUrl(null);
+      setLettreMotivationUrl(null);
       router.push("/offres-lists/success");
     } catch (error) {
       console.error("Erreur dans onSubmit:", error);
@@ -351,10 +298,8 @@ const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
             </h2>
             <div className="space-y-6">
               <div>
-                <Label
-                  htmlFor="cv"
-                  className="text-gray-700 mb-2 flex items-center">
-                  CV * (PDF, DOC, DOCX, PNG, JPEG, JPG, max 5MB)
+                <Label className="text-gray-700 mb-2 flex items-center">
+                  CV * (PDF, PNG, JPG, JPEG)
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -366,54 +311,21 @@ const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <div className="mt-2">
-                  <label
-                    htmlFor="cv"
-                    className={`relative block group ${
-                      isSubmitting
-                        ? "cursor-not-allowed opacity-50"
-                        : "cursor-pointer"
-                    }`}>
-                    <div className="flex items-center justify-center w-full px-6 py-4 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                      <div className="space-y-1 text-center">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <div className="text-sm text-gray-600">
-                          <span className="font-semibold text-blue-600">
-                            Cliquez pour télécharger
-                          </span>{" "}
-                          ou glissez-déposez
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          PDF, DOC, DOCX, PNG, JPEG, JPG (Max. 5MB)
-                        </p>
-                      </div>
-                    </div>
-                    <Input
-                      id="cv"
-                      type="file"
-                      accept=".pdf,.doc,.docx,image/png,image/jpeg,image/jpg"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload(e, "cv")}
-                      disabled={isSubmitting}
-                    />
-                  </label>
-                </div>
-                {cvFile && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Fichier sélectionné : {cvFile.name} (
-                    {(cvFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                )}
+                <FileUpload
+                  onUpload={(url) => {
+                    setCvUrl(url);
+                    setCvError(null);
+                  }}
+                  accept="both"
+                  className="mt-2"
+                />
                 {cvError && (
                   <p className="text-red-500 text-sm mt-2">{cvError}</p>
                 )}
               </div>
               <div>
-                <Label
-                  htmlFor="lettre_motivation"
-                  className="text-gray-700 mb-2 flex items-center">
-                  Lettre de motivation (optionnel, PDF, DOC, DOCX, PNG, JPEG,
-                  JPG, max 5MB)
+                <Label className="text-gray-700 mb-2 flex items-center">
+                  Lettre de motivation (optionnel, PDF, PNG, JPG, JPEG)
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -428,49 +340,11 @@ const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <div className="mt-2">
-                  <label
-                    htmlFor="lettre_motivation"
-                    className={`relative block group ${
-                      isSubmitting
-                        ? "cursor-not-allowed opacity-50"
-                        : "cursor-pointer"
-                    }`}>
-                    <div className="flex items-center justify-center w-full px-6 py-4 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                      <div className="space-y-1 text-center">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <div className="text-sm text-gray-600">
-                          <span className="font-semibold text-blue-600">
-                            Cliquez pour télécharger
-                          </span>{" "}
-                          ou glissez-déposez
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          PDF, DOC, DOCX, PNG, JPEG, JPG (Max. 5MB)
-                        </p>
-                      </div>
-                    </div>
-                    <Input
-                      id="lettre_motivation"
-                      type="file"
-                      accept=".pdf,.doc,.docx,image/png,image/jpeg,image/jpg"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload(e, "lettre_motivation")}
-                      disabled={isSubmitting}
-                    />
-                  </label>
-                </div>
-                {lettreMotivationFile && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Fichier sélectionné : {lettreMotivationFile.name} (
-                    {(lettreMotivationFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                )}
-                {lettreMotivationError && (
-                  <p className="text-red-500 text-sm mt-2">
-                    {lettreMotivationError}
-                  </p>
-                )}
+                <FileUpload
+                  onUpload={(url) => setLettreMotivationUrl(url)}
+                  accept="both"
+                  className="mt-2"
+                />
               </div>
             </div>
           </div>
@@ -603,7 +477,7 @@ const ApplicationFormulaire: FC<ApplicationFormulaireProps> = ({ idPost }) => {
               <Button
                 type="submit"
                 className="px-6 bg-blue-600 hover:bg-blue-700 rounded-[12px] h-10"
-                disabled={isSubmitting || !isDirty || !cvFile}>
+                disabled={isSubmitting || !isDirty || !cvUrl}>
                 {isSubmitting ? (
                   <div className="flex items-center space-x-2">
                     <Loader2 className="h-5 w-5 animate-spin" />

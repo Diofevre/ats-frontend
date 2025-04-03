@@ -11,7 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import HeaderSection from "@/components/back_office/quiz/headerSection";
 import { useClientStore } from "@/lib/store-user";
-import { submitQuiz, useQuizById } from "@/lib/services/client/procecus";
+import {
+  submitQuiz,
+  useProcessusByIdProces,
+} from "@/lib/services/client/procecus";
 
 interface Reponse {
   id: number;
@@ -75,9 +78,11 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [quizResult, setQuizResult] = useState<QuizScore | null>(null); // État pour le résultat
+  const [quizResult, setQuizResult] = useState<QuizScore | null>(null);
 
-  const { quiz: fetchedQuiz, isLoading } = useQuizById(Number(quizId));
+  const { proces: fetchedQuiz, isLoading } = useProcessusByIdProces(
+    Number(quizId)
+  );
 
   const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -95,7 +100,7 @@ export default function QuizPage() {
       try {
         if (fetchedQuiz) {
           setQuiz(fetchedQuiz);
-          setTimeLeft(fetchedQuiz.duree * 60);
+          setTimeLeft(fetchedQuiz.duree);
         }
       } catch (error) {
         console.error("Erreur lors du chargement du quiz:", error);

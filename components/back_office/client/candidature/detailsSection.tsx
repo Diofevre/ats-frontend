@@ -5,10 +5,7 @@ import { PostulationType } from "@/lib/types/client/client.types";
 import { useEffect, useState } from "react";
 import { Processus } from "@/lib/types/processus-admin/processus-admin";
 import { offreService } from "@/lib/services/offres/offres";
-import {
-  submitTacheLink,
-  submitTacheFile,
-} from "@/lib/services/client/procecus";
+import { submitTacheLink } from "@/lib/services/client/procecus";
 import { ClientData } from "@/lib/store-user";
 import OfferDetails from "./offerDetails";
 import RecruitmentProcess from "./recruitmentProcess";
@@ -27,10 +24,7 @@ export default function DetailsSection({
   const router = useRouter();
   const [processSteps, setProcessSteps] = useState<Processus[]>([]);
   const [showFilePopup, setShowFilePopup] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>("");
-  const [submissionType, setSubmissionType] = useState<"file" | "link">("file");
-  const [fileError, setFileError] = useState<string | null>(null);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,35 +65,6 @@ export default function DetailsSection({
     return urlPattern.test(url);
   };
 
-  const handleFileSubmission = async (stepId: string) => {
-    if (!selectedFile) {
-      setFileError("Veuillez sélectionner un fichier avant de soumettre.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      await submitTacheFile(
-        formData,
-        Number(stepId),
-        client?.token_candidat ?? ""
-      );
-      console.log(
-        `Fichier soumis pour le step ${stepId}: ${selectedFile.name}`
-      );
-      setShowFilePopup(null);
-      setSelectedFile(null);
-      setSubmissionType("file");
-    } catch (error) {
-      setFileError("Erreur lors de la soumission du fichier.");
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleLinkSubmission = async (stepId: string) => {
     if (!link) {
       setLinkError("Veuillez entrer un lien avant de soumettre.");
@@ -116,20 +81,11 @@ export default function DetailsSection({
       console.log(`Lien soumis pour le step ${stepId}: ${link}`);
       setShowFilePopup(null);
       setLink("");
-      setSubmissionType("file");
     } catch (error) {
       setLinkError("Erreur lors de la soumission du lien.");
       console.error(error);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleSubmission = (stepId: string) => {
-    if (submissionType === "file") {
-      handleFileSubmission(stepId);
-    } else {
-      handleLinkSubmission(stepId);
     }
   };
 
@@ -143,18 +99,12 @@ export default function DetailsSection({
       {showFilePopup && (
         <TaskSubmissionPopup
           stepId={showFilePopup}
-          selectedFile={selectedFile}
-          setSelectedFile={setSelectedFile}
           link={link}
           setLink={setLink}
-          submissionType={submissionType}
-          setSubmissionType={setSubmissionType}
-          fileError={fileError}
-          setFileError={setFileError}
           linkError={linkError}
           setLinkError={setLinkError}
           isSubmitting={isSubmitting}
-          handleSubmission={handleSubmission}
+          handleSubmission={handleLinkSubmission}
           setShowFilePopup={setShowFilePopup}
         />
       )}

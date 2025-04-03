@@ -85,14 +85,14 @@ export const submitTacheFile = async (
   }
 };
 
-export const useQuizById = (id: number | undefined) => {
+export const useProcessusByIdProces = (id: number | undefined) => {
   const { data, error, mutate } = useSWR(
     id ? `${API_URL}/api/processus/${id}` : null,
     fetcher
   );
 
   return {
-    quiz: data,
+    proces: data,
     isLoading: id && !error && !data,
     isError: error,
     mutate,
@@ -133,6 +133,20 @@ export const useProccecusPassed = (id: number, token: string | undefined) => {
   return {
     passedProcessus: data,
     isLoading: !error && !data,
+    isError: error,
+    mutate,
+  };
+};
+
+export const usePostulationDetail = (id: number | undefined) => {
+  const { data, error, mutate } = useSWR(
+    id ? `${API_URL}/api/postulations/${id}/details` : null,
+    fetcher
+  );
+
+  return {
+    detailPostulation: data,
+    isLoading: id && !error && !data,
     isError: error,
     mutate,
   };
