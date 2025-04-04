@@ -64,3 +64,10 @@ export interface CreateProcessusDto {
 export interface AddQuizzDto {
   questions: Question[];
 }
+
+export interface StartVisioDto {
+  users: number[];
+  candidats: number[];
+  start_time: string;
+  start_date: string;
+}

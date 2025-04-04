@@ -1,7 +1,7 @@
 'use client'
 
 import { ProcessusService } from '@/lib/services/processus-admin/processus-service';
-import { AddQuizzDto, CreateProcessusDto, Processus, ProcessusDetail } from '@/lib/types/processus-admin/processus-admin';
+import { AddQuizzDto, CreateProcessusDto, Processus, ProcessusDetail, StartVisioDto } from '@/lib/types/processus-admin/processus-admin';
 import useSWR from 'swr';
 
 const PROCESSUS_KEY = 'processus';
@@ -65,6 +65,11 @@ export function useProcessus() {
     mutate();
   };
 
+  const startVisio = async (id: string, data: StartVisioDto) => {
+    await ProcessusService.startVisio(id, data);
+    mutate();
+  };
+
   const makeTop = async (id: string) => {
     await ProcessusService.makeTop(id);
     mutate();
@@ -96,6 +101,7 @@ export function useProcessus() {
     startProcessus,
     startInacheve,
     startForCandidat,
+    startVisio,
     makeTop,
     makeBottom,
     reverseOrder,
