@@ -36,7 +36,7 @@ export default function TaskSubmissionPopup({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed top-[-5rem] left-0 right-0 bottom-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           Soumettre une tâche

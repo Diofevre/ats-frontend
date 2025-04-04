@@ -66,6 +66,8 @@ export const useAllOffres = (filters: OffreFilters) => {
   const baseUrl = `${API_URL}/api/offres/available`;
   const urlWithFilters = buildUrl(baseUrl, filters);
 
+  console.log(urlWithFilters);
+
   const { data, error, mutate } = useSWR(urlWithFilters, fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,

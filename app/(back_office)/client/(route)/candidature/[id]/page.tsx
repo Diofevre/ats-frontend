@@ -9,10 +9,7 @@ import HeaderSection from "@/components/back_office/client/candidature/headerSec
 import DetailsSection from "@/components/back_office/client/candidature/detailsSection";
 import { PostulationType } from "@/lib/types/client/client.types";
 import { Button } from "@/components/ui/button";
-import {
-  usePostulationDetail,
-  useProccecusPassed,
-} from "@/lib/services/client/procecus";
+import { useProccecusPassed } from "@/lib/services/client/procecus";
 
 export default function ApplicationDetailPage() {
   const params = useParams();
@@ -20,10 +17,6 @@ export default function ApplicationDetailPage() {
   const applicationId = params.id as string;
 
   const { client, loadClient } = useClientStore();
-
-  const { detailPostulation } = usePostulationDetail(Number(applicationId));
-
-  console.log(detailPostulation);
 
   useEffect(() => {
     if (!client) {
@@ -40,7 +33,6 @@ export default function ApplicationDetailPage() {
     client?.token_candidat ?? ""
   );
 
-  console.log(passedProcessus);
 
   const application = myPostulations?.find(
     (app: PostulationType) => app.id === Number(applicationId)
@@ -68,7 +60,11 @@ export default function ApplicationDetailPage() {
       <HeaderSection application={application} onBack={() => router.back()} />
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <DetailsSection application={application} client={client} />
+          <DetailsSection
+            application={application}
+            client={client}
+            passedProcessus={passedProcessus}
+          />
         </div>
       </div>
     </div>
