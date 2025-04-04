@@ -1,4 +1,4 @@
-export type ProcessusType = 'VISIO_CONFERENCE' | 'QUESTIONNAIRE' | 'TACHE';
+export type ProcessusType = "VISIO_CONFERENCE" | "QUESTIONNAIRE" | "TACHE";
 
 export type Reponse = {
   label: string;
@@ -16,7 +16,7 @@ export interface Processus {
   titre: string;
   type: ProcessusType;
   description: string;
-  statut: 'A_VENIR' | 'EN_COURS' | 'TERMINE';
+  statut: "A_VENIR" | "EN_COURS" | "TERMINE";
   duree: number;
   start_at: string;
   created_at: string;

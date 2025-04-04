@@ -15,11 +15,13 @@ import QuizCard from "./quizCard";
 interface DetailsSectionProps {
   application: PostulationType;
   client: ClientData | null;
+  passedProcessus: { statut: string; type_processus: string };
 }
 
 export default function DetailsSection({
   application,
   client,
+  passedProcessus,
 }: DetailsSectionProps) {
   const router = useRouter();
   const [processSteps, setProcessSteps] = useState<Processus[]>([]);
@@ -95,6 +97,7 @@ export default function DetailsSection({
       <RecruitmentProcess
         processSteps={processSteps}
         handleStepAction={handleStepAction}
+        passedProcessus={passedProcessus}
       />
       {showFilePopup && (
         <TaskSubmissionPopup

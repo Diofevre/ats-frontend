@@ -37,15 +37,14 @@ export const startProcecus = async (id: number, token: string) => {
 };
 
 export const submitTacheLink = async (
-  link: string,
+  lien: string,
   id: number,
   token: string
 ) => {
-  console.log(link);
   try {
     const response = await axios.post(
       `${API_URL}/api/processus/${id}/submit/tache`,
-      { link },
+      { lien },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,31 +55,6 @@ export const submitTacheLink = async (
     return response.data;
   } catch (err) {
     console.error("Échec de soumetre le tache lien", err);
-    throw err;
-  }
-};
-
-export const submitTacheFile = async (
-  formData: FormData,
-  id: number,
-  token: string
-) => {
-  console.log(token);
-  try {
-    const response = await axios.post(
-      `${API_URL}/api/processus/${id}/submit/tache`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (err) {
-    console.error("Échec de soumetre le tache fichier", err);
     throw err;
   }
 };
@@ -124,7 +98,7 @@ export const submitQuiz = async (
 };
 
 export const useProccecusPassed = (id: number, token: string | undefined) => {
-  const url = `${API_URL}/api/processus/${id}/is-passed`;
+  const url = `${API_URL}/api/postulations/${id}/details/me`;
   const { data, error, mutate } = useSWR(
     token ? [url, token] : null,
     fetcherProtected

@@ -7,6 +7,7 @@ import EmptyState from "./emptyState";
 interface RecruitmentProcessProps {
   processSteps: Processus[];
   handleStepAction: (step: Processus) => void;
+  passedProcessus: { statut: string; type_processus: string };
 }
 
 const processTypeIcons = {
@@ -18,7 +19,10 @@ const processTypeIcons = {
 export default function RecruitmentProcess({
   processSteps,
   handleStepAction,
+  passedProcessus,
 }: RecruitmentProcessProps) {
+  console.log(passedProcessus);
+
   return (
     <Card className="bg-white border border-gray-100 text-gray-900 shadow-sm">
       <CardHeader className="border-b border-gray-100">
@@ -33,22 +37,28 @@ export default function RecruitmentProcess({
               const IconComponent = processTypeIcons[step.type];
               const isLast = index === processSteps.length - 1;
 
+              const isPassed =
+                step.type === passedProcessus.type_processus &&
+                passedProcessus.statut === "TERMINER";
+
+              const stepStatus = isPassed ? "TERMINER" : step.statut;
+
               return (
                 <div key={step.id} className="relative flex items-start gap-4">
                   <div className="flex flex-col items-center">
                     <div
                       className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                        step.statut === "TERMINE"
+                        stepStatus === "TERMINER"
                           ? "bg-green-100"
-                          : step.statut === "EN_COURS"
+                          : stepStatus === "EN_COURS"
                           ? "bg-blue-100"
                           : "bg-yellow-100"
                       }`}>
                       <IconComponent
                         className={`h-5 w-5 ${
-                          step.statut === "TERMINE"
+                          stepStatus === "TERMINER"
                             ? "text-green-500"
-                            : step.statut === "EN_COURS"
+                            : stepStatus === "EN_COURS"
                             ? "text-blue-500"
                             : "text-yellow-500"
                         }`}
@@ -70,25 +80,29 @@ export default function RecruitmentProcess({
                     <div className="flex items-center justify-between">
                       <Badge
                         className={`mt-2 ${
-                          step.statut === "TERMINE"
+                          stepStatus === "TERMINER"
                             ? "bg-green-100 text-green-800"
-                            : step.statut === "EN_COURS"
+                            : stepStatus === "EN_COURS"
                             ? "bg-blue-100 text-blue-800"
                             : "bg-yellow-100 text-yellow-800"
                         } text-xs font-medium px-2 py-0.5 rounded-full`}>
-                        {step.statut === "TERMINE"
+                        {stepStatus === "TERMINER"
                           ? "Terminé"
-                          : step.statut === "EN_COURS"
+                          : stepStatus === "EN_COURS"
                           ? "En cours"
                           : "À venir"}
                       </Badge>
-                      {step.statut === "EN_COURS" && (
-                        <Badge
-                          onClick={() => handleStepAction(step)}
-                          className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 px-3 py-1 rounded-md">
-                          Commencer
-                        </Badge>
-                      )}
+
+                      {/* Bouton Commencer seulement si non passé + non visio */}
+                      {stepStatus === "EN_COURS" &&
+                        step.type !== "VISIO_CONFERENCE" &&
+                        !isPassed && (
+                          <Badge
+                            onClick={() => handleStepAction(step)}
+                            className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 px-3 py-1 rounded-md">
+                            Commencer
+                          </Badge>
+                        )}
                     </div>
                   </div>
                 </div>

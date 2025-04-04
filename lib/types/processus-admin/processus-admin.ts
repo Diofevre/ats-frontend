@@ -1,5 +1,5 @@
-export type ProcessusType = 'VISIO_CONFERENCE' | 'QUESTIONNAIRE' | 'TACHE';
-export type StatusType = 'A_VENIR' | 'EN_COURS' | 'TERMINE';
+export type ProcessusType = "VISIO_CONFERENCE" | "QUESTIONNAIRE" | "TACHE";
+export type StatusType = "A_VENIR" | "EN_COURS" | "TERMINER";
 
 export interface Reponse {
   label: string;
