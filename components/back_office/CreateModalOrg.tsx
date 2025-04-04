@@ -56,10 +56,10 @@ export default function CreateOrganizationModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg w-full max-w-md">
         <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <Building2 className="w-6 h-6 text-[#1E1F22] mr-2" />
-              <h2 className="text-xl font-semibold text-[#1E1F22]">
+              <h2 className="font-semibold text-[#1E1F22] uppercase">
                 Nouvelle organisation
               </h2>
             </div>
@@ -124,7 +124,7 @@ export default function CreateOrganizationModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1E1F22]"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1E1F22]"
               >
                 Annuler
               </button>
@@ -132,7 +132,7 @@ export default function CreateOrganizationModal({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "px-4 py-2 text-sm font-medium text-white bg-[#1E1F22] rounded-md",
+                  "px-6 py-2 text-sm font-medium text-white bg-[#1E1F22] rounded-full",
                   isSubmitting
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-[#313338] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1E1F22]"

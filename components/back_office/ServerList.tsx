@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Plus, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOrganization } from '@/hooks/use-organization';
 import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 interface ServerListProps {
   activeServer: string;
@@ -17,6 +18,7 @@ export default function ServerList({
   setActiveServer, 
   setIsCreateModalOpen 
 }: ServerListProps) {
+  const router = useRouter();
   const { 
     organizations, 
     isLoadingOrganizations, 
@@ -25,23 +27,25 @@ export default function ServerList({
   } = useOrganization();
   const { user } = useAuth();
 
-  // Automatically select first server when organizations load
-  useEffect(() => {
-    if (organizations && organizations.length > 0 && !activeServer) {
-      setActiveServer(organizations[0].id.toString());
-    }
-  }, [organizations, activeServer, setActiveServer]);
+  const handleServerClick = (orgId: string) => {
+    setActiveServer(orgId);
+    router.push(`/admin/organizations/${orgId}/dashboard`);
+  };
 
   const handleDeleteOrganization = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette organisation ?')) {
       try {
         await deleteOrganization(id);
-        // If we deleted the active server, select the first remaining one
-        if (activeServer === id.toString() && organizations && organizations.length > 1) {
-          const remainingOrgs = organizations.filter(org => org.id !== id);
-          if (remainingOrgs.length > 0) {
+        // Only change active server if we're deleting the current one
+        if (activeServer === id.toString()) {
+          const remainingOrgs = organizations?.filter(org => org.id !== id);
+          if (remainingOrgs && remainingOrgs.length > 0) {
             setActiveServer(remainingOrgs[0].id.toString());
+            router.push(`/admin/organizations/${remainingOrgs[0].id}/dashboard`);
+          } else {
+            setActiveServer('');
+            router.push('/admin');
           }
         }
       } catch (error) {
@@ -86,7 +90,7 @@ export default function ServerList({
             {organizations.map((org) => (
               <button
                 key={org.id}
-                onClick={() => setActiveServer(org.id.toString())}
+                onClick={() => handleServerClick(org.id.toString())}
                 className={cn(
                   "w-12 h-12 rounded-[24px] flex items-center justify-center transition-all duration-200 group relative",
                   activeServer === org.id.toString()
@@ -95,8 +99,8 @@ export default function ServerList({
                 )}
                 title={org.nom}
               >
-                <span className="text-white font-semibold text-sm">
-                  {org.nom.substring(0, 2).toUpperCase()}
+                <span className="text-white font-semibold text-xs">
+                  {org.nom.substring(0, 4).toUpperCase()}
                 </span>
 
                 {/* Indicator bar */}
@@ -107,7 +111,7 @@ export default function ServerList({
                 )} style={{ transform: 'translateX(-50%)' }} />
 
                 {/* Delete button - only shows on hover */}
-                { user?.role === 'ADMINISTRATEUR' && (
+                {user?.role === 'ADMINISTRATEUR' && (
                   <button
                     onClick={(e) => handleDeleteOrganization(org.id, e)}
                     className="absolute top-0 right-0 -mr-1 -mt-1 w-5 h-5 bg-red-500 rounded-full items-center justify-center text-white opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 text-xs flex"
@@ -115,7 +119,7 @@ export default function ServerList({
                   >
                     ×
                   </button>
-                ) }
+                )}
               </button>
             ))}
           </div>

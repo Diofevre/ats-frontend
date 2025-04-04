@@ -7,13 +7,19 @@ import CreateForm from './form-annonce';
 import { Preview } from './preview';
 import { useOffres } from '@/hooks/use-offre';
 import { toast } from 'sonner';
+import { useParams, useRouter } from 'next/navigation';
 
 const STEPS = ['Offre d\'emploi', 'Aperçu'];
 
 export function MultiStepForm() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [offreData, setOffreData] = useState<CreateOffreDto | null>(null);
   const { createOffre, isLoadings } = useOffres();
+
+  // Get ID from URL
+  const { id } = useParams();
+  const organizationId = Number(id);
 
   const handleOffreSubmit = async (data: CreateOffreDto | Offre) => {
     try {
@@ -43,6 +49,7 @@ export function MultiStepForm() {
       setCurrentStep(0);
       
       toast.success('Offre créée avec succès !');
+      router.push(`/admin/organizations/${organizationId}/offres`)
     } catch (error) {
       console.error('Erreur lors de la création:', error);
       toast.error('Une erreur est survenue lors de la création de l\'offre');
@@ -50,7 +57,7 @@ export function MultiStepForm() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4">
       <StepIndicator currentStep={currentStep} steps={STEPS} />
       
       <div className="mt-8">

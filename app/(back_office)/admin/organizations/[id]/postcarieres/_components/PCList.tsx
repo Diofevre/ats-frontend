@@ -8,28 +8,25 @@ import Nothings from '@/components/nothings';
 import { Trash2, Plus, Calendar } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-
-const CardSkeleton = () => (
-  <div className="bg-white rounded-2xl p-6 animate-pulse">
-    <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-4"></div>
-    <div className="space-y-2 mb-6">
-      <div className="h-4 bg-gray-200 rounded w-full"></div>
-      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-      <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-    </div>
-    <div className="flex space-x-3">
-      <div className="h-9 bg-gray-200 rounded-xl w-28"></div>
-      <div className="h-9 bg-gray-200 rounded-xl w-28"></div>
-    </div>
-  </div>
-);
+import RefreshButton from '@/components/refresh';
+import CardSkeleton from './skeleton-postcarrieres';
 
 interface Props {
   organizationId: number
 }
 
 const PostCarieresList = ({ organizationId } : Props) => {
-  const { postCarieres, isLoadingPostCarieres, deletePostCariere } = usePostCariere(organizationId);
+  const { postCarieres, isLoadingPostCarieres, deletePostCariere, mutatePostCarieres } = usePostCariere(organizationId);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await mutatePostCarieres();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -39,19 +36,15 @@ const PostCarieresList = ({ organizationId } : Props) => {
 
   if (isLoadingPostCarieres) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex justify-between items-center mb-8">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded-lg w-48"></div>
-            </div>
-            <div className="h-10 bg-gray-200 rounded-full w-36 animate-pulse"></div>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-          </div>
+      <div className="min-h-screen max-w-6xl mx-auto py-12">
+        <div className="flex justify-between items-center mb-8">
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+          <RefreshButton isRefreshing={true} />
+        </div>
+        <div className="space-y-16">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
       </div>
     );
@@ -61,6 +54,16 @@ const PostCarieresList = ({ organizationId } : Props) => {
 
   return (
     <div className="min-h-screen max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold uppercase">Posts de Carrière</h1>
+        <div className="flex items-center gap-4">
+          <RefreshButton 
+            isRefreshing={isRefreshing}
+            onClick={handleRefresh}
+          />
+        </div>
+      </div>
+
       {(!filteredPostCarieres || filteredPostCarieres.length === 0) ? (
         <div className="flex flex-col items-center justify-center">
           <Nothings title="Carrières" />

@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Clock, Search, ChevronLeft, ChevronRight, Loader2, Building2, Plus } from 'lucide-react';
+import { Briefcase, MapPin, Search, ChevronLeft, ChevronRight, Loader2, Building2, Plus } from 'lucide-react';
 import { useOrganization } from '@/hooks/use-organization';
 import { useOffresDetails } from '@/hooks/use-offre-details';
 import Nothings from '@/components/nothings';
@@ -213,10 +213,6 @@ const Offres = () => {
                           <div className="flex items-center text-sm text-gray-600">
                             <Briefcase className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                             <span className="truncate">{displayOffre.type_emploi} - {displayOffre.salaire} {displayOffre.devise}</span>
-                          </div>
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Clock className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                            <span className="truncate">{displayOffre.horaire_ouverture} - {displayOffre.horaire_fermeture}</span>
                           </div>
                         </div>
                         <div className="mt-4 flex items-center justify-between">

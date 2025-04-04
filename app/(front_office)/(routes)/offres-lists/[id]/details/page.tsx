@@ -133,16 +133,12 @@ export default function OffreDetails() {
                     </div>
                     <div className="flex items-center text-gray-700">
                       <Clock className="h-5 w-5 mr-2 text-blue-500" />
-                      <span>
-                        {mockJob?.horaire_ouverture} -{" "}
-                        {mockJob?.horaire_fermeture}
-                      </span>
                     </div>
                     <div className="flex items-center text-gray-700">
                       <Calendar className="h-5 w-5 mr-2 text-blue-500" />
                       <span>
                         Créé le :{" "}
-                        {new Date(mockJob?.created_at).toLocaleDateString()}
+                        {mockJob?.created_at ? new Date(mockJob.created_at).toLocaleDateString() : "Date non disponible"}
                       </span>
                     </div>
                     <div className="flex items-center text-gray-700">
@@ -170,7 +166,7 @@ export default function OffreDetails() {
                 </p>
                 <p>
                   <strong>Dernière mise à jour :</strong>{" "}
-                  {new Date(mockJob?.updated_at).toLocaleDateString()}
+                  {mockJob?.updated_at ? new Date(mockJob.updated_at).toLocaleDateString() : "Date non disponible"}
                 </p>
               </div>
             </CardContent>
