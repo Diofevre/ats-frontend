@@ -55,6 +55,7 @@ export interface Candidat {
 export interface Postulation {
   id: number;
   candidat: Candidat;
+  note: number;
   processus_passer: ProcessusPassage[];
 }
 
