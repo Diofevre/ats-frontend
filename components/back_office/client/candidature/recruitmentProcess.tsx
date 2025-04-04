@@ -21,8 +21,6 @@ export default function RecruitmentProcess({
   handleStepAction,
   passedProcessus,
 }: RecruitmentProcessProps) {
-  console.log(passedProcessus);
-
   return (
     <Card className="bg-white border border-gray-100 text-gray-900 shadow-sm">
       <CardHeader className="border-b border-gray-100">
@@ -32,19 +30,19 @@ export default function RecruitmentProcess({
       </CardHeader>
       <CardContent className="pt-6">
         <div className="space-y-6">
-          {processSteps.length > 0 ? (
-            processSteps.map((step, index) => {
-              const IconComponent = processTypeIcons[step.type];
-              const isLast = index === processSteps.length - 1;
+          {processSteps?.length > 0 ? (
+            processSteps?.map((step, index) => {
+              const IconComponent = processTypeIcons[step?.type];
+              const isLast = index === processSteps?.length - 1;
 
               const isPassed =
-                step.type === passedProcessus.type_processus &&
-                passedProcessus.statut === "TERMINER";
+                step?.type === passedProcessus?.type_processus &&
+                passedProcessus?.statut === "TERMINER";
 
-              const stepStatus = isPassed ? "TERMINER" : step.statut;
+              const stepStatus = isPassed ? "TERMINER" : step?.statut;
 
               return (
-                <div key={step.id} className="relative flex items-start gap-4">
+                <div key={step?.id} className="relative flex items-start gap-4">
                   <div className="flex flex-col items-center">
                     <div
                       className={`flex h-8 w-8 items-center justify-center rounded-full ${
@@ -69,13 +67,13 @@ export default function RecruitmentProcess({
                     )}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-800">{step.titre}</h4>
+                    <h4 className="font-medium text-gray-800">{step?.titre}</h4>
                     <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                       <Clock className="h-4 w-4 text-blue-500" />
-                      <span>{`Durée: ${step.duree} minutes`}</span>
+                      <span>{`Durée: ${step?.duree} minutes`}</span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      {step.description}
+                      {step?.description}
                     </p>
                     <div className="flex items-center justify-between">
                       <Badge
@@ -95,7 +93,7 @@ export default function RecruitmentProcess({
 
                       {/* Bouton Commencer seulement si non passé + non visio */}
                       {stepStatus === "EN_COURS" &&
-                        step.type !== "VISIO_CONFERENCE" &&
+                        step?.type !== "VISIO_CONFERENCE" &&
                         !isPassed && (
                           <Badge
                             onClick={() => handleStepAction(step)}
