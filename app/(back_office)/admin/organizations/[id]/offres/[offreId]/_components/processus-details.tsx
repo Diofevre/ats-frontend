@@ -3,17 +3,31 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Loader2, Plus, Play, Trash2, FileText, Clock, ArrowUpDown, X, Upload, CheckCircle } from 'lucide-react';
-import { Processus, StatusOffre } from '@/lib/types/offre-details';
+import { 
+  Loader2, 
+  Plus, 
+  Play, 
+  Trash2, 
+  FileText, 
+  Clock, 
+  ArrowUpDown, 
+  X, 
+  Upload, 
+  CheckCircle, 
+  Video 
+} from 'lucide-react';
+import { Processus, StatusOffre, Candidat } from '@/lib/types/offre-details';
 import { Combobox } from '../../_components/combobox';
 
 interface ProcessSectionProps {
   processus: Processus[];
   isEditing: boolean;
   offreStatus: StatusOffre;
+  candidats?: Candidat[];
   onCreateProcess: (process: CreateProcessDto) => Promise<void>;
   onDeleteProcess: (id: number) => Promise<void>;
   onStartProcess: (id: number) => Promise<void>;
+  onStartVisio?: (id: number, data: StartVisioDto) => Promise<void>;
   onTerminateProcess?: (id: number) => Promise<void>;
   onViewChange?: () => void;
 }
@@ -24,6 +38,13 @@ interface CreateProcessDto {
   description: string;
   duree: number;
   start_at: string;
+}
+
+interface StartVisioDto {
+  users: number[];
+  candidats: number[];
+  start_time: string;
+  start_date: string;
 }
 
 interface Question {
@@ -64,14 +85,19 @@ const ProcessSection = ({
   processus,
   offreStatus,
   isEditing,
+  candidats = [],
   onCreateProcess,
   onDeleteProcess,
   onStartProcess,
+  onStartVisio,
   onTerminateProcess,
   onViewChange
 }: ProcessSectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVisioModalOpen, setIsVisioModalOpen] = useState(false);
+  const [selectedProcessId, setSelectedProcessId] = useState<number | null>(null);
   const [isCreatingProcess, setIsCreatingProcess] = useState(false);
+  const [isSchedulingVisio, setIsSchedulingVisio] = useState(false);
   const [processError, setProcessError] = useState('');
   const [uploadingQuizId, setUploadingQuizId] = useState<number | null>(null);
   const [startingProcessId, setStartingProcessId] = useState<number | null>(null);
@@ -83,6 +109,13 @@ const ProcessSection = ({
     description: '',
     duree: 30,
     start_at: new Date().toISOString().slice(0, 16),
+  });
+
+  const [visioData, setVisioData] = useState<StartVisioDto>({
+    users: [],
+    candidats: [],
+    start_time: '14:30',
+    start_date: new Date().toISOString().split('T')[0],
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, processId: number) => {
@@ -130,6 +163,28 @@ const ProcessSection = ({
     }
   };
 
+  const handleStartVisio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProcessId || !onStartVisio) return;
+
+    setIsSchedulingVisio(true);
+    try {
+      await onStartVisio(selectedProcessId, visioData);
+      setIsVisioModalOpen(false);
+      setVisioData({
+        users: [],
+        candidats: [],
+        start_time: '14:30',
+        start_date: new Date().toISOString().split('T')[0],
+      });
+    } catch (error) {
+      console.error('Error scheduling video conference:', error);
+      setProcessError('Une erreur est survenue lors de la programmation de la visioconférence.');
+    } finally {
+      setIsSchedulingVisio(false);
+    }
+  };
+
   const handleDeleteProcess = async (id: number) => {
     setDeletingProcessId(id);
     try {
@@ -145,10 +200,9 @@ const ProcessSection = ({
     setProcessError('');
 
     try {
-      // Create a new object with the formatted date
       const processData = {
         ...newProcess,
-        start_at: new Date(newProcess.start_at).toISOString(), // Convert to ISO string
+        start_at: new Date(newProcess.start_at).toISOString(),
       };
 
       await onCreateProcess(processData);
@@ -176,6 +230,11 @@ const ProcessSection = ({
     } finally {
       setTerminatingProcessId(null);
     }
+  };
+
+  const openVisioModal = (processId: number) => {
+    setSelectedProcessId(processId);
+    setIsVisioModalOpen(true);
   };
 
   const getProcessTypeLabel = (type: TypeProcessus) => {
@@ -231,12 +290,16 @@ const ProcessSection = ({
     return offreStatus === 'CREE';
   };
 
+  const shouldShowVisioButton = (etape: Processus) => {
+    return etape.type === 'VISIO_CONFERENCE' && etape.statut === 'EN_COURS' && onStartVisio !== undefined;
+  };
+
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold uppercase">Processus de recrutement</h2>
         <div className="flex gap-2">
-          {isEditing && (
+          {isEditing || offreStatus !== 'FERME' && (
             <button
               onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-[12px] hover:bg-[#2C9CC6]/80 transition-colors text-xs"
@@ -345,7 +408,83 @@ const ProcessSection = ({
                 )}
                 {isCreatingProcess ? 'Création...' : 'Ajouter l\'étape'}
               </button>
+            )}
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isVisioModalOpen} onClose={() => setIsVisioModalOpen(false)}>
+        <form onSubmit={handleStartVisio} className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Programmer la visioconférence</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Candidats
+              </label>
+              <select
+                multiple
+                value={visioData.candidats.map(String)}
+                onChange={(e) => {
+                  const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+                  setVisioData({ ...visioData, candidats: selectedOptions });
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                {candidats.map((candidat) => (
+                  <option key={candidat.id} value={candidat.id}>
+                    {candidat.nom} ({candidat.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                value={visioData.start_date}
+                onChange={(e) => setVisioData({ ...visioData, start_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Heure
+              </label>
+              <input
+                type="time"
+                value={visioData.start_time}
+                onChange={(e) => setVisioData({ ...visioData, start_time: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          {processError && (
+            <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+              {processError}
+            </div>
+          )}
+
+          <div className="mt-6 flex justify-end">
+            <button
+              type="submit"
+              disabled={isSchedulingVisio}
+              className="inline-flex items-center px-4 py-2 bg-[#2C9CC6] text-white rounded-full text-xs hover:bg-[#2C9CC6]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSchedulingVisio ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Video className="w-4 h-4 mr-2" />
               )}
+              {isSchedulingVisio ? 'Programmation...' : 'Programmer la visioconférence'}
+            </button>
           </div>
         </form>
       </Modal>
@@ -385,6 +524,15 @@ const ProcessSection = ({
 
               {isEditing && (
                 <div className="flex items-center space-x-2">
+                  {shouldShowVisioButton(etape) && (
+                    <button
+                      onClick={() => openVisioModal(etape.id)}
+                      className="inline-flex items-center px-3 py-1 bg-[#2C9CC6] text-white rounded-full text-xs hover:bg-[#2C9CC6]/80 transition-colors"
+                    >
+                      <Video className="w-3 h-3 mr-1" />
+                      Programmer
+                    </button>
+                  )}
                   {etape.type === 'QUESTIONNAIRE' && shouldShowUploadButton(etape) && (
                     <>
                       <input

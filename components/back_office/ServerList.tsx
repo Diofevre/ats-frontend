@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Plus, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOrganization } from '@/hooks/use-organization';
@@ -27,8 +27,18 @@ export default function ServerList({
   } = useOrganization();
   const { user } = useAuth();
 
+  // Load active server from localStorage on component mount
+  useEffect(() => {
+    const savedServer = localStorage.getItem('activeServer');
+    if (savedServer && (!activeServer || activeServer !== savedServer)) {
+      setActiveServer(savedServer);
+      router.push(`/admin/organizations/${savedServer}/dashboard`);
+    }
+  }, [activeServer, router, setActiveServer]);
+
   const handleServerClick = (orgId: string) => {
     setActiveServer(orgId);
+    localStorage.setItem('activeServer', orgId);
     router.push(`/admin/organizations/${orgId}/dashboard`);
   };
 
@@ -41,10 +51,13 @@ export default function ServerList({
         if (activeServer === id.toString()) {
           const remainingOrgs = organizations?.filter(org => org.id !== id);
           if (remainingOrgs && remainingOrgs.length > 0) {
-            setActiveServer(remainingOrgs[0].id.toString());
-            router.push(`/admin/organizations/${remainingOrgs[0].id}/dashboard`);
+            const newActiveServer = remainingOrgs[0].id.toString();
+            setActiveServer(newActiveServer);
+            localStorage.setItem('activeServer', newActiveServer);
+            router.push(`/admin/organizations/${newActiveServer}/dashboard`);
           } else {
             setActiveServer('');
+            localStorage.removeItem('activeServer');
             router.push('/admin');
           }
         }

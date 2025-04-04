@@ -1,4 +1,4 @@
-import { Processus, CreateProcessusDto, AddQuizzDto, ProcessusDetail } from "@/lib/types/processus-admin/processus-admin";
+import { Processus, CreateProcessusDto, AddQuizzDto, ProcessusDetail, StartVisioDto } from "@/lib/types/processus-admin/processus-admin";
 import api from "../api";
 
 export const ProcessusService = {
@@ -40,6 +40,10 @@ export const ProcessusService = {
 
   startForCandidat: async (id: string): Promise<void> => {
     await api.post(`/api/processus/${id}/start-for-candidat`);
+  },
+
+  startVisio: async (id: string, data: StartVisioDto): Promise<void> => {
+    await api.post(`/api/processus/${id}/start/visio`, data);
   },
 
   makeTop: async (id: string): Promise<void> => {

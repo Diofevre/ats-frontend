@@ -26,7 +26,7 @@ import { useProcessus } from '@/hooks/use-processus-admin';
 import { useParams, useRouter } from 'next/navigation';
 import { Postulation, TypeProcessus } from '@/lib/types/offre-details';
 import { CandidateDetails } from '../[offreId]/_components/candidats-details';
-import { ProcessusType } from '@/lib/types/processus-admin/processus-admin';
+import { ProcessusType, StartVisioDto } from '@/lib/types/processus-admin/processus-admin';
 import ProcessSection from '../[offreId]/_components/processus-details';
 
 interface CreateProcessusDto {
@@ -47,7 +47,7 @@ const OffreId = () => {
   const [selectedView, setSelectedView] = useState<'details' | 'process' | 'candidates'>('details');
   const [selectedCandidate, setSelectedCandidate] = useState<Postulation | null>(null);
   const { mutate } = useOffres();
-  const { createProcessus, deleteProcessus, startProcessus, terminateProcessus } = useProcessus();
+  const { createProcessus, deleteProcessus, startProcessus, terminateProcessus, startVisio } = useProcessus();
   const { offre, isLoading } = useOffresDetails(offreId || 0);
 
   const { id } = useParams();
@@ -97,6 +97,16 @@ const OffreId = () => {
     }
   };
 
+  const handleStartVisio = async (processId: number, data: StartVisioDto) => {
+    try {
+      await startVisio(String(processId), data);
+      await mutate();
+    } catch (err) {
+      console.error('Error starting visio:', err);
+      throw err;
+    }
+  };
+  
   const handleTerminateProcess = async (processId: number) => {
     try {
       await terminateProcessus(String(processId));
@@ -222,18 +232,18 @@ const OffreId = () => {
               </div>
               <div className="ml-auto">
                 <span className="text-sm font-medium text-gray-500">
-                  Note: A-Venir/5
+                  Note: {postulation.note}/5
                 </span>
               </div>
             </div>
-            {/* {postulation.remarques.length > 0 && ( */}
+            {/* {postulation.remarques.length > 0 && (
               <div className="mt-4 pl-16">
                 <p className="text-sm text-gray-600">
-                  {/* {postulation.remarques[0].text} */}
+                  {postulation.remarques[0].text}
                   TODO: Postulation remaque a venir
                 </p>
               </div>
-            {/* )} */}
+            )} */}
             {selectedView === 'candidates' && (
               <div className="mt-4 pl-16">
                 <button
@@ -262,6 +272,7 @@ const OffreId = () => {
           >
             ⟵ {selectedView === 'details' ? 'Retour aux offres' : 'Retour aux détails'}
           </span>
+          {/* Actins Button */}
           <div className="flex flex-row items-center gap-2 mb-4">
             {selectedView === 'details' && (
               <>
@@ -332,12 +343,12 @@ const OffreId = () => {
                     <h1 className="text-2xl font-bold text-[#1E1F22] uppercase">{offre.titre}</h1>
                     <p className="text-gray-500 mt-2">{offre.organisation.nom}</p>
                     <div className="flex items-center mt-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium uppercase ${
                         offre.status === 'OUVERT' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {offre.status}
+                        {offre.status === 'CREE' ? 'En attente' : offre.status}
                       </span>
                       <span className="ml-4 text-sm text-gray-500">
                         Publié le {new Date(offre.created_at).toLocaleDateString()}
@@ -363,11 +374,15 @@ const OffreId = () => {
                   processus={offre.processus}
                   isEditing={true}
                   offreStatus={offre.status}
+                  candidats={offre.postulations.map(p => p.candidat)}
                   onCreateProcess={handleCreateProcess}
                   onDeleteProcess={handleDeleteProcess}
                   onStartProcess={handleStartProcess}
+                  onStartVisio={handleStartVisio}
                   onTerminateProcess={handleTerminateProcess}
+                  onViewChange={() => setSelectedView('process')}
                 />
+              
               ) : selectedView === 'candidates' ? (
                 renderCandidatesSection()
               ) : (
@@ -376,12 +391,15 @@ const OffreId = () => {
                     processus={offre.processus}
                     offreStatus={offre.status}
                     isEditing={false}
+                    candidats={offre.postulations.map(p => p.candidat)}
                     onCreateProcess={handleCreateProcess}
                     onDeleteProcess={handleDeleteProcess}
                     onStartProcess={handleStartProcess}
+                    onStartVisio={handleStartVisio}
                     onTerminateProcess={handleTerminateProcess}
                     onViewChange={() => setSelectedView('process')}
                   />
+
                   {renderCandidatesSection()}
                 </>
               )}
