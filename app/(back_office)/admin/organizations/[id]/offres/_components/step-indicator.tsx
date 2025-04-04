@@ -11,7 +11,7 @@ interface StepIndicatorProps {
 
 export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
   return (
-    <div className="max-w-4xl mx-auto mb-16">
+    <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-center space-x-4">
         {steps.map((step, index) => (
           <React.Fragment key={step}>

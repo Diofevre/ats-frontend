@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { CreatePostCariereDto, UpdatePostCariereDto, PostCariere } from '@/lib/types/postcarieres';
 import { usePostCariere } from '@/hooks/use-postcariere';
 import { useOrganization } from '@/hooks/use-organization';
@@ -11,6 +11,19 @@ import { X, Loader2, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Combobox } from '../../offres/_components/combobox';
 import { FileUpload } from '@/components/file-upload';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { postCariereSchema, PostCariereFormValues } from '@/lib/schemas/postcariere';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PostCariereFormProps {
   initialData?: PostCariere;
@@ -20,21 +33,20 @@ interface PostCariereFormProps {
 const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
   const router = useRouter();
   const { createPostCariere, updatePostCariere } = usePostCariere();
-  const { organizations, isLoadingOrganizations } = useOrganization();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { organizations } = useOrganization();
 
-  const [formData, setFormData] = useState<CreatePostCariereDto | UpdatePostCariereDto>(
-    initialData || {
-      titre: '',
-      contenu: '',
-      organisation_id: 0,
-      images: []
+  const { id } = useParams();
+  const organizationId = Number(id);
+
+  const form = useForm<PostCariereFormValues>({
+    resolver: zodResolver(postCariereSchema),
+    defaultValues: {
+      titre: initialData?.titre || '',
+      contenu: initialData?.contenu || '',
+      organisation_id: initialData?.organisation_id || organizationId,
+      images: initialData?.images || [],
     }
-  );
-
-  const [previewImages, setPreviewImages] = useState<string[]>(
-    initialData?.images || []
-  );
+  });
 
   const organizationOptions = React.useMemo(() => {
     return organizations?.map(org => ({
@@ -44,176 +56,187 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
   }, [organizations]);
 
   const handleImageUpload = (fileUrl: string) => {
-    setPreviewImages(prev => [...prev, fileUrl]);
-    setFormData(prev => ({
-      ...prev,
-      images: [...(prev.images || []), fileUrl]
-    }));
+    const currentImages = form.getValues('images') || [];
+    form.setValue('images', [...currentImages, fileUrl], {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    });
   };
 
   const removeImage = (index: number) => {
-    setPreviewImages(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
-      ...prev,
-      images: (prev.images || []).filter((_, i) => i !== index)
-    }));
+    const currentImages = form.getValues('images');
+    form.setValue('images', currentImages.filter((_, i) => i !== index), {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.organisation_id) {
-      toast.error("Please select an organization");
-      return;
-    }
-
-    setIsSubmitting(true);
+  // This function is called when the form is submitted
+  const onSubmit = async (data: PostCariereFormValues) => {
     try {
+      const formData = {
+        ...data,
+        images: data.images || [],
+        organisation_id: organizationId
+      };
+
       if (isEditing && initialData) {
         await updatePostCariere(initialData.id, formData as UpdatePostCariereDto);
-        toast.success("Post updated successfully");
+        toast.success("Post mis à jour avec succès");
       } else {
         await createPostCariere(formData as CreatePostCariereDto);
-        toast.success("Post created successfully");
+        toast.success("Post créé avec succès");
       }
 
       router.push(`/admin/organizations/${formData.organisation_id}/postcarieres`);
     } catch (error) {
       console.error('Error saving post:', error);
-      toast.error("Failed to save post");
-    } finally {
-      setIsSubmitting(false);
+      toast.error("Échec de l'enregistrement du post");
     }
   };
 
-  if (isLoadingOrganizations) {
-    return (
-      <div className="min-h-screen bg-gray-50/50">
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <div className="animate-pulse space-y-8">
-              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-              <div className="space-y-6">
-                <div className="h-12 bg-gray-200 rounded-xl"></div>
-                <div className="h-32 bg-gray-200 rounded-xl"></div>
-                <div className="h-12 bg-gray-200 rounded-xl"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-4">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 group"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-8 group"
         >
           ⟵
-          Back to Career Posts
+          Retour
         </button>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 rounded-xl bg-gray-900 flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                {isEditing ? 'Edit Career Post' : 'Create New Career Post'}
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                {isEditing ? 'Update the details of your career post' : 'Create a new career opportunity post'}
-              </p>
-            </div>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="h-12 w-12 rounded-xl bg-gray-900 flex items-center justify-center">
+            <Building2 className="h-6 w-6 text-white" />
           </div>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 uppercase">
+              {isEditing ? `Modifier l'offre de carrière` : 'Créer une nouvelle offre de carrière'}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 uppercase">
+              {isEditing ? 'Mettre à jour les détails de votre offre de carrière' : 'Créer une nouvelle opportunité de carrière'}
+            </p>
+          </div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
-              <Combobox
-                value={formData.organisation_id?.toString() || ''}
-                onChange={(value) => setFormData({ ...formData, organisation_id: parseInt(value) })}
-                options={organizationOptions}
-                placeholder="Select an organization"
-                emptyMessage="No organizations found"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-              <input
-                type="text"
-                value={formData.titre}
-                onChange={(e) => setFormData({ ...formData, titre: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-900 focus:ring-1 
-                  focus:ring-gray-900 transition-colors placeholder-gray-400 text-gray-900"
-                placeholder="Enter post title"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-              <textarea
-                value={formData.contenu}
-                onChange={(e) => setFormData({ ...formData, contenu: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-900 focus:ring-1 
-                  focus:ring-gray-900 transition-colors placeholder-gray-400 text-gray-900 min-h-[160px]"
-                placeholder="Describe the career opportunity..."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-4">
-                Images <span className="text-gray-400">(Max 5 images, 5MB each)</span>
-              </label>
-              
-              {previewImages.length < 5 && (
-                <FileUpload
-                  onUpload={handleImageUpload}
-                  accept="image"
-                  className="mb-4"
-                />
-              )}
-
-              {previewImages.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {previewImages.map((image, index) => (
-                    <div key={index} className="relative group aspect-video">
-                      <Image
-                        src={image}
-                        alt={`Preview ${index + 1}`}
-                        fill
-                        className="rounded-xl object-cover"
-                        unoptimized
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className='hidden'>
+              <FormField
+                control={form.control}
+                name="organisation_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Organisation</FormLabel>
+                    <FormControl>
+                      <Combobox
+                        value={field.value.toString()}
+                        onChange={(value) => field.onChange(parseInt(value))}
+                        options={organizationOptions}
+                        placeholder="Sélectionner une organisation"
+                        emptyMessage="Aucune organisation trouvée"
                       />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 p-1.5 bg-white rounded-lg shadow-sm opacity-0 
-                          group-hover:opacity-100 transition-opacity hover:bg-red-50"
-                      >
-                        <X className="h-4 w-4 text-red-500" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
+            <FormField
+              control={form.control}
+              name="titre"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Titre</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Entrez le titre du post"
+                      className="rounded-xl h-12"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contenu"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contenu</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Décrivez l'opportunité de carrière..."
+                      className="rounded-xl min-h-[160px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Images <span className="text-gray-400">(Max 5 images, 5MB chacune)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="space-y-4">
+                      {(field.value?.length || 0) < 5 && (
+                        <FileUpload
+                          onUpload={handleImageUpload}
+                          accept="image"
+                        />
+                      )}
+
+                      {field.value && field.value.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {field.value.map((image, index) => (
+                            <div key={index} className="relative group aspect-video">
+                              <Image
+                                src={image}
+                                alt={`Preview ${index + 1}`}
+                                fill
+                                className="rounded-xl object-cover"
+                                unoptimized
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-2 right-2 p-1.5 bg-white rounded-lg shadow-sm opacity-0 
+                                  group-hover:opacity-100 transition-opacity hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4 text-red-500" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="flex items-center gap-2 pt-6">
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 
-                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 h-11"
+                disabled={form.formState.isSubmitting}
+                className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 h-11"
               >
-                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Saving...' : isEditing ? 'Update Post' : 'Create Post'}
+                {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {form.formState.isSubmitting ? 'Enregistrement...' : isEditing ? 'Mettre à jour' : 'Créer'}
               </Button>
               <Button
                 type="button"
@@ -221,11 +244,11 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
                 variant="outline"
                 className="px-6 py-3 rounded-full h-11"
               >
-                Cancel
+                Annuler
               </Button>
             </div>
           </form>
-        </div>
+        </Form>
       </div>
     </div>
   );

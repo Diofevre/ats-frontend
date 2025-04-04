@@ -74,8 +74,6 @@ export interface Offres {
   type_temps: TypeTemps;
   salaire: string;
   devise: Devise;
-  horaire_ouverture: string;
-  horaire_fermeture: string;
   created_at: string;
   updated_at: string;
   processus: Processus[];

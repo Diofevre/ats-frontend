@@ -6,7 +6,6 @@ import {
   MapPin,
   Briefcase,
   Calendar,
-  Clock,
   Users,
   Frown,
 } from "lucide-react";
@@ -178,13 +177,7 @@ const OffresLists = () => {
                               whileHover={{ x: 5 }}
                               className="flex items-center text-gray-600">
                               <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                              {new Date(job.created_at).toLocaleDateString()}
-                            </motion.div>
-                            <motion.div
-                              whileHover={{ x: 5 }}
-                              className="flex items-center text-gray-600">
-                              <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                              {`${job.horaire_ouverture} - ${job.horaire_fermeture}`}
+                              {job.created_at ? new Date(job.created_at).toLocaleDateString() : "Date inconnue"}
                             </motion.div>
                             <motion.div
                               whileHover={{ x: 5 }}
