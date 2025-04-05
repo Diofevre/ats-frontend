@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useOrganization } from '@/hooks/use-organization';
 import { CreateOffreDto, Offre, TypeEmploi } from '@/lib/types/offres/offres.type';
 import { createOffreSchema, updateOffreSchema, type CreateOffreSchema } from '@/lib/schemas/offre';
-import { Edit, Plus, X } from 'lucide-react';
+import { Edit, X } from 'lucide-react';
 import Image from 'next/image';
 import { Combobox } from './combobox';
 import { FileUpload } from '@/components/file-upload';
@@ -25,22 +25,26 @@ import {
 import { useParams } from 'next/navigation';
 
 interface OffreFormProps {
-  initialData?: Offre;
+  initialData?: Offre | CreateOffreDto | null;
   onSubmit: (data: CreateOffreDto | Offre) => Promise<void>;
   onCancel?: () => void;
+  mode?: 'create' | 'edit';
 }
 
-export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
+export default function OffreForm({ initialData, onSubmit, onCancel, mode }: OffreFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { organizations, isLoadingOrganizations } = useOrganization();
 
   const { id } = useParams();
   const organizationId = Number(id);
 
+  // ---- MODIFICATION CLÉ ----
+  const effectiveMode = mode ?? (initialData ? 'edit' : 'create');
+
   const form = useForm<CreateOffreSchema>({
-    resolver: zodResolver(initialData ? updateOffreSchema : createOffreSchema),
+    resolver: zodResolver(effectiveMode === 'edit' ? updateOffreSchema : createOffreSchema),
     defaultValues: {
-      organisation_id: initialData?.organisation_id || organizationId.toString(),
+      organisation_id: initialData?.organisation_id?.toString() || organizationId.toString(),
       titre: initialData?.titre || '',
       description: initialData?.description || '',
       date_limite: initialData?.date_limite ? new Date(initialData.date_limite).toISOString().split('T')[0] : '',
@@ -52,7 +56,7 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
       salaire: initialData?.salaire || '',
       devise: initialData?.devise || 'EURO',
       image_url: initialData?.image_url || '',
-      ...(initialData && { id: initialData.id }),
+      ...(initialData && 'id' in initialData && { id: initialData.id }), 
     },
   });
 
@@ -88,15 +92,7 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
   const onFormSubmit = async (formData: CreateOffreSchema) => {
     try {
       setIsSubmitting(true);
-      if (initialData) {
-        await onSubmit({
-          ...initialData,
-          ...formData,
-        });
-        toast.success("Offre modifiée avec succès");
-      } else {
-        await onSubmit(formData);
-      }
+      await onSubmit(formData);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error("Une erreur est survenue lors de la soumission du formulaire");
@@ -115,7 +111,11 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
   };
 
   const handleBack = () => {
-    window.history.back();
+    if (onCancel) {
+      onCancel();
+    } else {
+      window.history.back();
+    }
   };
 
   return (
@@ -372,26 +372,22 @@ export default function OffreForm({ initialData, onSubmit }: OffreFormProps) {
         <div className="flex justify-end space-x-4">
           <Button
             type="submit"
-            className="flex items-center px-5 py-2.5 text-sm font-medium text-white bg-[#1E1F22] border border-transparent rounded-[12px] hover:bg-[#313338] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
                 <span>En cours...</span>
               </>
-            ) : initialData ? (
+            ) : effectiveMode === 'edit' ? (
               <>
                 <Edit className="w-4 h-4 mr-2" />
                 <span>Modifier</span>
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4 mr-2" />
-                <span>Créer</span>
+                <span>
+                  Suivant ⟶
+                </span>
               </>
             )}
           </Button>

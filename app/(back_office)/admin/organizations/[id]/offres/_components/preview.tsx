@@ -85,17 +85,19 @@ export function Preview({ offreData, onBack, onFinish, isLoading }: PreviewProps
 
       <div className="max-w-4xl mx-auto pt-6">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {offreData.image_url && (
-            <div className="relative w-full h-64">
-              <Image
-                src={offreData.image_url}
-                alt="Image de l'offre"
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            </div>
-          )}
+          <div className="flex flex-row items-center justify-between p-4 relative">
+            {offreData.image_url && (
+              <div className="relative w-40 h-28">
+                <Image
+                  src={offreData.image_url}
+                  alt="Image de l'offre"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            )}
+          </div>
 
           <div className="p-8 space-y-8">
             <div className="space-y-4">

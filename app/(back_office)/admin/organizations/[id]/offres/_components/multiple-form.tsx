@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { CreateOffreDto, Offre } from '@/lib/types/offres/offres.type';
 import { StepIndicator } from './step-indicator';
-import CreateForm from './form-annonce';
 import { Preview } from './preview';
 import { useOffres } from '@/hooks/use-offre';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
+import OffreForm from './form-annonce';
 
 const STEPS = ['Offre d\'emploi', 'Aperçu'];
 
@@ -59,15 +59,18 @@ export function MultiStepForm() {
   return (
     <div className="max-w-6xl mx-auto px-4">
       <StepIndicator currentStep={currentStep} steps={STEPS} />
-      
+
       <div className="mt-8">
+        {/* Étape 0: Formulaire */}
         {currentStep === 0 && (
-          <CreateForm
+          <OffreForm
+            initialData={offreData}
+            mode='create'
             onSubmit={handleOffreSubmit}
-            onCancel={() => setCurrentStep(0)}
           />
         )}
-        
+
+        {/* Étape 1: Aperçu */}
         {currentStep === 1 && offreData && (
           <Preview
             offreData={offreData}
