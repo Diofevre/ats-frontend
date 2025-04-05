@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { CreatePostCariereDto, UpdatePostCariereDto, PostCariere } from '@/lib/types/postcarieres';
 import { usePostCariere } from '@/hooks/use-postcariere';
@@ -55,6 +55,19 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
     })) || [];
   }, [organizations]);
 
+  // Set the organization name as title prefix when organizations are loaded
+  useEffect(() => {
+    if (organizationOptions.length > 0) {
+      const currentOrg = organizationOptions.find(org => org.value === organizationId.toString());
+      if (currentOrg) {
+        form.setValue('titre', `${currentOrg.label}`, {
+          shouldValidate: true,
+          shouldDirty: false
+        });
+      }
+    }
+  }, [organizationOptions, organizationId, form]);
+
   const handleImageUpload = (fileUrl: string) => {
     const currentImages = form.getValues('images') || [];
     form.setValue('images', [...currentImages, fileUrl], {
@@ -76,10 +89,14 @@ const PostCariereForm = ({ initialData, isEditing }: PostCariereFormProps) => {
   // This function is called when the form is submitted
   const onSubmit = async (data: PostCariereFormValues) => {
     try {
+      const currentOrg = organizationOptions.find(org => org.value === organizationId.toString());
       const formData = {
         ...data,
         images: data.images || [],
-        organisation_id: organizationId
+        organisation_id: organizationId,
+        titre: data.titre.startsWith(currentOrg?.label || '') 
+          ? data.titre 
+          : `${currentOrg?.label} - ${data.titre}`
       };
 
       if (isEditing && initialData) {

@@ -28,6 +28,7 @@ import { Postulation, TypeProcessus } from '@/lib/types/offre-details';
 import { CandidateDetails } from '../[offreId]/_components/candidats-details';
 import { ProcessusType, StartVisioDto } from '@/lib/types/processus-admin/processus-admin';
 import ProcessSection from '../[offreId]/_components/processus-details';
+import { toast } from 'sonner';
 
 interface CreateProcessusDto {
   titre: string;
@@ -71,8 +72,11 @@ const OffreId = () => {
         type: processData.type as unknown as ProcessusType,
       });
       await mutate();
+
+      toast.success('Processus créé avec succès !');
     } catch (err) {
       console.error('Error creating process:', err);
+      toast.error(`Une erreur est survenue lors de la création du processus.`);
       throw err;
     }
   };
@@ -81,8 +85,11 @@ const OffreId = () => {
     try {
       await deleteProcessus(String(processId));
       await mutate();
+
+      toast.success('Processus supprimé avec succès !');
     } catch (err) {
       console.error('Error deleting process:', err);
+      toast.error(`Une erreur est survenue lors de la suppression du processus.`);
       throw err;
     }
   };
@@ -91,8 +98,11 @@ const OffreId = () => {
     try {
       await startProcessus(String(processId));
       await mutate();
+
+      toast.success('Processus démarré avec succès !');
     } catch (err) {
       console.error('Error starting process:', err);
+      toast.error(`Une erreur est survenue lors du démarrage du processus.`);
       throw err;
     }
   };
@@ -101,8 +111,11 @@ const OffreId = () => {
     try {
       await startVisio(String(processId), data);
       await mutate();
+
+      toast.success('Visio démarrée avec succès !');
     } catch (err) {
       console.error('Error starting visio:', err);
+      toast.error(`Une erreur est survenue lors du démarrage de la visio.`);
       throw err;
     }
   };
@@ -111,8 +124,11 @@ const OffreId = () => {
     try {
       await terminateProcessus(String(processId));
       await mutate();
+
+      toast.success('Processus terminé avec succès !');
     } catch (err) {
       console.error('Error deleting process:', err);
+      toast.error(`Une erreur est survenue lors de la fermeture du processus.`);
       throw err;
     }
   };
@@ -124,6 +140,7 @@ const OffreId = () => {
       await mutate();
       setEditingOffre(null);
       
+      toast.success('Offre modifiée avec succès !');
       router.push(`/admin/organizations/${organizationId}/offres`)
     } catch (error) {
       console.error('Error updating offer:', error);
@@ -137,9 +154,11 @@ const OffreId = () => {
     try {
       await offreService.publish(offreId, token);
       await mutate();
+
+      toast.success('Offre publiée avec succès !');
     } catch (error) {
       console.error('Error publishing offer:', error);
-      alert('Une erreur est survenue lors de la publication de l\'offre.');
+      toast.error(`Veiller ajouter d'abord un processus avant de publier l\'offre.`);
     } finally {
       setIsPublishing(false);
     }
@@ -151,6 +170,8 @@ const OffreId = () => {
     try {
       await offreService.fermer(offreId, token);
       await mutate();
+
+      toast.success('Offre fermée avec succès !');
     } catch (error) {
       console.error('Error closing offer:', error);
       alert('Une erreur est survenue lors de la fermeture de l\'offre.');

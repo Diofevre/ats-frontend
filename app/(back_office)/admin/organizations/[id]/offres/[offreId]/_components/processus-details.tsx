@@ -14,10 +14,12 @@ import {
   X, 
   Upload, 
   CheckCircle, 
-  Video 
+  Video, 
+  ListTodo
 } from 'lucide-react';
 import { Processus, StatusOffre, Candidat } from '@/lib/types/offre-details';
 import { Combobox } from '../../_components/combobox';
+import { QuestionManager } from './question-manager';
 
 interface ProcessSectionProps {
   processus: Processus[];
@@ -110,6 +112,11 @@ const ProcessSection = ({
     duree: 30,
     start_at: new Date().toISOString().slice(0, 16),
   });
+
+  // Manage Question/Reponse state
+  const [isQuestionManagerOpen, setIsQuestionManagerOpen] = useState(false);
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<number | null>(null);
+
 
   const [visioData, setVisioData] = useState<StartVisioDto>({
     users: [],
@@ -292,6 +299,11 @@ const ProcessSection = ({
 
   const shouldShowVisioButton = (etape: Processus) => {
     return etape.type === 'VISIO_CONFERENCE' && etape.statut === 'EN_COURS' && onStartVisio !== undefined;
+  };
+
+  const handleOpenQuestionManager = (processId: number) => {
+    setSelectedQuestionnaireId(processId);
+    setIsQuestionManagerOpen(true);
   };
 
   return (
@@ -489,6 +501,17 @@ const ProcessSection = ({
         </form>
       </Modal>
 
+      {isQuestionManagerOpen && selectedQuestionnaireId && (
+        <QuestionManager
+          processusId={selectedQuestionnaireId}
+          onClose={() => {
+            setIsQuestionManagerOpen(false);
+            setSelectedQuestionnaireId(null);
+          }}
+        />
+      )}
+
+
       <div className="space-y-4">
         {processus.map((etape) => (
           <div key={etape.id} className="bg-white p-4 rounded-lg border border-gray-200">
@@ -524,6 +547,15 @@ const ProcessSection = ({
 
               {isEditing && (
                 <div className="flex items-center space-x-2">
+                  {offreStatus === 'CREE' && etape.type === 'QUESTIONNAIRE' && (
+                    <button
+                      onClick={() => handleOpenQuestionManager(etape.id)}
+                      className="inline-flex items-center px-3 py-1 bg-[#2C9CC6] text-white rounded-full text-xs hover:bg-[#2C9CC6]/80 transition-colors"
+                    >
+                      <ListTodo className="w-3 h-3 mr-1" />
+                      Gérer les questions
+                    </button>
+                  )}
                   {shouldShowVisioButton(etape) && (
                     <button
                       onClick={() => openVisioModal(etape.id)}
